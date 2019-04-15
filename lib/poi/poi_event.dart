@@ -7,6 +7,10 @@ abstract class PoiEvent extends Equatable {
 }
 
 class ScanItem extends PoiEvent {
+  final String userToken;
+
+  ScanItem({@required this.userToken}) : super([userToken]);
+
   @override
   String toString() => 'ScanItem';
 }

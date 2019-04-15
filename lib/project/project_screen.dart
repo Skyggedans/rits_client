@@ -33,69 +33,57 @@ class _ProjectScreenState extends State<ProjectScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(_project.name),
-        ),
-        body: Center(
-              child: BlocBuilder(
-                bloc: _projectBloc,
-
-                builder: (BuildContext context, ProjectState state) {
-                  if (state is ProjectUninitialized) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  else if (state is ProjectLoaded) {
-                    return new Column (
-                        mainAxisAlignment: MainAxisAlignment.center,
-
-                        children: [
-                          RaisedButton(
-                            child: const Text('POI'),
-
-                            onPressed: () {
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => PoiScreen()),
-                              );
-                            },
-                          ),
-
-                          RaisedButton(
-                            child: const Text('Reports'),
-
-                            onPressed: () {
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => ReportsScreen(
-                                    project: _project,
-                                    userToken: state.userToken),
-                                ),
-                              );
-                            },
-                          ),
-                        ]
-                    );
-                  }
-                  else if (state is ProjectError) {
-                    return Center(
-                      child: Text('Failed to load project'),
-                    );
-                  }
-                },
-              )
-          ),
-        );
-  }
-
-
-  void _showDialog(BuildContext context, String text) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Text(text),
-          );
-        }
+      appBar: AppBar(
+        title: Text(_project.name),
+      ),
+      body: Center(
+          child: BlocBuilder(
+        bloc: _projectBloc,
+        builder: (BuildContext context, ProjectState state) {
+          if (state is ProjectUninitialized) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (state is ProjectLoaded) {
+            return new Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  RaisedButton(
+                    child: const Text('Scan Bar Code'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PoiScreen(
+                                project: _project,
+                                userToken: state.userToken,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                  RaisedButton(
+                    child: const Text('Reports'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ReportsScreen(
+                                project: _project,
+                                userToken: state.userToken,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                ]);
+          } else if (state is ProjectError) {
+            return Center(
+              child: Text('Failed to load project'),
+            );
+          }
+        },
+      )),
     );
   }
 

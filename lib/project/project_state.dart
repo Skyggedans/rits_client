@@ -26,7 +26,7 @@ class ItemScanned extends ProjectState {
   ItemScanned({this.itemInfo}) : super([itemInfo]);
 
   @override
-  String toString() => 'ItemScanned { info: ${itemInfo} }';
+  String toString() => 'ItemScanned { info: $itemInfo }';
 }
 
 class ProjectError extends ProjectState {

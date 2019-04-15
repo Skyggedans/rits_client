@@ -4,7 +4,6 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'utils/rest_client.dart';
-import './routes.dart';
 import './splash/splash.dart';
 import './projects/projects.dart';
 import './authentication/authentication.dart';

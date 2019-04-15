@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:meta/meta.dart';
 import 'package:collection/collection.dart';
 
 import '../user_repository/user_repository.dart';

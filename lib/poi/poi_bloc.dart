@@ -5,11 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:bloc/bloc.dart';
-import 'package:android_intent/android_intent.dart';
 
 import '../settings.dart' as settings;
 import '../utils/rest_client.dart';
-import '../models/projects/projects.dart';
 import 'poi.dart';
 
 class PoiBloc extends Bloc<PoiEvent, PoiState> {
@@ -30,9 +28,30 @@ class PoiBloc extends Bloc<PoiEvent, PoiState> {
   @override
   Stream<PoiState> mapEventToState(PoiEvent event) async* {
     if (event is ScanItem) {
-      final dynamic result = await _channel.invokeMethod('scanBarCode');
+      final String result = await _channel.invokeMethod('scanBarCode');
 
-      yield ItemScanned(itemInfo: result);
+      try {
+        dynamic decodedResult = json.decode(result);
+        final contextSet = await _setContextFromBarCode(
+            decodedResult['ritsData']['itemId'], event.userToken);
+
+        if (contextSet) {
+          yield ItemScanned(itemInfo: decodedResult['ritsData']['itemId']);
+        } else {
+          yield PoiError(itemInfo: 'Unable to set context');
+        }
+      } catch (_) {
+        yield PoiError(itemInfo: 'Unrecognized content: $result');
+      }
     }
+  }
+
+  Future<bool> _setContextFromBarCode(
+      String contextId, String userToken) async {
+    final url =
+        '${settings.backendUrl}/SetContextFromBarCode/$userToken/${Uri.encodeFull(contextId)}';
+    final response = await restClient.get(url);
+
+    return json.decode(response.body);
   }
 }

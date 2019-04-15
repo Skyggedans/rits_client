@@ -17,10 +17,14 @@ class ItemScanned extends PoiState {
   ItemScanned({this.itemInfo}) : super([itemInfo]);
 
   @override
-  String toString() => 'ItemScanned { info: ${itemInfo} }';
+  String toString() => 'ItemScanned { info: $itemInfo }';
 }
 
 class PoiError extends PoiState {
+  final String itemInfo;
+
+  PoiError({@required this.itemInfo}) : super([itemInfo]);
+
   @override
-  String toString() => 'PoiError';
+  String toString() => 'PoiError {info: $itemInfo}';
 }
