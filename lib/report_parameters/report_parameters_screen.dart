@@ -115,6 +115,7 @@ class _ReportParameters extends StatelessWidget {
                       keyboardType: param.dataType == 'numeric'
                           ? TextInputType.number
                           : TextInputType.text,
+                      enabled: !param.readOnly,
                       decoration: InputDecoration(
                         labelText: param.title,
                         helperText: param.title,
@@ -142,25 +143,27 @@ class _ReportParameters extends StatelessWidget {
                 hint: param.title,
                 child: RaisedButton(
                   child: Text('${param.title}: ${param.value}'),
-                  onPressed: () async {
-                    final selection = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SingleSelection(
-                              param: param,
-                              userToken: concreteState.userToken,
+                  onPressed: !param.readOnly
+                      ? () async {
+                          final selection = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SingleSelection(
+                                    param: param,
+                                    userToken: concreteState.userToken,
+                                  ),
                             ),
-                      ),
-                    );
+                          );
 
-                    if (selection != null) {
-                      _reportParametersBloc.dispatch(SaveReportParameter(
-                        report: concreteState.report,
-                        userToken: concreteState.userToken,
-                        parameter: param.copyWith(value: selection),
-                      ));
-                    }
-                  },
+                          if (selection != null) {
+                            _reportParametersBloc.dispatch(SaveReportParameter(
+                              report: concreteState.report,
+                              userToken: concreteState.userToken,
+                              parameter: param.copyWith(value: selection),
+                            ));
+                          }
+                        }
+                      : null,
                 ),
               );
             } else if (param.selectionMode == 'multiselect') {
@@ -170,25 +173,27 @@ class _ReportParameters extends StatelessWidget {
                 hint: param.title,
                 child: RaisedButton(
                   child: Text('${param.title}: ...'),
-                  onPressed: () async {
-                    final selection = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MultiSelection(
-                              param: param,
-                              userToken: concreteState.userToken,
+                  onPressed: !param.readOnly
+                      ? () async {
+                          final selection = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MultiSelection(
+                                    param: param,
+                                    userToken: concreteState.userToken,
+                                  ),
                             ),
-                      ),
-                    );
+                          );
 
-                    if (selection is List<Filter>) {
-                      _reportParametersBloc.dispatch(SaveReportParameter(
-                        report: concreteState.report,
-                        userToken: concreteState.userToken,
-                        parameter: param.copyWith(value: selection),
-                      ));
-                    }
-                  },
+                          if (selection is List<Filter>) {
+                            _reportParametersBloc.dispatch(SaveReportParameter(
+                              report: concreteState.report,
+                              userToken: concreteState.userToken,
+                              parameter: param.copyWith(value: selection),
+                            ));
+                          }
+                        }
+                      : null,
                 ),
               );
             }

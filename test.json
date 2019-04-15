@@ -1,0 +1,32 @@
+[
+    {
+        "ParameterName": "ReportingYear",
+        "Title": "Reporting Year",
+        "ViewItemName": "ForecastvsSalesforSalesRep",
+        "ItemTypeName": "Reports",
+        "ParameterValue": "2017",
+        "DataType": "Numeric",
+        "SelectionMode": "None",
+        "ReadOnly": "False"
+    },
+    {
+        "ParameterName": "SalesRep",
+        "Title": "Sales Representative",
+        "ViewItemName": null,
+        "ItemTypeName": null,
+        "ParameterValue": null,
+        "DataType": "Text",
+        "SelectionMode": "One",
+        "ReadOnly": "False"
+    },
+    {
+        "ParameterName": "SalesRepSelectedItem",
+        "Title": "Sales Representative",
+        "ViewItemName": "ForecastvsSalesforSalesRep",
+        "ItemTypeName": "Reports",
+        "ParameterValue": "Nancy Davolio",
+        "DataType": "Text",
+        "SelectionMode": "None",
+        "ReadOnly": "True"
+    }
+]

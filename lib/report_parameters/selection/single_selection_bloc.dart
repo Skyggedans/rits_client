@@ -30,7 +30,10 @@ class SingleSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
       try {
         final options = await _fetchParamOptions(event.param, event.userToken);
 
-        yield SelectionOptionsLoaded(options: options);
+        yield SelectionOptionsLoaded(
+          options: options,
+          selection: event.param.value,
+        );
       } catch (_) {
         yield SelectionOptionsError();
       }

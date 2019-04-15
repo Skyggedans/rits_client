@@ -37,9 +37,10 @@ class ReportParametersBloc
         final params = await _fetchReportParams(event.report, event.userToken);
 
         yield ReportParametersLoaded(
-            report: event.report,
-            userToken: event.userToken,
-            parameters: params);
+          report: event.report,
+          userToken: event.userToken,
+          parameters: params,
+        );
       } catch (_) {
         yield ReportParametersError();
       }
@@ -49,7 +50,9 @@ class ReportParametersBloc
       try {
         await _saveReportParam(event.report, event.parameter, event.userToken);
         this.dispatch(FetchReportParameters(
-            report: event.report, userToken: event.userToken));
+          report: event.report,
+          userToken: event.userToken,
+        ));
       } catch (_) {
         yield ReportParametersError();
       }
