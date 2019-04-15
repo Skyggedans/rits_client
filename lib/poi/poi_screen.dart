@@ -5,80 +5,65 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../utils/rest_client.dart';
-import '../models/projects/projects.dart';
-import '../reports/reports.dart';
-import 'project.dart';
+import 'poi.dart';
 
-class ProjectScreen extends StatefulWidget {
-  final Project project;
-
-  ProjectScreen({Key key, @required this.project}) : super(key: key);
+class PoiScreen extends StatefulWidget {
+  PoiScreen({Key key}) : super(key: key);
 
   @override
-  State createState() => _ProjectScreenState();
+  State createState() => _PoiScreenState();
 }
 
-class _ProjectScreenState extends State<ProjectScreen> {
-  final ProjectBloc _projectBloc = ProjectBloc(restClient: RestClient());
-
-  Project get _project => widget.project;
+class _PoiScreenState extends State<PoiScreen> {
+  final PoiBloc _poiBloc = PoiBloc(restClient: RestClient());
 
   @override
   void initState() {
     super.initState();
-    _projectBloc.dispatch(LoadProject(_project));
+    _poiBloc.dispatch(ScanItem());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(_project.name),
+          title: Text('POI'),
         ),
         body: Center(
               child: BlocBuilder(
-                bloc: _projectBloc,
+                bloc: _poiBloc,
 
-                builder: (BuildContext context, ProjectState state) {
-                  if (state is ProjectUninitialized) {
+                builder: (BuildContext context, PoiState state) {
+                  if (state is PoiUninitialized) {
                     return Center(
                       child: CircularProgressIndicator(),
                     );
                   }
-                  else if (state is ProjectLoaded) {
+                  else if (state is ItemScanned) {
                     return new Column (
                         mainAxisAlignment: MainAxisAlignment.center,
 
                         children: [
-                          RaisedButton(
-                            child: const Text('Scan Item'),
-
-                            onPressed: () {
-                              _projectBloc.dispatch(ScanItem());
-                            },
-                          ),
+                          Text('Scanned content:\n${state.itemInfo}'),
 
                           RaisedButton(
                             child: const Text('Reports'),
 
                             onPressed: () {
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => ReportsScreen(
-                                    project: _project,
-                                    userToken: state.userToken),
-                                ),
-                              );
+//                              Navigator.push(context,
+//                                MaterialPageRoute(builder: (context) => ReportsScreen(
+//                                    Poi: _Poi,
+//                                    userToken: state.userToken),
+//                                ),
+//                              );
                             },
                           ),
                         ]
                     );
                   }
-                  else if (state is ItemScanned) {
-                    _showDialog(context, state.itemInfo);
-                  }
-                  else if (state is ProjectError) {
+                  else if (state is PoiError) {
                     return Center(
-                      child: Text('Failed to load project'),
+                      child: Text('Failed to scan POI'),
                     );
                   }
                 },
@@ -87,21 +72,9 @@ class _ProjectScreenState extends State<ProjectScreen> {
         );
   }
 
-
-  void _showDialog(BuildContext context, String text) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Text(text),
-          );
-        }
-    );
-  }
-
   @override
   void dispose() {
-    _projectBloc.dispose();
+    _poiBloc.dispose();
     super.dispose();
   }
 }

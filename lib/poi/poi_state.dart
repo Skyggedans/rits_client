@@ -2,25 +2,16 @@ import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 
 @immutable
-abstract class ProjectState extends Equatable {
-  ProjectState([List props = const []]) : super(props);
+abstract class PoiState extends Equatable {
+  PoiState([List props = const []]) : super(props);
 }
 
-class ProjectUninitialized extends ProjectState {
+class PoiUninitialized extends PoiState {
   @override
-  String toString() => 'ProjectUninitialized';
+  String toString() => 'PoiUninitialized';
 }
 
-class ProjectLoaded extends ProjectState {
-  final String userToken;
-
-  ProjectLoaded({this.userToken}) : super([userToken]);
-
-  @override
-  String toString() => 'ProjectLoaded';
-}
-
-class ItemScanned extends ProjectState {
+class ItemScanned extends PoiState {
   final String itemInfo;
 
   ItemScanned({this.itemInfo}) : super([itemInfo]);
@@ -29,7 +20,7 @@ class ItemScanned extends ProjectState {
   String toString() => 'ItemScanned { info: ${itemInfo} }';
 }
 
-class ProjectError extends ProjectState {
+class PoiError extends PoiState {
   @override
-  String toString() => 'ProjectError';
+  String toString() => 'PoiError';
 }

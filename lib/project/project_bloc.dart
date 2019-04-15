@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:bloc/bloc.dart';
+import 'package:android_intent/android_intent.dart';
 
 import '../settings.dart' as settings;
 import '../utils/rest_client.dart';
@@ -12,6 +14,7 @@ import 'project.dart';
 
 class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   final RestClient restClient;
+  static const MethodChannel _channel = MethodChannel('com.rockwellits.client');
 
   ProjectBloc({@required this.restClient});
 

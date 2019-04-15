@@ -1,6 +1,10 @@
 import 'package:intl/intl.dart';
 import 'package:equatable/equatable.dart';
 
+import 'report_parameters.dart';
+
+enum SelectionMode { none, one, multiselect }
+
 class ReportParameter extends Equatable {
   final String name;
   final String title;
@@ -11,16 +15,16 @@ class ReportParameter extends Equatable {
   final String selectionMode;
   final bool readOnly;
 
-  ReportParameter(
-      {this.name,
-      this.title,
-      this.viewItem,
-      this.itemType,
-      this.value,
-      this.dataType,
-      this.selectionMode,
-      this.readOnly})
-      : super([
+  ReportParameter({
+    this.name,
+    this.title,
+    this.viewItem,
+    this.itemType,
+    this.value,
+    this.dataType,
+    this.selectionMode,
+    this.readOnly,
+  }) : super([
           name,
           title,
           viewItem,
@@ -32,20 +36,34 @@ class ReportParameter extends Equatable {
         ]);
 
   factory ReportParameter.fromJson(Map<String, dynamic> json) {
-    dynamic paramValue;
+    final dataType = json['DataType'].toString().toLowerCase();
+    dynamic value = json['ParameterValue'];
 
-    switch (json['DataType']) {
-      case 'DateTime':
+    switch (dataType) {
+      case 'numeric':
         {
-          final DateFormat format = DateFormat('MM/dd/yyyy');
+          final numValue = value is num ? value : double.tryParse(value);
+          final truncatedValue = numValue.truncate();
 
-          paramValue = format.parse(json['ParameterValue']);
+          value = numValue == truncatedValue ? truncatedValue : numValue;
 
           break;
         }
-      default:
+      case 'date':
         {
-          paramValue = json['ParameterValue'];
+          final DateFormat format = DateFormat('MM/dd/yyyy');
+
+          value = format.parse(value);
+
+          break;
+        }
+      case 'datetime':
+        {
+          final DateFormat format = DateFormat('MM/dd/yyyy hh:mm:ss a');
+
+          value = format.parse(value);
+
+          break;
         }
     }
 
@@ -54,24 +72,37 @@ class ReportParameter extends Equatable {
         title: json['Title'],
         viewItem: json['ViewItemName'],
         itemType: json['ItemTypeName'],
-        value: paramValue,
-        dataType: json['DataType'],
-        selectionMode: json['SelectionMode'],
+        value: value,
+        dataType: dataType,
+        selectionMode: json['SelectionMode'].toString().toLowerCase(),
         readOnly: json['ReadOnly'].toLowerCase() == 'true');
   }
 
   Map<String, dynamic> toJson() {
-    String paramValue;
+    dynamic paramValue;
 
-    switch (dataType) {
-      case 'DateTime': {
-        paramValue = DateFormat('yyyy-MM-dd').format(value);
+    if (selectionMode != 'multiselect') {
+      switch (dataType) {
+        case 'date':
+          {
+            paramValue = DateFormat('yyyy-MM-dd').format(value);
 
-        break;
+            break;
+          }
+        case 'datetime':
+          {
+            paramValue = DateFormat('yyyy-MM-dd hh:mm:ss a').format(value);
+
+            break;
+          }
+        default:
+          {
+            paramValue = value.toString();
+          }
       }
-      default: {
-        paramValue = value;
-      }
+    } else {
+      paramValue =
+          (value as List<Filter>).map((filter) => filter.toJson()).toList();
     }
 
     return {
@@ -87,17 +118,18 @@ class ReportParameter extends Equatable {
   }
 
   ReportParameter copyWith({
+    String viewItem,
+    String itemType,
     dynamic value,
   }) {
     return ReportParameter(
-      name: name,
-      title: title,
-      viewItem: viewItem,
-      itemType: itemType,
-      value: value ?? this.value,
-      dataType: dataType,
-      selectionMode: selectionMode,
-      readOnly: readOnly
-    );
+        name: name,
+        title: title,
+        viewItem: viewItem ?? this.viewItem,
+        itemType: itemType ?? this.itemType,
+        value: value ?? this.value,
+        dataType: dataType,
+        selectionMode: selectionMode,
+        readOnly: readOnly);
   }
 }

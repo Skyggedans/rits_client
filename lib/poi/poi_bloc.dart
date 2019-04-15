@@ -10,48 +10,29 @@ import 'package:android_intent/android_intent.dart';
 import '../settings.dart' as settings;
 import '../utils/rest_client.dart';
 import '../models/projects/projects.dart';
-import 'project.dart';
+import 'poi.dart';
 
-class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
+class PoiBloc extends Bloc<PoiEvent, PoiState> {
   final RestClient restClient;
   static const MethodChannel _channel = MethodChannel('com.rockwellits.client');
 
-  ProjectBloc({@required this.restClient});
+  PoiBloc({@required this.restClient});
 
   @override
-  get initialState => ProjectUninitialized();
+  get initialState => PoiUninitialized();
 
   @override
-  Stream<ProjectEvent> transform(Stream<ProjectEvent> events) {
-    return (events as Observable<ProjectEvent>)
+  Stream<PoiEvent> transform(Stream<PoiEvent> events) {
+    return (events as Observable<PoiEvent>)
         .debounce(Duration(milliseconds: 500));
   }
 
   @override
-  Stream<ProjectState> mapEventToState(ProjectEvent event) async* {
-    if (event is LoadProject) {
-      try {
-        final userToken = await _getUserTokenForProject(event.project);
-
-        yield ProjectLoaded(userToken: userToken);
-      }
-      catch (_) {
-        yield ProjectError();
-      }
-    }
-    else if (event is ScanItem) {
+  Stream<PoiState> mapEventToState(PoiEvent event) async* {
+    if (event is ScanItem) {
       final dynamic result = await _channel.invokeMethod('scanBarCode');
 
       yield ItemScanned(itemInfo: result);
     }
-  }
-
-  Future<String> _getUserTokenForProject(Project project) async {
-    const userId = 'default-user';
-    const skypeId = 'User';
-    final url = '${settings.backendUrl}/StartSkypeSession/$skypeId/$userId/${Uri.encodeFull(project.name)}';
-    final response = await restClient.get(url);
-
-    return json.decode(response.body);
   }
 }

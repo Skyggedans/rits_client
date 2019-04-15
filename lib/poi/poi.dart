@@ -1,4 +1,4 @@
-export 'project_screen.dart';
-export 'project_bloc.dart';
-export 'project_event.dart';
-export 'project_state.dart';
+export 'poi_screen.dart';
+export 'poi_bloc.dart';
+export 'poi_event.dart';
+export 'poi_state.dart';

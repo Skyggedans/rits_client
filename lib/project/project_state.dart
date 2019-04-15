@@ -20,6 +20,15 @@ class ProjectLoaded extends ProjectState {
   String toString() => 'ProjectLoaded';
 }
 
+class ItemScanned extends ProjectState {
+  final String itemInfo;
+
+  ItemScanned({this.itemInfo}) : super([itemInfo]);
+
+  @override
+  String toString() => 'ItemScanned { info: ${itemInfo} }';
+}
+
 class ProjectError extends ProjectState {
   @override
   String toString() => 'ProjectError';

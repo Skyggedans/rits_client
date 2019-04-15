@@ -33,7 +33,7 @@ class RestClient {
     final allHeaders =
         CombinedMapView(<Map<String, String>>[getHeaders(), headers]);
     final response = await http.post(url,
-        body: body, headers: allHeaders, encoding: encoding);
+        body: body, headers: getHeaders(), encoding: encoding);
 
     return handleResponse(response);
   }
@@ -69,8 +69,7 @@ class RestClient {
 
     if (statusCode == 401) {
       throw new Exception('Unauthorized');
-    }
-    else if (statusCode != 200) {
+    } else if (statusCode != 200) {
       throw new Exception('Error while fetching data');
     }
 

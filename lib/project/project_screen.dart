@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../utils/rest_client.dart';
 import '../models/projects/projects.dart';
 import '../reports/reports.dart';
+import '../poi/poi.dart';
 import 'project.dart';
 
 class ProjectScreen extends StatefulWidget {
@@ -51,6 +52,16 @@ class _ProjectScreenState extends State<ProjectScreen> {
 
                         children: [
                           RaisedButton(
+                            child: const Text('POI'),
+
+                            onPressed: () {
+                              Navigator.push(context,
+                                MaterialPageRoute(builder: (context) => PoiScreen()),
+                              );
+                            },
+                          ),
+
+                          RaisedButton(
                             child: const Text('Reports'),
 
                             onPressed: () {
@@ -74,6 +85,18 @@ class _ProjectScreenState extends State<ProjectScreen> {
               )
           ),
         );
+  }
+
+
+  void _showDialog(BuildContext context, String text) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text(text),
+          );
+        }
+    );
   }
 
   @override

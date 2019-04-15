@@ -6,6 +6,7 @@ class _InputDropdown extends StatelessWidget {
     Key key,
     this.child,
     this.labelText,
+    this.helperText,
     this.valueText,
     this.valueStyle,
     this.onPressed,
@@ -13,6 +14,7 @@ class _InputDropdown extends StatelessWidget {
 
   final String labelText;
   final String valueText;
+  final String helperText;
   final TextStyle valueStyle;
   final VoidCallback onPressed;
   final Widget child;
@@ -24,6 +26,12 @@ class _InputDropdown extends StatelessWidget {
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: labelText,
+          helperText: helperText,
+
+          helperStyle: TextStyle(
+            fontSize: 1,
+            color: Color.fromARGB(0, 0, 0, 0),
+          )
         ),
         baseStyle: valueStyle,
         child: Row(
@@ -45,6 +53,7 @@ class DateTimePicker extends StatelessWidget {
   const DateTimePicker({
     Key key,
     this.labelText,
+    this.helperText,
     this.selectedDate,
     this.selectedTime,
     this.selectDate,
@@ -52,6 +61,7 @@ class DateTimePicker extends StatelessWidget {
   }) : super(key: key);
 
   final String labelText;
+  final String helperText;
   final DateTime selectedDate;
   final TimeOfDay selectedTime;
   final ValueChanged<DateTime> selectDate;
@@ -81,18 +91,25 @@ class DateTimePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextStyle valueStyle = Theme.of(context).textTheme.title;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: <Widget>[
-        Expanded(
-          flex: 4,
-          child: _InputDropdown(
-            labelText: labelText,
-            valueText: DateFormat.yMd().format(selectedDate),
-            valueStyle: valueStyle,
-            onPressed: () { _selectDate(context); },
-          ),
-        ),
+//    return Row(
+//      crossAxisAlignment: CrossAxisAlignment.end,
+//      children: <Widget>[
+//        Expanded(
+//          flex: 4,
+          return Semantics(
+            label: labelText,
+            hint: helperText,
+            textField: true,
+
+            child: _InputDropdown(
+              labelText: labelText,
+              helperText: helperText,
+              valueText: DateFormat.yMd().format(selectedDate),
+              valueStyle: valueStyle,
+              onPressed: () { _selectDate(context); },
+            )
+          );
+//        ),
 //        const SizedBox(width: 12.0),
 //        Expanded(
 //          flex: 3,
@@ -102,7 +119,7 @@ class DateTimePicker extends StatelessWidget {
 //            onPressed: () { _selectTime(context); },
 //          ),
 //        ),
-      ],
-    );
+//      ],
+//    );
   }
 }
