@@ -1,11 +1,11 @@
 import 'package:intl/intl.dart';
 import 'package:equatable/equatable.dart';
 
-import 'report_parameters.dart';
+import 'view_objects.dart';
 
 enum SelectionMode { none, one, multiselect }
 
-class ReportParameter extends Equatable {
+class ViewObjectParameter extends Equatable {
   final String name;
   final String title;
   final String viewItem;
@@ -15,7 +15,7 @@ class ReportParameter extends Equatable {
   final String selectionMode;
   final bool readOnly;
 
-  ReportParameter({
+  ViewObjectParameter({
     this.name,
     this.title,
     this.viewItem,
@@ -35,7 +35,7 @@ class ReportParameter extends Equatable {
           readOnly
         ]);
 
-  factory ReportParameter.fromJson(Map<String, dynamic> json) {
+  factory ViewObjectParameter.fromJson(Map<String, dynamic> json) {
     final dataType = json['DataType'].toString().toLowerCase();
     dynamic value = json['ParameterValue'];
 
@@ -67,7 +67,7 @@ class ReportParameter extends Equatable {
         }
     }
 
-    return ReportParameter(
+    return ViewObjectParameter(
         name: json['ParameterName'],
         title: json['Title'],
         viewItem: json['ViewItemName'],
@@ -117,12 +117,12 @@ class ReportParameter extends Equatable {
     };
   }
 
-  ReportParameter copyWith({
+  ViewObjectParameter copyWith({
     String viewItem,
     String itemType,
     dynamic value,
   }) {
-    return ReportParameter(
+    return ViewObjectParameter(
         name: name,
         title: title,
         viewItem: viewItem ?? this.viewItem,

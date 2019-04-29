@@ -6,7 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../utils/rest_client.dart';
 import '../models/projects/projects.dart';
-import '../reports/reports.dart';
+import '../view_objects/view_objects.dart';
+import '../chart/chart.dart';
+import '../report/report.dart';
 import '../poi/poi.dart';
 import 'project.dart';
 
@@ -41,9 +43,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
         bloc: _projectBloc,
         builder: (BuildContext context, ProjectState state) {
           if (state is ProjectUninitialized) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
+            return CircularProgressIndicator();
           } else if (state is ProjectLoaded) {
             return new Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -63,13 +63,31 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     },
                   ),
                   RaisedButton(
-                    child: const Text('Reports'),
+                    child: Text('Reports'),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ReportsScreen(
+                          builder: (context) => ViewObjectsScreen(
                                 project: _project,
+                                type: 'Report',
+                                detailsScreenRoute: ReportScreen.route,
+                                userToken: state.userToken,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text('Charts'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewObjectsScreen(
+                                project: _project,
+                                type: 'Chart',
+                                detailsScreenRoute: ChartScreen.route,
                                 userToken: state.userToken,
                               ),
                         ),
@@ -78,9 +96,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   ),
                 ]);
           } else if (state is ProjectError) {
-            return Center(
-              child: Text('Failed to load project'),
-            );
+            return const Text('Failed to load project');
           }
         },
       )),

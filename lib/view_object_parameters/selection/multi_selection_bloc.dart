@@ -7,13 +7,13 @@ import 'package:bloc/bloc.dart';
 
 import '../../settings.dart' as settings;
 import '../../utils/rest_client.dart';
-import '../../models/report_parameters/report_parameters.dart';
+import '../../models/view_objects/view_objects.dart';
 import 'selection.dart';
 
-class SingleSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
+class MultiSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
   final RestClient restClient;
 
-  SingleSelectionBloc({@required this.restClient});
+  MultiSelectionBloc({@required this.restClient});
 
   @override
   Stream<SelectionEvent> transform(Stream<SelectionEvent> events) {
@@ -30,38 +30,31 @@ class SingleSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
       try {
         final options = await _fetchParamOptions(event.param, event.userToken);
 
-        yield SelectionOptionsLoaded(
-          options: options,
-          selection: event.param.value,
-        );
+        yield SelectionOptionsLoaded(options: options);
       } catch (_) {
         yield SelectionOptionsError();
       }
-    } else if (event is UpdateSelection) {
-      yield SelectionOptionsLoaded(
-        options: (currentState as SelectionOptionsLoaded<dynamic>).options,
-        selection: event.option,
-      );
+    } else if (event is UpdateSelection<Filter>) {
+      final List<Filter> updatedOptions =
+          (currentState as SelectionOptionsLoaded<Filter>)
+              .options
+              .map((option) {
+        return option.title == event.option.title ? event.option : option;
+      }).toList();
+
+      yield SelectionOptionsLoaded(options: updatedOptions);
     }
   }
 
-  Future<List<dynamic>> _fetchParamOptions(
-      ReportParameter param, String userToken) async {
+  Future<List<Filter>> _fetchParamOptions(
+      ViewObjectParameter param, String userToken) async {
     final url =
-        '${settings.backendUrl}/GetPickListItems/$userToken/${Uri.encodeFull(param.name)}';
-
+        '${settings.backendUrl}/GetCategoryFilterData/$userToken/${param.name}';
     final response = await restClient.get(url);
-
     final List body = json.decode(response.body);
 
-    if (param.dataType == 'number') {
-      return body.map((option) {
-        return double.tryParse(option);
-      }).toList();
-    } else {
-      return body.map((option) {
-        return option;
-      }).toList();
-    }
+    return body.map((option) {
+      return Filter.fromJson(option);
+    }).toList();
   }
 }

@@ -6,7 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../models/projects/projects.dart';
 import '../utils/rest_client.dart';
-import '../reports/reports.dart';
+import '../view_objects/view_objects.dart';
+import '../report/report.dart';
+import '../chart/chart.dart';
 import 'poi.dart';
 
 class PoiScreen extends StatefulWidget {
@@ -50,14 +52,32 @@ class _PoiScreenState extends State<PoiScreen> {
                 children: [
                   Text('Bar code content:\n${state.itemInfo}'),
                   RaisedButton(
-                    child: const Text('Reports'),
+                    child: Text('Reports'),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ReportsScreen(
+                          builder: (context) => ViewObjectsScreen(
                                 project: _project,
-                                userToken: _userToken,
+                                type: 'Report',
+                                detailsScreenRoute: ReportScreen.route,
+                                userToken: state.userToken,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text('Charts'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewObjectsScreen(
+                                project: _project,
+                                type: 'Chart',
+                                detailsScreenRoute: ChartScreen.route,
+                                userToken: state.userToken,
                               ),
                         ),
                       );

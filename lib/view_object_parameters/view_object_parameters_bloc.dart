@@ -7,71 +7,72 @@ import 'package:bloc/bloc.dart';
 
 import '../settings.dart' as settings;
 import '../utils/rest_client.dart';
-import '../models/reports/reports.dart';
-import '../models/report_parameters/report_parameters.dart';
-import 'report_parameters.dart';
+import '../models/view_objects/view_objects.dart';
+import 'view_object_parameters.dart';
 
-class ReportParametersBloc
-    extends Bloc<ReportParametersEvent, ReportParametersState> {
+class ViewObjectParametersBloc
+    extends Bloc<ViewObjectParametersEvent, ViewObjectParametersState> {
   final RestClient restClient;
 
-  ReportParametersBloc({@required this.restClient});
+  ViewObjectParametersBloc({@required this.restClient});
 
   @override
-  Stream<ReportParametersEvent> transform(
-      Stream<ReportParametersEvent> events) {
-    return (events as Observable<ReportParametersEvent>)
+  Stream<ViewObjectParametersEvent> transform(
+      Stream<ViewObjectParametersEvent> events) {
+    return (events as Observable<ViewObjectParametersEvent>)
         .debounce(Duration(milliseconds: 500));
   }
 
   @override
-  get initialState => ReportParametersInProgress();
+  get initialState => ViewObjectParametersInProgress();
 
   @override
-  Stream<ReportParametersState> mapEventToState(
-      ReportParametersEvent event) async* {
-    if (event is FetchReportParameters) {
-      yield ReportParametersInProgress();
+  Stream<ViewObjectParametersState> mapEventToState(
+      ViewObjectParametersEvent event) async* {
+    if (event is FetchViewObjectParameters) {
+      yield ViewObjectParametersInProgress();
 
       try {
-        final params = await _fetchReportParams(event.report, event.userToken);
+        final params =
+            await _fetchViewObjectParams(event.viewObject, event.userToken);
 
-        yield ReportParametersLoaded(
-          report: event.report,
+        yield ViewObjectParametersLoaded(
+          viewObject: event.viewObject,
           userToken: event.userToken,
           parameters: params,
         );
       } catch (_) {
-        yield ReportParametersError();
+        yield ViewObjectParametersError();
       }
-    } else if (event is SaveReportParameter) {
-      yield ReportParametersInProgress();
+    } else if (event is SaveViewObjectParameter) {
+      yield ViewObjectParametersInProgress();
 
       try {
-        await _saveReportParam(event.report, event.parameter, event.userToken);
-        this.dispatch(FetchReportParameters(
-          report: event.report,
+        await _saveViewObjectParam(
+            event.viewObject, event.parameter, event.userToken);
+        this.dispatch(FetchViewObjectParameters(
+          viewObject: event.viewObject,
           userToken: event.userToken,
         ));
       } catch (_) {
-        yield ReportParametersError();
+        yield ViewObjectParametersError();
       }
     }
   }
 
-  Future<List<ReportParameter>> _fetchReportParams(
-      Report report, String userToken) async {
+  Future<List<ViewObjectParameter>> _fetchViewObjectParams(
+      ViewObject viewObject, String userToken) async {
     final url =
-        '${settings.backendUrl}/GetViewElementParameter/$userToken/${Uri.encodeFull(report.name)}/Reports';
+        '${settings.backendUrl}/GetViewElementParameter/$userToken/${Uri.encodeFull(viewObject.name)}/${viewObject.itemType}';
     final response = await restClient.get(url);
-    print(response.body);
     final List body = json.decode(response.body);
 
-    List<ReportParameter> allParams = body.map((param) {
-      return ReportParameter.fromJson(param);
+    List<ViewObjectParameter> allParams = body.map((param) {
+      return ViewObjectParameter.fromJson(param);
     }).toList();
 
-    allParams = allParams.fold(List<ReportParameter>(), (params, nextParam) {
+    allParams =
+        allParams.fold(List<ViewObjectParameter>(), (params, nextParam) {
       if (!nextParam.name.endsWith('SelectedItem')) {
         final selectionValueParam = allParams.firstWhere(
             (param) => param.name == '${nextParam.name}SelectedItem',
@@ -94,8 +95,8 @@ class ReportParametersBloc
     return allParams;
   }
 
-  Future<void> _saveReportParam(
-      Report report, ReportParameter param, String userToken) async {
+  Future<void> _saveViewObjectParam(ViewObject viewObject,
+      ViewObjectParameter param, String userToken) async {
     final paramJson = param.toJson();
     final name = Uri.encodeFull(paramJson['ParameterName']);
 

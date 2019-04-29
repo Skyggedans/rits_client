@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../utils/rest_client.dart';
-import '../../models/report_parameters/report_parameters.dart';
+import '../../models/view_objects/view_objects.dart';
 import 'selection.dart';
 
 class MultiSelection extends StatefulWidget {
-  final ReportParameter param;
+  final ViewObjectParameter param;
   final String userToken;
 
   MultiSelection({Key key, @required this.param, @required this.userToken})
@@ -22,7 +22,7 @@ class _MultiSelectionState extends State<MultiSelection> {
   final MultiSelectionBloc _selectionBloc =
       MultiSelectionBloc(restClient: RestClient());
 
-  ReportParameter get _param => widget.param;
+  ViewObjectParameter get _param => widget.param;
 
   String get _userToken => widget.userToken;
 

@@ -19,51 +19,74 @@ class RestClient {
     return _instance;
   }
 
-  Future<http.Response> get(String url, {Map<String, String> headers}) async {
-    final allHeaders =
-        CombinedMapView(<Map<String, String>>[getHeaders(), headers]);
-    final response = await http.get(url, headers: getHeaders());
+  Future<http.Response> get(String url,
+      {Map<String, String> headers: const {}}) async {
+    final allHeaders = <String, String>{}
+      ..addAll(_getHeaders())
+      ..addAll(headers);
 
-    return handleResponse(response);
+    final response = await http.get(
+      url,
+      headers: allHeaders,
+    );
+
+    return _handleResponse(response);
   }
 
   Future<http.Response> post(String url,
-      {Map<String, String> headers, body, encoding}) async {
-    final allHeaders =
-        CombinedMapView(<Map<String, String>>[getHeaders(), headers]);
-    final response = await http.post(url,
-        body: body, headers: getHeaders(), encoding: encoding);
+      {Map<String, String> headers: const {}, body, encoding}) async {
+    final allHeaders = <String, String>{}
+      ..addAll(_getHeaders())
+      ..addAll(headers);
 
-    return handleResponse(response);
+    final response = await http.post(
+      url,
+      body: body,
+      headers: allHeaders,
+      encoding: encoding,
+    );
+
+    return _handleResponse(response);
   }
 
   Future<http.Response> delete(String url,
-      {Map<String, String> headers}) async {
-    final allHeaders =
-        CombinedMapView(<Map<String, String>>[getHeaders(), headers]);
-    final response = await http.delete(url, headers: allHeaders);
+      {Map<String, String> headers: const {}}) async {
+    final allHeaders = <String, String>{}
+      ..addAll(_getHeaders())
+      ..addAll(headers);
 
-    return handleResponse(response);
+    final response = await http.delete(
+      url,
+      headers: allHeaders,
+    );
+
+    return _handleResponse(response);
   }
 
   Future<http.Response> put(String url,
-      {Map<String, String> headers, body, encoding}) async {
-    final allHeaders =
-        CombinedMapView(<Map<String, String>>[getHeaders(), headers]);
-    final response = await http.put(url,
-        body: body, headers: allHeaders, encoding: encoding);
+      {Map<String, String> headers: const {}, body, encoding}) async {
+    final allHeaders = <String, String>{}
+      ..addAll(_getHeaders())
+      ..addAll(headers);
 
-    return handleResponse(response);
+    final response = await http.put(
+      url,
+      body: body,
+      headers: allHeaders,
+      encoding: encoding,
+    );
+
+    return _handleResponse(response);
   }
 
-  Map<String, String> getHeaders() {
+  Map<String, String> _getHeaders() {
     return {
       'Authorization': 'Bearer ${userRepository.accessToken}',
-      'Content-Type': 'application/json'
+      //'Content-Type': 'application/json'
     };
   }
 
-  http.Response handleResponse(http.Response response) {
+  http.Response _handleResponse(http.Response response) {
     final int statusCode = response.statusCode;
 
     if (statusCode == 401) {

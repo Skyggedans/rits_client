@@ -33,11 +33,8 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
           final projects = await _fetchProjects();
 
           yield ProjectsLoaded(projects: projects);
-
-          return;
         }
-      }
-      catch (_) {
+      } catch (_) {
         yield ProjectsError();
       }
     }

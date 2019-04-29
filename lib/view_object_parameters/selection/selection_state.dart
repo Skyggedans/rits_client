@@ -7,7 +7,7 @@ abstract class SelectionState extends Equatable {
 
 class SelectionOptionsUninitialized extends SelectionState {
   @override
-  String toString() => 'ReportParametersUninitialized';
+  String toString() => 'SelectionOptionsUninitialized';
 }
 
 class SelectionOptionsLoaded<T> extends SelectionState {

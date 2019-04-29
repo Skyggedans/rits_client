@@ -32,11 +32,15 @@ class PoiBloc extends Bloc<PoiEvent, PoiState> {
 
       try {
         dynamic decodedResult = json.decode(result);
-        final contextSet = await _setContextFromBarCode(
+        final levelName = await _setContextFromBarCode(
             decodedResult['ritsData']['itemId'], event.userToken);
 
-        if (contextSet) {
-          yield ItemScanned(itemInfo: decodedResult['ritsData']['itemId']);
+        if (levelName != null) {
+          yield ItemScanned(
+            itemInfo: decodedResult['ritsData']['itemId'],
+            levelName: levelName,
+            userToken: event.userToken,
+          );
         } else {
           yield PoiError(itemInfo: 'Unable to set context');
         }
@@ -46,7 +50,7 @@ class PoiBloc extends Bloc<PoiEvent, PoiState> {
     }
   }
 
-  Future<bool> _setContextFromBarCode(
+  Future<String> _setContextFromBarCode(
       String contextId, String userToken) async {
     final url =
         '${settings.backendUrl}/SetContextFromBarCode/$userToken/${Uri.encodeFull(contextId)}';

@@ -5,37 +5,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../utils/rest_client.dart';
-import '../models/reports/reports.dart';
-import '../models/report_parameters/report_parameters.dart';
+import '../models/view_objects/view_objects.dart';
 import '../widgets/widgets.dart';
 import 'selection/selection.dart';
-import 'report_parameters.dart';
+import 'view_object_parameters.dart';
 
-class ReportParametersScreen extends StatefulWidget {
-  final Report report;
+class ViewObjectParametersScreen extends StatefulWidget {
+  final ViewObject viewObject;
   final String userToken;
 
-  ReportParametersScreen(
-      {Key key, @required this.report, @required this.userToken})
+  ViewObjectParametersScreen(
+      {Key key, @required this.viewObject, @required this.userToken})
       : super(key: key);
 
   @override
-  State createState() => _ReportParametersScreenState();
+  State createState() => _ViewObjectParametersScreenState();
 }
 
-class _ReportParametersScreenState extends State<ReportParametersScreen> {
-  final ReportParametersBloc _projectsBloc =
-      ReportParametersBloc(restClient: RestClient());
+class _ViewObjectParametersScreenState
+    extends State<ViewObjectParametersScreen> {
+  final ViewObjectParametersBloc _projectsBloc =
+      ViewObjectParametersBloc(restClient: RestClient());
 
-  Report get _report => widget.report;
+  ViewObject get _viewObject => widget.viewObject;
 
   String get _userToken => widget.userToken;
 
   @override
   void initState() {
     super.initState();
-    _projectsBloc.dispatch(FetchReportParameters(
-      report: _report,
+    _projectsBloc.dispatch(FetchViewObjectParameters(
+      viewObject: _viewObject,
       userToken: _userToken,
     ));
   }
@@ -44,25 +44,22 @@ class _ReportParametersScreenState extends State<ReportParametersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Report Parameters'),
+        title: Text('${_viewObject.title} Parameters'),
       ),
       body: Center(
         child: BlocBuilder(
           bloc: _projectsBloc,
-          builder: (BuildContext context, ReportParametersState state) {
-            if (state is ReportParametersInProgress) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state is ReportParametersLoaded) {
+          builder: (BuildContext context, ViewObjectParametersState state) {
+            if (state is ViewObjectParametersInProgress) {
+              return CircularProgressIndicator();
+            } else if (state is ViewObjectParametersLoaded) {
               return BlocProvider(
                 bloc: _projectsBloc,
                 child: _ReportParameters(),
               );
-            } else if (state is ReportParametersError) {
-              return Center(
-                child: Text('Failed to fetch or save report parameters'),
-              );
+            } else if (state is ViewObjectParametersError) {
+              return const Text(
+                  'Failed to fetch or save view object parameters');
             }
           },
         ),
@@ -81,16 +78,18 @@ class _ReportParameters extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _reportParametersBloc =
-        BlocProvider.of<ReportParametersBloc>(context);
+        BlocProvider.of<ViewObjectParametersBloc>(context);
 
     return BlocBuilder(
       bloc: _reportParametersBloc,
-      builder: (BuildContext context, ReportParametersState state) {
-        final concreteState = (state as ReportParametersLoaded);
+      builder: (BuildContext context, ViewObjectParametersState state) {
+        final concreteState = (state as ViewObjectParametersLoaded);
 
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: concreteState.parameters.map((param) {
+          children: concreteState.parameters
+              .where((param) => !param.readOnly)
+              .map((param) {
             if (param.selectionMode == 'none') {
               switch (param.dataType) {
                 case 'datetime':
@@ -100,8 +99,8 @@ class _ReportParameters extends StatelessWidget {
                       helperText: param.title,
                       selectedDate: param.value,
                       selectDate: (value) {
-                        _reportParametersBloc.dispatch(SaveReportParameter(
-                          report: concreteState.report,
+                        _reportParametersBloc.dispatch(SaveViewObjectParameter(
+                          viewObject: concreteState.viewObject,
                           userToken: concreteState.userToken,
                           parameter: param.copyWith(value: value),
                         ));
@@ -125,8 +124,8 @@ class _ReportParameters extends StatelessWidget {
                         ),
                       ),
                       onFieldSubmitted: (text) {
-                        _reportParametersBloc.dispatch(SaveReportParameter(
-                          report: concreteState.report,
+                        _reportParametersBloc.dispatch(SaveViewObjectParameter(
+                          viewObject: concreteState.viewObject,
                           userToken: concreteState.userToken,
                           parameter: param.copyWith(value: text),
                         ));
@@ -156,8 +155,9 @@ class _ReportParameters extends StatelessWidget {
                           );
 
                           if (selection != null) {
-                            _reportParametersBloc.dispatch(SaveReportParameter(
-                              report: concreteState.report,
+                            _reportParametersBloc
+                                .dispatch(SaveViewObjectParameter(
+                              viewObject: concreteState.viewObject,
                               userToken: concreteState.userToken,
                               parameter: param.copyWith(value: selection),
                             ));
@@ -186,8 +186,9 @@ class _ReportParameters extends StatelessWidget {
                           );
 
                           if (selection is List<Filter>) {
-                            _reportParametersBloc.dispatch(SaveReportParameter(
-                              report: concreteState.report,
+                            _reportParametersBloc
+                                .dispatch(SaveViewObjectParameter(
+                              viewObject: concreteState.viewObject,
                               userToken: concreteState.userToken,
                               parameter: param.copyWith(value: selection),
                             ));

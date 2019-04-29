@@ -13,11 +13,17 @@ class PoiUninitialized extends PoiState {
 
 class ItemScanned extends PoiState {
   final String itemInfo;
+  final String levelName;
+  final String userToken;
 
-  ItemScanned({this.itemInfo}) : super([itemInfo]);
+  ItemScanned({
+    @required this.itemInfo,
+    @required this.levelName,
+    @required this.userToken,
+  }) : super([itemInfo, levelName, userToken]);
 
   @override
-  String toString() => 'ItemScanned { info: $itemInfo }';
+  String toString() => 'ItemScanned { info: $itemInfo, level: $levelName }';
 }
 
 class PoiError extends PoiState {

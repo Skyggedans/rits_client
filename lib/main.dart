@@ -4,11 +4,12 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'utils/rest_client.dart';
-import './splash/splash.dart';
-import './projects/projects.dart';
-import './authentication/authentication.dart';
-import './login/login.dart';
-import './user_repository/user_repository.dart';
+import 'splash/splash.dart';
+import 'projects/projects.dart';
+import 'authentication/authentication.dart';
+import 'login/login.dart';
+import 'user_repository/user_repository.dart';
+import 'routes.dart';
 
 class SimpleBlocDelegate extends BlocDelegate {
   @override
@@ -74,6 +75,7 @@ class _RitsAppState extends State<RitsApp> {
     return BlocProvider<AuthenticationBloc>(
       bloc: _authenticationBloc,
       child: MaterialApp(
+        routes: routes,
         home: BlocBuilder<AuthenticationEvent, AuthenticationState>(
           bloc: _authenticationBloc,
           builder: (BuildContext context, AuthenticationState state) {

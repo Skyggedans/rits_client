@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../models/report_parameters/report_parameters.dart';
+import '../../models/view_objects/view_objects.dart';
 
 @immutable
 abstract class SelectionEvent extends Equatable {
@@ -9,7 +9,7 @@ abstract class SelectionEvent extends Equatable {
 }
 
 class FetchSelectionOptions extends SelectionEvent {
-  final ReportParameter param;
+  final ViewObjectParameter param;
   final String userToken;
 
   FetchSelectionOptions({@required this.param, @required this.userToken})

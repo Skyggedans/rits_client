@@ -7,7 +7,13 @@ class Report extends Equatable {
   final String contentType;
   final String inputForm;
 
-  Report({this.name, this.title, this.itemType, this.contentType, this.inputForm});
+  Report({
+    this.name,
+    this.title,
+    this.itemType,
+    this.contentType,
+    this.inputForm,
+  });
 
   factory Report.fromJson(Map<String, dynamic> json) {
     return Report(
