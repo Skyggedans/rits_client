@@ -57,7 +57,7 @@ class ViewObjectsBloc extends Bloc<ViewObjectsEvent, ViewObjectsState> {
     String type,
     String userToken,
   ) async {
-    final url = '${settings.backendUrl}/ViewObjects/$userToken/${type}';
+    final url = '${settings.backendUrl}/ViewObjects/$userToken/$type';
     final response = await restClient.get(url);
     final List body = json.decode(response.body);
 
@@ -73,7 +73,7 @@ class ViewObjectsBloc extends Bloc<ViewObjectsEvent, ViewObjectsState> {
     String userToken,
   ) async {
     final url =
-        '${settings.backendUrl}/Hierarchy/$userToken/$hierarchyLevel/${type}';
+        '${settings.backendUrl}/Hierarchy/$userToken/$hierarchyLevel/$type';
     final response = await restClient.get(url);
     final List body = json.decode(response.body);
 

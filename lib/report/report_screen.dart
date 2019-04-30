@@ -7,10 +7,8 @@ import '../models/view_objects/view_objects.dart';
 import '../view_object/view_object.dart';
 import 'report.dart';
 
-class ReportScreen extends ViewObjectScreen<ReportBloc> {
+class ReportScreen extends ViewObjectScreen {
   static String route = '/report';
-
-  ReportBloc get viewObjectBloc => ReportBloc();
 
   ReportScreen({
     Key key,
@@ -23,10 +21,12 @@ class ReportScreen extends ViewObjectScreen<ReportBloc> {
         );
 
   @override
-  State createState() => ReportScreenState();
+  State createState() => _ReportScreenState();
 }
 
-class ReportScreenState extends ViewObjectScreenState {
+class _ReportScreenState extends ViewObjectScreenState {
+  ViewObjectBloc viewObjectBloc = ReportBloc();
+
   @override
   Widget buildOutputWidget(ViewObjectState state) {
     if (state is ViewObjectGenerated) {

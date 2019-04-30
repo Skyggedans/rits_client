@@ -8,12 +8,9 @@ import '../models/view_objects/view_objects.dart';
 import '../view_object_parameters/view_object_parameters.dart';
 import 'view_object.dart';
 
-abstract class ViewObjectScreen<T extends ViewObjectBloc>
-    extends StatefulWidget {
+abstract class ViewObjectScreen extends StatefulWidget {
   final ViewObject viewObject;
   final String userToken;
-
-  T get viewObjectBloc;
 
   ViewObjectScreen({
     Key key,
@@ -26,8 +23,8 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc>
     extends State<ViewObjectScreen> {
   ViewObject get _viewObject => widget.viewObject;
   String get _userToken => widget.userToken;
-  T get _viewObjectBloc => widget.viewObjectBloc;
 
+  T viewObjectBloc;
   Widget buildOutputWidget(ViewObjectGenerated state);
 
   @override
@@ -38,14 +35,14 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc>
       ),
       body: Center(
         child: BlocBuilder(
-          bloc: _viewObjectBloc,
+          bloc: viewObjectBloc,
           builder: (BuildContext context, ViewObjectState state) {
             if (state is ViewObjectGeneration) {
               return CircularProgressIndicator();
             } else if (state is ViewObjectGenerated) {
               return buildOutputWidget(state);
             } else if (state is ViewObjectError) {
-              return Text('Failed to generate view object');
+              return const Text('Failed to generate view object');
             } else {
               return new Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -65,7 +62,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc>
                     RaisedButton(
                       child: const Text('View'),
                       onPressed: () {
-                        _viewObjectBloc.dispatch(GenerateViewObject(
+                        viewObjectBloc.dispatch(GenerateViewObject(
                           _viewObject,
                           _userToken,
                         ));
@@ -81,7 +78,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc>
 
   @override
   void dispose() {
-    _viewObjectBloc.dispose();
+    viewObjectBloc.dispose();
     super.dispose();
   }
 }
