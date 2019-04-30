@@ -1,12 +1,12 @@
-import 'dart:typed_data';
+import 'dart:convert';
 
 import '../settings.dart' as settings;
 import '../utils/rest_client.dart';
 import '../models/view_objects/view_objects.dart';
 import '../view_object/view_object.dart';
 
-class ChartBloc extends ViewObjectBloc {
-  ChartBloc() : super(restClient: RestClient());
+class TabularDataBloc extends ViewObjectBloc {
+  TabularDataBloc() : super(restClient: RestClient());
 
   @override
   Stream<ViewObjectState> mapEventToState(ViewObjectEvent event) async* {
@@ -14,21 +14,21 @@ class ChartBloc extends ViewObjectBloc {
       yield ViewObjectGeneration();
 
       try {
-        final bytes = await _getChartBytes(event.viewObject, event.userToken);
+        final data = await _getData(event.viewObject, event.userToken);
 
-        yield ViewObjectGenerated(bytes: bytes);
+        yield ViewObjectGenerated(data: data);
       } catch (_) {
         yield ViewObjectError();
       }
     }
   }
 
-  Future<Uint8List> _getChartBytes(
+  Future<List<dynamic>> _getData(
       ViewObject viewObject, String userToken) async {
     final url =
-        '${settings.reportUrl}/Charts/BaseChart?skypeBotToken=$userToken&chart=${Uri.encodeFull(viewObject.name)}&export=jpg';
+        '${settings.backendUrl}/fetch/$userToken/3/${Uri.encodeFull(viewObject.name)}';
     final response = await restClient.get(url);
 
-    return response.bodyBytes;
+    return json.decode(response.body)[0];
   }
 }

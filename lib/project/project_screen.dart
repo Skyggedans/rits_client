@@ -9,6 +9,7 @@ import '../models/projects/projects.dart';
 import '../view_objects/view_objects.dart';
 import '../chart/chart.dart';
 import '../report/report.dart';
+import '../tabular_data/tabular_data.dart';
 import '../poi/poi.dart';
 import 'project.dart';
 
@@ -70,7 +71,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         MaterialPageRoute(
                           builder: (context) => ViewObjectsScreen(
                                 project: _project,
-                                type: 'Report',
+                                type: 'Reports',
                                 detailsScreenRoute: ReportScreen.route,
                                 userToken: state.userToken,
                               ),
@@ -86,8 +87,24 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         MaterialPageRoute(
                           builder: (context) => ViewObjectsScreen(
                                 project: _project,
-                                type: 'Chart',
+                                type: 'Charts',
                                 detailsScreenRoute: ChartScreen.route,
+                                userToken: state.userToken,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text('Tabular Data'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewObjectsScreen(
+                                project: _project,
+                                type: 'DataObjects',
+                                detailsScreenRoute: TabularDataScreen.route,
                                 userToken: state.userToken,
                               ),
                         ),

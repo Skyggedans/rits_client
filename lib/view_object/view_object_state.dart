@@ -20,8 +20,9 @@ class ViewObjectGeneration extends ViewObjectState {
 
 class ViewObjectGenerated extends ViewObjectState {
   final Uint8List bytes;
+  final dynamic data;
 
-  ViewObjectGenerated({this.bytes}) : super([bytes]);
+  ViewObjectGenerated({this.bytes, this.data}) : super([bytes, data]);
 
   @override
   String toString() => 'ViewObjectGenerated';

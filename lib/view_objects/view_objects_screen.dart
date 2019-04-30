@@ -34,7 +34,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
       ViewObjectsBloc(restClient: RestClient());
 
   Project get _project => widget.project;
-  String get _typePlural => widget.typePlural;
+  String get _type => widget.type;
   String get _userToken => widget.userToken;
   String get _hierarchyLevel => widget.hierarchyLevel;
 
@@ -43,7 +43,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
     super.initState();
     _viewObjectsBloc.dispatch(FetchViewObjects(
       project: _project,
-      type: _typePlural,
+      type: _type,
       userToken: _userToken,
       hierarchyLevel: _hierarchyLevel,
     ));
@@ -53,7 +53,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_typePlural),
+        title: Text(_type),
       ),
       body: Center(
           child: BlocBuilder(
