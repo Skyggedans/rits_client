@@ -22,12 +22,13 @@ class TabularDataScreen extends ViewObjectScreen {
   State createState() => _TabularDataScreenState();
 }
 
-class _TabularDataScreenState extends ViewObjectScreenState {
-  ViewObjectBloc viewObjectBloc = TabularDataBloc();
+class _TabularDataScreenState
+    extends ViewObjectScreenState<TabularDataBloc, TabularDataGenerated> {
+  TabularDataBloc viewObjectBloc = TabularDataBloc();
 
   @override
-  Widget buildOutputWidget(ViewObjectGenerated state) {
-    final List<dynamic> rows = state.data;
+  Widget buildOutputWidget(TabularDataGenerated state) {
+    final rows = state.data;
 
     if (rows.length > 0) {
       final List<String> columns = rows[0].keys.toList();
@@ -63,7 +64,7 @@ class _TabularDataScreenState extends ViewObjectScreenState {
                   children: row.keys.toList().map((prop) {
                     return Expanded(
                       child: Text(
-                        row[prop] ?? '',
+                        (row[prop] ?? '').toString(),
                       ),
                     );
                   }).toList(),

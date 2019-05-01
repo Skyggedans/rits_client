@@ -19,13 +19,13 @@ abstract class ViewObjectScreen extends StatefulWidget {
   }) : super(key: key);
 }
 
-abstract class ViewObjectScreenState<T extends ViewObjectBloc>
-    extends State<ViewObjectScreen> {
+abstract class ViewObjectScreenState<T extends ViewObjectBloc,
+    S extends ViewObjectState> extends State<ViewObjectScreen> {
   ViewObject get _viewObject => widget.viewObject;
   String get _userToken => widget.userToken;
 
   T viewObjectBloc;
-  Widget buildOutputWidget(ViewObjectGenerated state);
+  Widget buildOutputWidget(S state);
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc>
           builder: (BuildContext context, ViewObjectState state) {
             if (state is ViewObjectGeneration) {
               return CircularProgressIndicator();
-            } else if (state is ViewObjectGenerated) {
+            } else if (state is S) {
               return buildOutputWidget(state);
             } else if (state is ViewObjectError) {
               return const Text('Failed to generate view object');

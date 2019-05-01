@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-import '../models/reports/reports.dart';
 import '../models/view_objects/view_objects.dart';
 
 abstract class ViewObjectParametersState extends Equatable {

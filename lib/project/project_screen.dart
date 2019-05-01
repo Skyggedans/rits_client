@@ -10,6 +10,7 @@ import '../view_objects/view_objects.dart';
 import '../chart/chart.dart';
 import '../report/report.dart';
 import '../tabular_data/tabular_data.dart';
+import '../kpi/kpi.dart';
 import '../poi/poi.dart';
 import 'project.dart';
 
@@ -105,6 +106,22 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                 project: _project,
                                 type: 'DataObjects',
                                 detailsScreenRoute: TabularDataScreen.route,
+                                userToken: state.userToken,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text('KPIs'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewObjectsScreen(
+                                project: _project,
+                                type: 'KPIs',
+                                detailsScreenRoute: KpiScreen.route,
                                 userToken: state.userToken,
                               ),
                         ),

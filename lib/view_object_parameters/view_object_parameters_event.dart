@@ -2,7 +2,6 @@ import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 
 import '../models/view_objects/view_objects.dart';
-import '../models/view_objects/view_objects.dart';
 
 @immutable
 abstract class ViewObjectParametersEvent extends Equatable {

@@ -22,11 +22,12 @@ class ChartScreen extends ViewObjectScreen {
   State createState() => _ChartScreenState();
 }
 
-class _ChartScreenState extends ViewObjectScreenState {
-  ViewObjectBloc viewObjectBloc = ChartBloc();
+class _ChartScreenState
+    extends ViewObjectScreenState<ChartBloc, ChartGenerated> {
+  ChartBloc viewObjectBloc = ChartBloc();
 
   @override
-  Widget buildOutputWidget(ViewObjectGenerated state) {
+  Widget buildOutputWidget(ChartGenerated state) {
     return Image.memory(state.bytes);
   }
 }

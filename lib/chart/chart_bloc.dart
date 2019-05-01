@@ -4,6 +4,7 @@ import '../settings.dart' as settings;
 import '../utils/rest_client.dart';
 import '../models/view_objects/view_objects.dart';
 import '../view_object/view_object.dart';
+import 'chart.dart';
 
 class ChartBloc extends ViewObjectBloc {
   ChartBloc() : super(restClient: RestClient());
@@ -16,7 +17,7 @@ class ChartBloc extends ViewObjectBloc {
       try {
         final bytes = await _getChartBytes(event.viewObject, event.userToken);
 
-        yield ViewObjectGenerated(bytes: bytes);
+        yield ChartGenerated(bytes: bytes);
       } catch (_) {
         yield ViewObjectError();
       }

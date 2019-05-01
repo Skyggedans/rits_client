@@ -4,6 +4,7 @@ import '../settings.dart' as settings;
 import '../utils/rest_client.dart';
 import '../models/view_objects/view_objects.dart';
 import '../view_object/view_object.dart';
+import 'tabular_data.dart';
 
 class TabularDataBloc extends ViewObjectBloc {
   TabularDataBloc() : super(restClient: RestClient());
@@ -16,7 +17,7 @@ class TabularDataBloc extends ViewObjectBloc {
       try {
         final data = await _getData(event.viewObject, event.userToken);
 
-        yield ViewObjectGenerated(data: data);
+        yield TabularDataGenerated(data: data);
       } catch (_) {
         yield ViewObjectError();
       }

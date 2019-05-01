@@ -24,18 +24,17 @@ class ReportScreen extends ViewObjectScreen {
   State createState() => _ReportScreenState();
 }
 
-class _ReportScreenState extends ViewObjectScreenState {
-  ViewObjectBloc viewObjectBloc = ReportBloc();
+class _ReportScreenState
+    extends ViewObjectScreenState<ReportBloc, ReportGenerated> {
+  ReportBloc viewObjectBloc = ReportBloc();
 
   @override
-  Widget buildOutputWidget(ViewObjectState state) {
-    if (state is ViewObjectGenerated) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (state.bytes.lengthInBytes > 0) {
-          PdfViewer.loadBytes(state.bytes);
-        }
-      });
-    }
+  Widget buildOutputWidget(ReportGenerated state) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (state.bytes.lengthInBytes > 0) {
+        PdfViewer.loadBytes(state.bytes);
+      }
+    });
 
     return Text('Report generated successfully');
   }

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 
@@ -19,10 +17,10 @@ class ViewObjectGeneration extends ViewObjectState {
 }
 
 class ViewObjectGenerated extends ViewObjectState {
-  final Uint8List bytes;
-  final dynamic data;
+  // final Uint8List bytes;
+  // final dynamic data;
 
-  ViewObjectGenerated({this.bytes, this.data}) : super([bytes, data]);
+  // ViewObjectGenerated({this.bytes, this.data}) : super([bytes, data]);
 
   @override
   String toString() => 'ViewObjectGenerated';
