@@ -7,7 +7,7 @@ import '../view_object/view_object.dart';
 import 'kpi.dart';
 
 class KpiScreen extends ViewObjectScreen {
-  static String route = '/tabular_data';
+  static String route = '/kpi';
 
   KpiScreen({
     Key key,
@@ -26,6 +26,54 @@ class KpiScreen extends ViewObjectScreen {
 class _KpiScreenState extends ViewObjectScreenState<KpiBloc, KpiGenerated> {
   KpiBloc viewObjectBloc = KpiBloc();
 
+  Card buildKpiCard(Kpi kpi) {
+    var color = 'green';
+    var direction = 'up';
+
+    if (kpi.previousValue != null) {
+      if (kpi.previousValue > kpi.value) {
+        direction = 'down';
+      } else if (kpi.previousValue == kpi.value) {
+        direction = 'neutral';
+      }
+    }
+
+    if (kpi.indicator != null) {
+      if (kpi.indicator == 0) {
+        color = 'red';
+      } else if (kpi.indicator == 1) {
+        color = 'green';
+      } else {
+        color = 'yellow';
+      }
+    }
+
+    final targetText = kpi.targetValue != null && kpi.targetValue > 0
+        ? ', Target: ${kpi.targetValue}'
+        : null;
+
+    final userText1 =
+        kpi.userText1 != null ? '\n${kpi.userText1}: ${kpi.extraData1}' : null;
+
+    final userText2 =
+        kpi.userText2 != null ? '\n${kpi.userText2}: ${kpi.extraData2}' : null;
+
+    return Card(
+      child: ListTile(
+        trailing: Image(
+          image: AssetImage('assets/${color}_$direction.png'),
+          width: 90,
+          height: 90,
+        ),
+        title: Text(kpi.name),
+        subtitle: Text('Value: ${kpi.value}' +
+            (targetText != null ? targetText : '') +
+            (userText1 != null ? userText1 : '') +
+            (userText2 != null ? userText2 : '')),
+      ),
+    );
+  }
+
   @override
   Widget buildOutputWidget(KpiGenerated state) {
     final kpis = state.kpis;
@@ -35,54 +83,7 @@ class _KpiScreenState extends ViewObjectScreenState<KpiBloc, KpiGenerated> {
         padding: const EdgeInsets.all(10.0),
         itemCount: kpis.length,
         itemBuilder: (context, index) {
-          final Kpi kpi = kpis[index];
-          var color = 'green';
-          var direction = 'up';
-
-          if (kpi.previousValue != null) {
-            if (kpi.previousValue > kpi.value) {
-              direction = 'down';
-            } else if (kpi.previousValue == kpi.value) {
-              direction = 'neutral';
-            }
-          }
-
-          if (kpi.indicator != null) {
-            if (kpi.indicator == 0) {
-              color = 'red';
-            } else if (kpi.indicator == 1) {
-              color = 'green';
-            } else {
-              color = 'yellow';
-            }
-          }
-
-          final targetText = kpi.targetValue != null && kpi.targetValue > 0
-              ? ', Target: ${kpi.targetValue}'
-              : null;
-
-          final userText1 = kpi.userText1 != null
-              ? '\n${kpi.userText1}: ${kpi.extraData1}'
-              : null;
-
-          final userText2 = kpi.userText2 != null
-              ? '\n${kpi.userText2}: ${kpi.extraData2}'
-              : null;
-
-          return Card(
-            child: ListTile(
-              trailing: Image(
-                image: AssetImage('assets/${color}_$direction.png'),
-                width: 90,
-                height: 90,
-              ),
-              title: Text(kpi.name),
-              subtitle: Text('Value: ${kpi.value}' +
-                  (targetText != null ? targetText : '') +
-                  (userText1 != null ? userText1 : '') +
-                  (userText2 != null ? userText2 : '')),
-            ),
-          );
+          return buildKpiCard(kpis[index]);
         },
       );
     } else {
