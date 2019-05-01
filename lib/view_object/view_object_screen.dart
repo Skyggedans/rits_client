@@ -27,50 +27,64 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
   T viewObjectBloc;
   Widget buildOutputWidget(S state);
 
+  Future<bool> _onBackPressed() async {
+    if (viewObjectBloc.currentState != viewObjectBloc.initialState) {
+      viewObjectBloc.dispatch(ReturnToViewObjectMainScreen());
+
+      return false;
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_viewObject.title ?? _viewObject.name),
-      ),
-      body: Center(
-        child: BlocBuilder(
-          bloc: viewObjectBloc,
-          builder: (BuildContext context, ViewObjectState state) {
-            if (state is ViewObjectGeneration) {
-              return CircularProgressIndicator();
-            } else if (state is S) {
-              return buildOutputWidget(state);
-            } else if (state is ViewObjectError) {
-              return const Text('Failed to generate view object');
-            } else {
-              return new Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    RaisedButton(
-                      child: const Text('View Parameters'),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ViewObjectParametersScreen(
-                                viewObject: _viewObject, userToken: _userToken),
-                          ),
-                        );
-                      },
-                    ),
-                    RaisedButton(
-                      child: const Text('View'),
-                      onPressed: () {
-                        viewObjectBloc.dispatch(GenerateViewObject(
-                          _viewObject,
-                          _userToken,
-                        ));
-                      },
-                    ),
-                  ]);
-            }
-          },
+    return WillPopScope(
+      onWillPop: _onBackPressed,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_viewObject.title ?? _viewObject.name),
+        ),
+        body: Center(
+          child: BlocBuilder(
+            bloc: viewObjectBloc,
+            builder: (BuildContext context, ViewObjectState state) {
+              if (state is ViewObjectGeneration) {
+                return CircularProgressIndicator();
+              } else if (state is S) {
+                return buildOutputWidget(state);
+              } else if (state is ViewObjectError) {
+                return const Text('Failed to generate view object');
+              } else {
+                return new Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RaisedButton(
+                        child: const Text('View Parameters'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ViewObjectParametersScreen(
+                                  viewObject: _viewObject,
+                                  userToken: _userToken),
+                            ),
+                          );
+                        },
+                      ),
+                      RaisedButton(
+                        child: const Text('View'),
+                        onPressed: () {
+                          viewObjectBloc.dispatch(GenerateViewObject(
+                            _viewObject,
+                            _userToken,
+                          ));
+                        },
+                      ),
+                    ]);
+              }
+            },
+          ),
         ),
       ),
     );

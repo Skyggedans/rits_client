@@ -8,6 +8,11 @@ abstract class ViewObjectEvent extends Equatable {
   ViewObjectEvent([List props = const []]) : super(props);
 }
 
+class ReturnToViewObjectMainScreen extends ViewObjectEvent {
+  @override
+  String toString() => 'ReturnToViewObjectMainScreen';
+}
+
 class GenerateViewObject extends ViewObjectEvent {
   final ViewObject viewObject;
   final String userToken;

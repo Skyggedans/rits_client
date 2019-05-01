@@ -21,6 +21,8 @@ class ChartBloc extends ViewObjectBloc {
       } catch (_) {
         yield ViewObjectError();
       }
+    } else {
+      yield* super.mapEventToState(event);
     }
   }
 

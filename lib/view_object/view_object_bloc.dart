@@ -21,4 +21,11 @@ abstract class ViewObjectBloc extends Bloc<ViewObjectEvent, ViewObjectState> {
     return (events as Observable<ViewObjectEvent>)
         .debounce(Duration(milliseconds: 500));
   }
+
+  @override
+  Stream<ViewObjectState> mapEventToState(ViewObjectEvent event) async* {
+    if (event is ReturnToViewObjectMainScreen) {
+      yield ViewObjectIdle();
+    }
+  }
 }
