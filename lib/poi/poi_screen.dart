@@ -9,6 +9,8 @@ import '../utils/rest_client.dart';
 import '../view_objects/view_objects.dart';
 import '../report/report.dart';
 import '../chart/chart.dart';
+import '../tabular_data/tabular_data.dart';
+import '../kpi/kpi.dart';
 import 'poi.dart';
 
 class PoiScreen extends StatefulWidget {
@@ -59,8 +61,9 @@ class _PoiScreenState extends State<PoiScreen> {
                         MaterialPageRoute(
                           builder: (context) => ViewObjectsScreen(
                                 project: _project,
-                                type: 'Report',
+                                type: 'Reports',
                                 detailsScreenRoute: ReportScreen.route,
+                                hierarchyLevel: state.levelName,
                                 userToken: state.userToken,
                               ),
                         ),
@@ -75,8 +78,43 @@ class _PoiScreenState extends State<PoiScreen> {
                         MaterialPageRoute(
                           builder: (context) => ViewObjectsScreen(
                                 project: _project,
-                                type: 'Chart',
+                                type: 'Charts',
                                 detailsScreenRoute: ChartScreen.route,
+                                hierarchyLevel: state.levelName,
+                                userToken: state.userToken,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text('Tabular Data'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewObjectsScreen(
+                                project: _project,
+                                type: 'DataObjects',
+                                detailsScreenRoute: TabularDataScreen.route,
+                                hierarchyLevel: state.levelName,
+                                userToken: state.userToken,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text('KPIs'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewObjectsScreen(
+                                project: _project,
+                                type: 'KPIs',
+                                detailsScreenRoute: KpiScreen.route,
+                                hierarchyLevel: state.levelName,
                                 userToken: state.userToken,
                               ),
                         ),
