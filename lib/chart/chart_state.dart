@@ -1,11 +1,13 @@
-import 'dart:typed_data';
-
+import '../models/view_objects/view_objects.dart';
 import '../view_object/view_object.dart';
 
-class ChartGenerated extends ViewObjectState {
-  final Uint8List bytes;
+class ChartPresentation extends ViewObjectState {
+  final ViewObject viewObject;
+  final String url;
+  final String userToken;
 
-  ChartGenerated({this.bytes}) : super([bytes]);
+  ChartPresentation({this.viewObject, this.url, this.userToken})
+      : super([viewObject, url, userToken]);
 
   @override
   String toString() => 'ChartGenerated';

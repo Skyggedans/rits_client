@@ -7,7 +7,13 @@ import io.flutter.app.FlutterActivity
 import io.flutter.plugins.GeneratedPluginRegistrant
 import io.flutter.plugin.common.MethodChannel
 import android.app.Activity
-
+import android.net.Uri
+import android.os.Environment
+import android.util.Log
+import android.webkit.MimeTypeMap
+import java.io.File
+import android.os.StrictMode
+import android.os.Build
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.rockwellits.client"
@@ -20,12 +26,37 @@ class MainActivity : FlutterActivity() {
         super.onCreate(savedInstanceState)
         GeneratedPluginRegistrant.registerWith(this)
 
+        if (Build.VERSION.SDK_INT >= 24) {
+            try {
+                val m = StrictMode::class.java.getMethod("disableDeathOnFileUriExposure")
+                m.invoke(null)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+        }
+
         MethodChannel(flutterView, CHANNEL).setMethodCallHandler { call, result ->
             if (call.method == "scanBarCode") {
                 methodResult = result
 
                 val intent = Intent(ACTION_BARCODE)
                 startActivityForResult(intent, BARCODE_REQUEST)
+            }
+            if (call.method == "showDocument") {
+                val document = File(call.arguments as String)
+                val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    MimeTypeMap.getFileExtensionFromUrl(document.toURI().toString()))
+
+                if (mimeType != null) {
+                    val intent = Intent(Intent.ACTION_VIEW)
+
+                    intent.addCategory(Intent.CATEGORY_DEFAULT)
+                    intent.setDataAndType(Uri.fromFile(document), mimeType)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+                    startActivity(intent)
+                }
             }
             else {
                 result.notImplemented()

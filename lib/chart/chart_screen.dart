@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:meta/meta.dart';
 
 import '../models/view_objects/view_objects.dart';
@@ -23,11 +24,13 @@ class ChartScreen extends ViewObjectScreen {
 }
 
 class _ChartScreenState
-    extends ViewObjectScreenState<ChartBloc, ChartGenerated> {
+    extends ViewObjectScreenState<ChartBloc, ChartPresentation> {
   ChartBloc viewObjectBloc = ChartBloc();
 
   @override
-  Widget buildOutputWidget(ChartGenerated state) {
-    return Image.memory(state.bytes);
+  Widget buildOutputWidget(ChartPresentation state) {
+    return WebviewScaffold(
+      url: state.url,
+    );
   }
 }
