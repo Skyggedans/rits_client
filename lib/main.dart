@@ -89,7 +89,9 @@ class _RitsAppState extends State<RitsApp> {
               return LoginScreen(userRepository: _userRepository);
             }
             if (state is AuthenticationLoading) {
-              return CircularProgressIndicator();
+              return Center(
+                child: CircularProgressIndicator(),
+              );
             }
           },
         ),
