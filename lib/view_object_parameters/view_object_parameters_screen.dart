@@ -85,120 +85,142 @@ class _ReportParameters extends StatelessWidget {
       builder: (BuildContext context, ViewObjectParametersState state) {
         final concreteState = (state as ViewObjectParametersLoaded);
 
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: concreteState.parameters
-              .where((param) => !param.readOnly)
-              .map((param) {
-            if (param.selectionMode == 'none') {
-              switch (param.dataType) {
-                case 'datetime':
-                  {
-                    return DateTimePicker(
-                      labelText: param.title,
-                      helperText: param.title,
-                      selectedDate: param.value,
-                      selectDate: (value) {
-                        _reportParametersBloc.dispatch(SaveViewObjectParameter(
-                          viewObject: concreteState.viewObject,
-                          userToken: concreteState.userToken,
-                          parameter: param.copyWith(value: value),
-                        ));
-                      },
-                    );
-                  }
-                default:
-                  {
-                    final textField = TextFormField(
-                      initialValue: param.value.toString(),
-                      keyboardType: param.dataType == 'numeric'
-                          ? TextInputType.number
-                          : TextInputType.text,
-                      enabled: !param.readOnly,
-                      decoration: InputDecoration(
+        return Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: concreteState.parameters
+                .where((param) => !param.readOnly)
+                .map((param) {
+              if (param.selectionMode == 'none') {
+                switch (param.dataType) {
+                  case 'datetime':
+                    {
+                      return DateTimePicker(
                         labelText: param.title,
                         helperText: param.title,
-                        helperStyle: TextStyle(
-                          fontSize: 1,
-                          color: Color.fromARGB(0, 0, 0, 0),
+                        selectedDate: param.value,
+                        selectDate: (value) {
+                          _reportParametersBloc
+                              .dispatch(SaveViewObjectParameter(
+                            viewObject: concreteState.viewObject,
+                            userToken: concreteState.userToken,
+                            parameter: param.copyWith(value: value),
+                          ));
+                        },
+                      );
+                    }
+                  default:
+                    {
+                      final textField = TextFormField(
+                        initialValue: param.value.toString(),
+                        keyboardType: param.dataType == 'numeric'
+                            ? TextInputType.number
+                            : TextInputType.text,
+                        enabled: !param.readOnly,
+                        decoration: InputDecoration(
+                          labelText: param.title,
+                          helperText: param.title,
+                          helperStyle: TextStyle(
+                            fontSize: 1,
+                            color: Color.fromARGB(0, 0, 0, 0),
+                          ),
                         ),
-                      ),
-                      onFieldSubmitted: (text) {
-                        _reportParametersBloc.dispatch(SaveViewObjectParameter(
-                          viewObject: concreteState.viewObject,
-                          userToken: concreteState.userToken,
-                          parameter: param.copyWith(value: text),
-                        ));
-                      },
-                    );
+                        onFieldSubmitted: (text) {
+                          _reportParametersBloc
+                              .dispatch(SaveViewObjectParameter(
+                            viewObject: concreteState.viewObject,
+                            userToken: concreteState.userToken,
+                            parameter: param.copyWith(value: text),
+                          ));
+                        },
+                      );
 
-                    return textField;
-                  }
+                      return textField;
+                    }
+                }
+              } else if (param.selectionMode == 'one') {
+                final handler = !param.readOnly
+                    ? () async {
+                        final selection = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SingleSelection(
+                                  param: param,
+                                  userToken: concreteState.userToken,
+                                ),
+                          ),
+                        );
+
+                        if (selection != null) {
+                          _reportParametersBloc
+                              .dispatch(SaveViewObjectParameter(
+                            viewObject: concreteState.viewObject,
+                            userToken: concreteState.userToken,
+                            parameter: param.copyWith(value: selection),
+                          ));
+                        }
+                      }
+                    : null;
+
+                return Semantics(
+                  button: true,
+                  value: param.title,
+                  onTap: handler,
+                  // child: TextFormField(
+                  //   initialValue: '${param.value}',
+                  //   textInputAction: TextInputAction.continueAction,
+                  //   //enabled: false,
+                  //   decoration: InputDecoration(
+                  //     labelText: '${param.title}',
+                  //     helperText: '${param.title}',
+                  //     helperStyle: TextStyle(
+                  //       fontSize: 1,
+                  //       color: Color.fromARGB(0, 0, 0, 0),
+                  //     ),
+                  //   ),
+                  // ),
+                  child: RaisedButton(
+                    child: Text('${param.title}: ${param.value}'),
+                    onPressed: handler,
+                  ),
+                );
+              } else if (param.selectionMode == 'multiselect') {
+                final handler = !param.readOnly
+                    ? () async {
+                        final selection = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MultiSelection(
+                                  param: param,
+                                  userToken: concreteState.userToken,
+                                ),
+                          ),
+                        );
+
+                        if (selection is List<Filter>) {
+                          _reportParametersBloc
+                              .dispatch(SaveViewObjectParameter(
+                            viewObject: concreteState.viewObject,
+                            userToken: concreteState.userToken,
+                            parameter: param.copyWith(value: selection),
+                          ));
+                        }
+                      }
+                    : null;
+
+                return Semantics(
+                  button: true,
+                  value: param.title,
+                  onTap: handler,
+                  child: RaisedButton(
+                    child: Text('${param.title}: (multiple selection)'),
+                    onPressed: handler,
+                  ),
+                );
               }
-            } else if (param.selectionMode == 'one') {
-              return Semantics(
-                button: true,
-                value: param.title,
-                hint: param.title,
-                child: RaisedButton(
-                  child: Text('${param.title}: ${param.value}'),
-                  onPressed: !param.readOnly
-                      ? () async {
-                          final selection = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SingleSelection(
-                                    param: param,
-                                    userToken: concreteState.userToken,
-                                  ),
-                            ),
-                          );
-
-                          if (selection != null) {
-                            _reportParametersBloc
-                                .dispatch(SaveViewObjectParameter(
-                              viewObject: concreteState.viewObject,
-                              userToken: concreteState.userToken,
-                              parameter: param.copyWith(value: selection),
-                            ));
-                          }
-                        }
-                      : null,
-                ),
-              );
-            } else if (param.selectionMode == 'multiselect') {
-              return Semantics(
-                button: true,
-                value: param.title,
-                hint: param.title,
-                child: RaisedButton(
-                  child: Text('${param.title}: ...'),
-                  onPressed: !param.readOnly
-                      ? () async {
-                          final selection = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MultiSelection(
-                                    param: param,
-                                    userToken: concreteState.userToken,
-                                  ),
-                            ),
-                          );
-
-                          if (selection is List<Filter>) {
-                            _reportParametersBloc
-                                .dispatch(SaveViewObjectParameter(
-                              viewObject: concreteState.viewObject,
-                              userToken: concreteState.userToken,
-                              parameter: param.copyWith(value: selection),
-                            ));
-                          }
-                        }
-                      : null,
-                ),
-              );
-            }
-          }).toList(),
+            }).toList(),
+          ),
         );
       },
     );

@@ -52,7 +52,12 @@ class _PoiScreenState extends State<PoiScreen> {
             return new Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Bar code content:\n${state.itemInfo}'),
+                  Text(
+                    'Item info: ${state.itemInfo}',
+                    style: TextStyle(
+                      fontSize: 24,
+                    ),
+                  ),
                   RaisedButton(
                     child: Text('Reports'),
                     onPressed: () {

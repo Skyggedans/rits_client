@@ -43,24 +43,24 @@ class MainActivity : FlutterActivity() {
                 val intent = Intent(ACTION_BARCODE)
                 startActivityForResult(intent, BARCODE_REQUEST)
             }
-            if (call.method == "showDocument") {
-                val document = File(call.arguments as String)
-                val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                    MimeTypeMap.getFileExtensionFromUrl(document.toURI().toString()))
+            // if (call.method == "showDocument") {
+            //     val document = File(call.arguments as String)
+            //     val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+            //         MimeTypeMap.getFileExtensionFromUrl(document.toURI().toString()))
 
-                if (mimeType != null) {
-                    val intent = Intent(Intent.ACTION_VIEW)
+            //     if (mimeType != null) {
+            //         val intent = Intent(Intent.ACTION_VIEW)
 
-                    intent.addCategory(Intent.CATEGORY_DEFAULT)
-                    intent.setDataAndType(Uri.fromFile(document), mimeType)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            //         intent.addCategory(Intent.CATEGORY_DEFAULT)
+            //         intent.setDataAndType(Uri.fromFile(document), mimeType)
+            //         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
-                    startActivity(intent)
-                }
-            }
-            else {
-                result.notImplemented()
-            }
+            //         startActivity(intent)
+            //     }
+            // }
+            // else {
+            //     result.notImplemented()
+            // }
         }
     }
 

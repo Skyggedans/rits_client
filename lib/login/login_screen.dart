@@ -39,9 +39,12 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         title: Text('Login'),
       ),
-      body: LoginForm(
-        authenticationBloc: _authenticationBloc,
-        loginBloc: _loginBloc,
+      body: Padding(
+        padding: EdgeInsets.all(10.0),
+        child: LoginForm(
+          authenticationBloc: _authenticationBloc,
+          loginBloc: _loginBloc,
+        ),
       ),
     );
   }

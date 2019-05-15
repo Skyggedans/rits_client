@@ -60,7 +60,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       RaisedButton(
-                        child: const Text('View Parameters'),
+                        child: const Text('View/Edit Parameters'),
                         onPressed: () {
                           Navigator.push(
                             context,

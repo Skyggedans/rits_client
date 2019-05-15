@@ -93,9 +93,11 @@ packages:
   flutter_pdf_viewer:
     dependency: "direct main"
     description:
-      path: "..\\flutter_pdf_viewer"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: dc93046e5947f3f9bdc6a9e8fa35349b60e9ace7
+      url: "https://github.com/Skyggedans/flutter_pdf_viewer.git"
+    source: git
     version: "0.4.0"
   flutter_test:
     dependency: "direct dev"

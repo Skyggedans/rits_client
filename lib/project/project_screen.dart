@@ -12,6 +12,7 @@ import '../report/report.dart';
 import '../tabular_data/tabular_data.dart';
 import '../kpi/kpi.dart';
 import '../poi/poi.dart';
+import '../luis/luis.dart';
 import 'project.dart';
 
 class ProjectScreen extends StatefulWidget {
@@ -57,6 +58,20 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => PoiScreen(
+                                project: _project,
+                                userToken: state.userToken,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                  RaisedButton(
+                    child: const Text('Start LUIS'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LuisScreen(
                                 project: _project,
                                 userToken: state.userToken,
                               ),
