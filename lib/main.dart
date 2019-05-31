@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rw_speech_recognizer/rw_speech_recognizer.dart';
 
 import 'utils/rest_client.dart';
 import 'splash/splash.dart';
@@ -28,6 +29,11 @@ void main() {
 
   BlocSupervisor().delegate = SimpleBlocDelegate();
   RestClient(userRepository: userRepository);
+
+  RwSpeechRecognizer.setCommands(<String>['Test'], (command) {
+    command;
+  });
+
   runApp(RitsApp(userRepository: userRepository));
 }
 
