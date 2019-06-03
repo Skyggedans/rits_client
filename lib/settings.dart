@@ -1,14 +1,13 @@
-const String backendUrl =
-    'https://appbuilder.rockwellits.com:8081/api/appbuilder';
-const String luisUrl = 'https://appbuilder.rockwellits.com:8081/api/Luis';
-const String chartUrl = 'https://appbuilder.rockwellits.com';
-const String reportUrl = 'https://appbuilder.rockwellits.com';
-const String authEndpoint =
-    'https://appbuilder.rockwellits.com:8087/connect/token';
-const String authUser = 'skyggedanser@gmail.com';
-const String authPassword = 'Skyggedanser12*';
-const String authClientId = 'skype_bot_service';
-const String authClientSecret = 'secret';
+const backendUrl = 'https://appbuilder.rockwellits.com:8081/api/appbuilder';
+const luisUrl = 'https://appbuilder.rockwellits.com:8081/api/Luis';
+const chartUrl = 'https://appbuilder.rockwellits.com';
+const reportUrl = 'https://appbuilder.rockwellits.com';
+const authUrl = 'https://192.168.99.100:4081/api/identity/oauth2/device/code';
+const authTokenUrl = 'https://192.168.99.100:4081/api/identity/oauth2/token';
+const authUser = 'skyggedanser@gmail.com';
+const authPassword = 'Skyggedanser12*';
+const authClientId = '378c9fcf2d7949bd9da1b998b54663c2';
+const authClientSecret = 'xKgEQNXVey_am1w-xIpMlNf1';
 
 const luisConfig = {
   'azureSubKeyId': '59899bd89b634e5ba62fde0a4fb224ca',

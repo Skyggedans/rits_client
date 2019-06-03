@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +13,7 @@ import 'splash/splash.dart';
 import 'projects/projects.dart';
 import 'authentication/authentication.dart';
 import 'login/login.dart';
+import 'user_code/user_code.dart';
 import 'user_repository/user_repository.dart';
 import 'routes.dart';
 
@@ -24,10 +29,21 @@ class SimpleBlocDelegate extends BlocDelegate {
   }
 }
 
-void main() {
+class _HttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext context) {
+    HttpClient client = super.createHttpClient(context);
+    client.badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
+    return client;
+  }
+}
+
+main() {
   final userRepository = UserRepository();
 
-  BlocSupervisor().delegate = SimpleBlocDelegate();
+  //BlocSupervisor().delegate = SimpleBlocDelegate();
+  HttpOverrides.global = _HttpOverrides();
   RestClient(userRepository: userRepository);
 
   RwSpeechRecognizer.setCommands(<String>['Test'], (command) {
@@ -42,24 +58,16 @@ class RitsApp extends StatefulWidget {
 
   RitsApp({Key key, @required this.userRepository}) : super(key: key);
 
-//  @override
-//  Widget build(BuildContext context) {
-//    return MaterialApp(
-//      title: 'RITS Demo',
-//      theme: ThemeData(
-//        primarySwatch: Colors.green,
-//      ),
-//      home: ProjectsScreen(),
-//      routes: routes,
-//    );
-//  }
-
   @override
   State<RitsApp> createState() => _RitsAppState();
 }
 
-class _RitsAppState extends State<RitsApp> {
+class _RitsAppState extends State<RitsApp> with BlocDelegate {
   AuthenticationBloc _authenticationBloc;
+
+  _RitsAppState() {
+    BlocSupervisor().delegate = this;
+  }
 
   UserRepository get _userRepository => widget.userRepository;
 
@@ -87,14 +95,16 @@ class _RitsAppState extends State<RitsApp> {
           builder: (BuildContext context, AuthenticationState state) {
             if (state is AuthenticationUninitialized) {
               return SplashScreen();
-            }
-            if (state is AuthenticationAuthenticated) {
+            } else if (state is AuthenticationPending) {
+              return UserCodeScreen(
+                verificationUrl: state.verificationUrl,
+                userCode: state.userCode,
+              );
+            } else if (state is Authenticated) {
               return ProjectsScreen();
-            }
-            if (state is AuthenticationUnauthenticated) {
+            } else if (state is Unauthenticated) {
               return LoginScreen(userRepository: _userRepository);
-            }
-            if (state is AuthenticationLoading) {
+            } else if (state is AuthenticationLoading) {
               return Center(
                 child: CircularProgressIndicator(),
               );
@@ -112,5 +122,19 @@ class _RitsAppState extends State<RitsApp> {
         // ),
       ),
     );
+  }
+
+  @override
+  void onTransition(Transition transition) {
+    print(transition);
+  }
+
+  @override
+  void onError(Object error, StackTrace stacktrace) {
+    print(error);
+
+    if (error is TokenExpiredError) {
+      _authenticationBloc.dispatch(AccessTokenExpired());
+    }
   }
 }

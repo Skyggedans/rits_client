@@ -6,30 +6,40 @@ import '../settings.dart' as settings;
 
 class UserRepository {
   String _accessToken;
+  String _refreshToken;
+  DateTime _expiresAt;
 
   String get accessToken => _accessToken;
+  String get refreshToken => _refreshToken;
 
   Future<String> authenticate({
     @required String username,
     @required String password,
   }) async {
     final client = await oauth2.resourceOwnerPasswordGrant(
-        Uri.parse(settings.authEndpoint), username, password,
+        Uri.parse(settings.authUrl), username, password,
         identifier: settings.authClientId, secret: settings.authClientSecret);
 
     return client.credentials.accessToken;
   }
 
-  Future<void> deleteToken() async {
+  Future<void> deleteTokens() async {
     /// delete from keystore/keychain
     _accessToken = null;
+    _refreshToken = null;
+    _expiresAt = null;
+
     await Future.delayed(Duration(seconds: 1));
     return;
   }
 
-  Future<void> persistToken(String token) async {
+  Future<void> persistTokens(
+      {String accessToken, String refreshToken, DateTime expiresAt}) async {
     /// write to keystore/keychain
-    _accessToken = token;
+    _accessToken = accessToken;
+    _refreshToken = refreshToken;
+    _expiresAt = expiresAt;
+
     await Future.delayed(Duration(seconds: 1));
     return;
   }
@@ -37,6 +47,13 @@ class UserRepository {
   Future<bool> hasToken() async {
     /// read from keystore/keychain
     await Future.delayed(Duration(seconds: 1));
-    return (_accessToken ?? '').isNotEmpty;
+    return (_accessToken ?? '').isNotEmpty &&
+        _expiresAt.isAfter(DateTime.now());
+  }
+
+  Future<bool> hasRefreshToken() async {
+    /// read from keystore/keychain
+    await Future.delayed(Duration(seconds: 1));
+    return (_refreshToken ?? '').isNotEmpty;
   }
 }
