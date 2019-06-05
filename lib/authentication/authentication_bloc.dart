@@ -33,13 +33,13 @@ class AuthenticationBloc
       yield Authenticated();
     } else if (event is AccessDenied) {
       yield AuthenticationFailed(reason: event.reason);
-    }
-    /*else if (event is AccessRevoked) {
+      /*}
+    else if (event is AccessRevoked) {
       await authRepository.deleteTokens();
-      yield Unauthenticated();
+      yield Unauthenticated();*/
     } else if (event is AccessTokenExpired) {
-      yield Unauthenticated();
-    }*/
+      dispatch(Authenticate());
+    }
   }
 
   Stream<AuthenticationState> _mapAppStarted() async* {
@@ -83,7 +83,7 @@ class AuthenticationBloc
         verificationUrl: response['verification_uri'],
       );
 
-      final pollingExpiresAt = DateTime.now().add(
+      final stopPollingAt = DateTime.now().add(
         Duration(seconds: response['expires_in']),
       );
 
@@ -124,7 +124,7 @@ class AuthenticationBloc
             dispatch(AccessDenied(reason: e.toString()));
           }
 
-          if (timer.isActive && DateTime.now().isAfter(pollingExpiresAt)) {
+          if (timer.isActive && DateTime.now().isAfter(stopPollingAt)) {
             timer.cancel();
             print('Token aquisition expired');
             dispatch(Authenticate());

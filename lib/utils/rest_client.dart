@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 
@@ -124,10 +123,12 @@ class RestClient extends AbstractRestClient {
   }
 
   RequestFunc _requestWrapper(RequestFunc func) {
-    final newFunc = (String url,
-        {Map<String, String> headers,
-        Map<String, String> body,
-        Encoding encoding}) async {
+    final newFunc = (
+      String url, {
+      Map<String, String> headers,
+      Map<String, String> body,
+      Encoding encoding,
+    }) async {
       try {
         return await func(url,
             headers: headers, body: body, encoding: encoding);

@@ -83,8 +83,30 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
               );
             } else if (state is Authenticated) {
               return ProjectsScreen();
-              // } else if (state is Unauthenticated) {
-              //   return LoginScreen(userRepository: _userRepository);
+            } else if (state is AuthenticationFailed) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text('Authorization Error'),
+                ),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      const Text(
+                          'Access not granted or authorization is timed out'),
+                      RaisedButton(
+                        child: const Text('Try Again'),
+                        onPressed: () {
+                          final _authBloc =
+                              BlocProvider.of<AuthenticationBloc>(context);
+                          _authBloc.dispatch(Authenticate());
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }
           },
         ),
@@ -110,7 +132,7 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
   void onError(Object error, StackTrace stacktrace) {
     print(error);
 
-    if (error is TokenExpiredError) {
+    if (error is AccessDeniedError) {
       _authenticationBloc.dispatch(AccessTokenExpired());
     }
   }
