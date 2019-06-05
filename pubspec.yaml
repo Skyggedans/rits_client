@@ -25,10 +25,6 @@ dependencies:
   cupertino_icons: ^0.1.2
   http: 0.12.0+1
   oauth2: 1.2.3
-  flutter_pdf_viewer:
-    git:
-      url: https://github.com/Skyggedans/flutter_pdf_viewer.git
-    #path: ../flutter_pdf_viewer
   android_intent: 0.3.0+1
   datetime_picker_formfield: 0.1.8
   equatable: 0.2.3
@@ -36,6 +32,11 @@ dependencies:
   rxdart: 0.21.0
   path_provider: any
   flutter_webview_plugin: 0.3.4
+  sqflite: 1.1.0
+  flutter_pdf_viewer:
+    git:
+      url: https://github.com/Skyggedans/flutter_pdf_viewer.git
+    #path: ../flutter_pdf_viewer
   rw_speech_recognizer:
     path: ../rw_speech_recognizer
 

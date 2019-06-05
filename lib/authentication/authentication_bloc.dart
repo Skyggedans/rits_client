@@ -2,22 +2,20 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 
-import 'package:flutter/rendering.dart';
-import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
-import 'package:http/http.dart' as HttpClient;
+import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart';
 import 'package:oauth2/oauth2.dart';
 
 import '../settings.dart' as settings;
-import '../user_repository/user_repository.dart';
-import './authentication.dart';
+import 'authentication.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
-  final UserRepository userRepository;
+  final AuthRepository authRepository;
 
-  AuthenticationBloc({@required this.userRepository}) {
-    assert(userRepository != null);
+  AuthenticationBloc({@required this.authRepository}) {
+    assert(authRepository != null);
   }
 
   @override
@@ -28,142 +26,156 @@ class AuthenticationBloc
     AuthenticationEvent event,
   ) async* {
     if (event is AppStarted) {
-      if (await userRepository.hasToken()) {
-        yield Authenticated();
-      } else if (await userRepository.hasRefreshToken()) {
-        try {
-          final response = await _requestAccessTokenByRefreshToken(
-              userRepository.refreshToken);
-
-          await userRepository.persistTokens(
-            accessToken: response['access_token'],
-            expiresAt: DateTime.now().add(
-              Duration(seconds: response['expires_in']),
-            ),
-          );
-
-          yield Authenticated();
-        } on TokenRevokedError {
-          dispatch(Authenticate());
-        } on TokenExpiredError {
-          dispatch(Authenticate());
-        }
-      } else {
-        dispatch(Authenticate());
-      }
+      yield* _mapAppStarted();
     } else if (event is Authenticate) {
-      try {
-        final response = await _requestUserAndDeviceCodes();
-
-        print(
-            'Authentication backend will be waiting for user code for ${response['expires_in']} seconds');
-
-        yield AuthenticationPending(
-          userCode: response['user_code'],
-          verificationUrl: response['verification_url'],
-        );
-
-        final pollingExpiresAt =
-            DateTime.now().add(Duration(seconds: response['expires_in']));
-
-        Timer.periodic(
-          Duration(milliseconds: response['interval'] * 1000 + 100),
-          (timer) async {
-            try {
-              print('Requesting access token');
-
-              final tokenResponse =
-                  await _requestAccessToken(response['device_code']);
-
-              timer.cancel();
-
-              print('Access granted');
-
-              dispatch(AccessGranted(
-                  accessToken: tokenResponse['access_token'],
-                  refreshToken: tokenResponse['refresh_token'],
-                  expiresAt: DateTime.now()
-                      .add(Duration(seconds: tokenResponse['expires_in']))));
-            } on AuthorizationPendingError catch (e) {
-              print(e);
-            } on RateLimitExceededError catch (e) {
-              print(e);
-            } on TokenExpiredError catch (e) {
-              print(e);
-              dispatch(Authenticate());
-            } on AuthorizationException catch (e) {
-              dispatch(AccessDenied(reason: e.toString()));
-            }
-
-            if (DateTime.now().isAfter(pollingExpiresAt)) {
-              timer.cancel();
-              print('Token aquisition expired');
-              dispatch(Authenticate());
-            }
-          },
-        );
-      } on RateLimitExceededError catch (e) {
-        print(e);
-
-        Future.delayed(const Duration(seconds: 1), () {
-          dispatch(Authenticate());
-        });
-      }
+      yield* _mapAuthenticate();
     } else if (event is AccessGranted) {
-      await userRepository.persistTokens(
-        accessToken: event.accessToken,
-        refreshToken: event.refreshToken,
-        expiresAt: event.expiresAt,
-      );
-
       yield Authenticated();
     } else if (event is AccessDenied) {
       yield AuthenticationFailed(reason: event.reason);
-    } else if (event is AccessRevoked) {
-      await userRepository.deleteTokens();
+    }
+    /*else if (event is AccessRevoked) {
+      await authRepository.deleteTokens();
       yield Unauthenticated();
     } else if (event is AccessTokenExpired) {
       yield Unauthenticated();
+    }*/
+  }
+
+  Stream<AuthenticationState> _mapAppStarted() async* {
+    if (await authRepository.hasAccessToken()) {
+      yield Authenticated();
+      // } else if (await authRepository.hasRefreshToken()) {
+      //   try {
+      //     final response = await _requestAccessTokenByRefreshToken(
+      //         authRepository.refreshToken);
+
+      //     await authRepository.persistTokens(
+      //       response['access_token'],
+      //       authRepository.refreshToken,
+      //       DateTime.now().add(
+      //         Duration(seconds: response['expires_in']),
+      //       ),
+      //     );
+
+      //     yield Authenticated();
+      //   } on TokenRevokedError {
+      //     await authRepository.deleteTokens();
+      //     dispatch(Authenticate());
+      //   } on TokenExpiredError {
+      //     await authRepository.deleteTokens();
+      //     dispatch(Authenticate());
+      //   }
+    } else {
+      dispatch(Authenticate());
+    }
+  }
+
+  Stream<AuthenticationState> _mapAuthenticate() async* {
+    try {
+      final response = await _requestUserAndDeviceCodes();
+
+      print(
+          'Authentication backend will be waiting for user code for ${response['expires_in']} seconds');
+
+      yield AuthenticationPending(
+        userCode: response['user_code'],
+        verificationUrl: response['verification_uri'],
+      );
+
+      final pollingExpiresAt = DateTime.now().add(
+        Duration(seconds: response['expires_in']),
+      );
+
+      Timer.periodic(
+        Duration(milliseconds: response['interval'] * 1000 + 100),
+        (timer) async {
+          try {
+            print('Requesting access token');
+
+            final tokenResponse =
+                await _requestAccessToken(response['device_code']);
+
+            timer.cancel();
+            print('Access granted for ${tokenResponse['expires_in']} seconds');
+
+            await authRepository.persistTokens(
+              tokenResponse['access_token'],
+              tokenResponse['refresh_token'],
+              DateTime.now().add(
+                Duration(seconds: tokenResponse['expires_in']),
+              ),
+            );
+
+            dispatch(AccessGranted());
+          } on AuthorizationPendingError catch (e) {
+            print(e);
+          } on RateLimitExceededError catch (e) {
+            print(e);
+            // sleep(const Duration(seconds: 1));
+          } on TokenExpiredError catch (e) {
+            timer.cancel();
+            print(e);
+            //dispatch(Authenticate());
+            dispatch(AccessDenied(reason: e.toString()));
+          } on AuthorizationException catch (e) {
+            timer.cancel();
+            print(e);
+            dispatch(AccessDenied(reason: e.toString()));
+          }
+
+          if (timer.isActive && DateTime.now().isAfter(pollingExpiresAt)) {
+            timer.cancel();
+            print('Token aquisition expired');
+            dispatch(Authenticate());
+          }
+        },
+      );
+    } on RateLimitExceededError catch (e) {
+      print(e);
+
+      Future.delayed(const Duration(seconds: 1), () {
+        dispatch(Authenticate());
+      });
     }
   }
 
   Future<Map<String, dynamic>> _requestUserAndDeviceCodes() async {
-    final response = await HttpClient.post(
+    final response = await http.post(
       settings.authUrl,
       body: {
         'client_id': settings.authClientId,
-        'scope': 'profile',
+        'scope': 'apiclient',
       },
     );
 
     final body = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      return body;
-    } else if (response.statusCode == 401 && body['error'] == 'access_denied') {
+    if (response.statusCode == 401 && body['error'] == 'access_denied') {
       throw AccessDeniedError();
     } else if (response.statusCode == 403 &&
         body['error_code'] == 'rate_limit_exceeded') {
       throw RateLimitExceededError();
     }
+
+    return body;
   }
 
   Future<Map<String, dynamic>> _requestAccessToken(String deviceCode) async {
-    final response = await HttpClient.post(
+    final response = await http.post(
       settings.authTokenUrl,
       body: {
         'client_id': settings.authClientId,
         'client_secret': settings.authClientSecret,
-        'code': deviceCode,
-        'grant_type': 'http://oauth.net/grant_type/device/1.0'
+        'scope': 'apiclient',
+        'device_code': deviceCode,
+        'grant_type': 'urn:ietf:params:oauth:grant-type:device_code'
       },
     );
 
     final body = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      return body;
-    } else if (response.statusCode == 400) {
+    if (response.statusCode == 400) {
       if (body['error'] == 'authorization_pending') {
         throw AuthorizationPendingError();
       } else if (body['error'] == 'invalid_grant') {
@@ -174,7 +186,7 @@ class AuthenticationBloc
         throw InvalidGrantTypeError();
       } else if (body['error'] == 'slow_down') {
         throw RateLimitExceededError();
-      } else if (body['error'] == 'token_expired') {
+      } else if (body['error'] == 'expired_token') {
         throw TokenExpiredError();
       }
     } else if (response.statusCode == 403 && body['error'] == 'access_denied') {
@@ -183,12 +195,12 @@ class AuthenticationBloc
       throw RateLimitExceededError();
     }
 
-    response;
+    return body;
   }
 
   Future<Map<String, dynamic>> _requestAccessTokenByRefreshToken(
       String refreshToken) async {
-    final response = await HttpClient.post(
+    final response = await http.post(
       settings.authUrl,
       body: {
         'client_id': settings.authClientId,

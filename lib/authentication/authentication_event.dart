@@ -16,16 +16,6 @@ class Authenticate extends AuthenticationEvent {
 }
 
 class AccessGranted extends AuthenticationEvent {
-  final String accessToken;
-  final String refreshToken;
-  final DateTime expiresAt;
-
-  AccessGranted(
-      {@required this.accessToken,
-      @required this.refreshToken,
-      @required this.expiresAt})
-      : super();
-
   @override
   String toString() => 'AccessGranted';
 }

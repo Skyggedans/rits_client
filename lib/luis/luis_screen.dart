@@ -6,7 +6,6 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import '../models/projects/projects.dart';
 import '../utils/rest_client.dart';
-import '../kpi/kpi.dart';
 import 'luis.dart';
 
 class LuisScreen extends StatefulWidget {

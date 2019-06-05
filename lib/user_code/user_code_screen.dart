@@ -14,22 +14,38 @@ class UserCodeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Authorization'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            'Please navigate to $verificationUrl and enter the code displayed below:',
-            textAlign: TextAlign.center,
-          ),
-          Text(
-            userCode,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+      body: Padding(
+        padding: EdgeInsets.all(30),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Please navigate to',
+              textAlign: TextAlign.center,
             ),
-          ),
-        ],
+            Text(
+              verificationUrl,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              'and enter the code displayed below:',
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              userCode,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -2,12 +2,13 @@ const backendUrl = 'https://appbuilder.rockwellits.com:8081/api/appbuilder';
 const luisUrl = 'https://appbuilder.rockwellits.com:8081/api/Luis';
 const chartUrl = 'https://appbuilder.rockwellits.com';
 const reportUrl = 'https://appbuilder.rockwellits.com';
-const authUrl = 'https://192.168.99.100:4081/api/identity/oauth2/device/code';
-const authTokenUrl = 'https://192.168.99.100:4081/api/identity/oauth2/token';
+const authUrl =
+    'https://appbuilder.rockwellits.com:8087/connect/deviceauthorization';
+const authTokenUrl = 'https://appbuilder.rockwellits.com:8087/connect/token';
 const authUser = 'skyggedanser@gmail.com';
 const authPassword = 'Skyggedanser12*';
-const authClientId = '378c9fcf2d7949bd9da1b998b54663c2';
-const authClientSecret = 'xKgEQNXVey_am1w-xIpMlNf1';
+const authClientId = 'device';
+const authClientSecret = 'secret';
 
 const luisConfig = {
   'azureSubKeyId': '59899bd89b634e5ba62fde0a4fb224ca',

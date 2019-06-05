@@ -1,33 +1,17 @@
-import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rw_speech_recognizer/rw_speech_recognizer.dart';
 
-import 'utils/rest_client.dart';
-import 'splash/splash.dart';
-import 'projects/projects.dart';
 import 'authentication/authentication.dart';
-import 'login/login.dart';
-import 'user_code/user_code.dart';
-import 'user_repository/user_repository.dart';
+import 'projects/projects.dart';
 import 'routes.dart';
-
-class SimpleBlocDelegate extends BlocDelegate {
-  @override
-  void onTransition(Transition transition) {
-    print(transition);
-  }
-
-  @override
-  void onError(Object error, StackTrace stacktrace) {
-    print(error);
-  }
-}
+import 'splash/splash.dart';
+import 'user_code/user_code.dart';
+import 'utils/rest_client.dart';
 
 class _HttpOverrides extends HttpOverrides {
   @override
@@ -40,23 +24,20 @@ class _HttpOverrides extends HttpOverrides {
 }
 
 main() {
-  final userRepository = UserRepository();
+  final authRepository = AuthRepository(authProvider: AuthProvider());
 
-  //BlocSupervisor().delegate = SimpleBlocDelegate();
   HttpOverrides.global = _HttpOverrides();
-  RestClient(userRepository: userRepository);
+  RestClient(authRepository: authRepository);
 
-  RwSpeechRecognizer.setCommands(<String>['Test'], (command) {
-    command;
-  });
+  RwSpeechRecognizer.setCommands(<String>['Test'], (command) {});
 
-  runApp(RitsApp(userRepository: userRepository));
+  runApp(RitsApp(authRepository: authRepository));
 }
 
 class RitsApp extends StatefulWidget {
-  final UserRepository userRepository;
+  final AuthRepository authRepository;
 
-  RitsApp({Key key, @required this.userRepository}) : super(key: key);
+  RitsApp({Key key, @required this.authRepository}) : super(key: key);
 
   @override
   State<RitsApp> createState() => _RitsAppState();
@@ -69,11 +50,11 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
     BlocSupervisor().delegate = this;
   }
 
-  UserRepository get _userRepository => widget.userRepository;
+  AuthRepository get _authRepository => widget.authRepository;
 
   @override
   void initState() {
-    _authenticationBloc = AuthenticationBloc(userRepository: _userRepository);
+    _authenticationBloc = AuthenticationBloc(authRepository: _authRepository);
     _authenticationBloc.dispatch(AppStarted());
     super.initState();
   }
@@ -102,12 +83,8 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
               );
             } else if (state is Authenticated) {
               return ProjectsScreen();
-            } else if (state is Unauthenticated) {
-              return LoginScreen(userRepository: _userRepository);
-            } else if (state is AuthenticationLoading) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
+              // } else if (state is Unauthenticated) {
+              //   return LoginScreen(userRepository: _userRepository);
             }
           },
         ),
