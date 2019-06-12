@@ -46,7 +46,7 @@ class ViewObjectsBloc extends Bloc<ViewObjectsEvent, ViewObjectsState> {
           yield ViewObjectsLoaded(
               viewObjects: reports, userToken: event.userToken);
         }
-      } catch (_) {
+      } on ApiError {
         yield ViewObjectsError();
       }
     }

@@ -19,7 +19,7 @@ class KpiBloc extends ViewObjectBloc {
         final kpis = await _getKpis(event.viewObject, event.userToken);
 
         yield KpiGenerated(kpis: kpis);
-      } catch (_) {
+      } on ApiError {
         yield ViewObjectError();
       }
     } else {

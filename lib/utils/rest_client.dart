@@ -9,6 +9,15 @@ import '../settings.dart' as settings;
 typedef RequestFunc = Future<http.Response> Function(String url,
     {Map<String, String> headers, Map<String, String> body, Encoding encoding});
 
+class ApiError implements Exception {
+  final String message;
+
+  ApiError(this.message);
+
+  @override
+  String toString() => message;
+}
+
 abstract class AbstractRestClient {
   Future<http.Response> get(String url,
       {Map<String, String> headers: const {}, body, encoding}) async {
@@ -166,7 +175,7 @@ class RestClient extends AbstractRestClient {
     if (statusCode == 401) {
       throw AccessDeniedError();
     } else if (statusCode != 200) {
-      throw Exception('Error while fetching data');
+      throw ApiError('Error while fetching data');
     }
 
     return response;
@@ -220,7 +229,7 @@ class LuisClient extends AbstractRestClient {
     final int statusCode = response.statusCode;
 
     if (statusCode != 200) {
-      throw new Exception('Error while fetching LUIS data');
+      throw ApiError('Error while fetching LUIS data');
     }
 
     return response;

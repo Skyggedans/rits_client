@@ -18,7 +18,7 @@ class TabularDataBloc extends ViewObjectBloc {
         final data = await _getData(event.viewObject, event.userToken);
 
         yield TabularDataGenerated(data: data);
-      } catch (_) {
+      } on ApiError {
         yield ViewObjectError();
       }
     } else {

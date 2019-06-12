@@ -30,7 +30,7 @@ class ReportBloc extends ViewObjectBloc {
                     pageSnap: true, pageFling: true, enableSwipe: true));
           }
         });
-      } catch (_) {
+      } on ApiError {
         yield ViewObjectError();
       }
     } else {

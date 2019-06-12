@@ -44,7 +44,7 @@ class PoiBloc extends Bloc<PoiEvent, PoiState> {
         } else {
           yield PoiError(itemInfo: 'Unable to set context');
         }
-      } catch (_) {
+      } on ApiError {
         yield PoiError(itemInfo: 'Unrecognized content: $result');
       }
     }

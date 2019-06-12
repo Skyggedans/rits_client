@@ -10,7 +10,6 @@ import 'authentication/authentication.dart';
 import 'projects/projects.dart';
 import 'routes.dart';
 import 'splash/splash.dart';
-import 'user_code/user_code.dart';
 import 'utils/rest_client.dart';
 
 class _HttpOverrides extends HttpOverrides {
@@ -77,36 +76,15 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
             if (state is AuthenticationUninitialized) {
               return SplashScreen();
             } else if (state is AuthenticationPending) {
-              return UserCodeScreen(
+              return AuthenticationUserCodeScreen(
                 verificationUrl: state.verificationUrl,
                 userCode: state.userCode,
+                expiresIn: state.expiresIn,
               );
             } else if (state is Authenticated) {
               return ProjectsScreen();
             } else if (state is AuthenticationFailed) {
-              return Scaffold(
-                appBar: AppBar(
-                  title: Text('Authorization Error'),
-                ),
-                body: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      const Text(
-                          'Access not granted or authorization is timed out'),
-                      RaisedButton(
-                        child: const Text('Try Again'),
-                        onPressed: () {
-                          final _authBloc =
-                              BlocProvider.of<AuthenticationBloc>(context);
-                          _authBloc.dispatch(Authenticate());
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              );
+              return AuthenticationFailureScreen();
             }
           },
         ),

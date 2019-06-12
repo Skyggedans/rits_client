@@ -12,8 +12,9 @@ class AuthenticationUninitialized extends AuthenticationState {
 class AuthenticationPending extends AuthenticationState {
   final String userCode;
   final String verificationUrl;
+  final Duration expiresIn;
 
-  AuthenticationPending({this.userCode, this.verificationUrl})
+  AuthenticationPending({this.userCode, this.verificationUrl, this.expiresIn})
       : super([userCode, verificationUrl]);
 
   @override

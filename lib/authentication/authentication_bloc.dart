@@ -81,6 +81,7 @@ class AuthenticationBloc
       yield AuthenticationPending(
         userCode: response['user_code'],
         verificationUrl: response['verification_uri'],
+        expiresIn: Duration(seconds: response['expires_in']),
       );
 
       final stopPollingAt = DateTime.now().add(
@@ -145,7 +146,7 @@ class AuthenticationBloc
       settings.authUrl,
       body: {
         'client_id': settings.authClientId,
-        'scope': 'apiclient',
+        'scope': 'apiclient offline_access',
       },
     );
 

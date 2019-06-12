@@ -34,7 +34,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
 
           yield ProjectsLoaded(projects: projects);
         }
-      } catch (_) {
+      } on ApiError {
         yield ProjectsError();
       }
     }

@@ -31,7 +31,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         final userToken = await _getUserTokenForProject(event.project);
 
         yield ProjectLoaded(userToken: userToken);
-      } catch (_) {
+      } on ApiError {
         yield ProjectError();
       }
     }

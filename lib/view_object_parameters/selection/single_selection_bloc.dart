@@ -34,7 +34,7 @@ class SingleSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
           options: options,
           selection: event.param.value,
         );
-      } catch (_) {
+      } on ApiError {
         yield SelectionOptionsError();
       }
     } else if (event is UpdateSelection) {

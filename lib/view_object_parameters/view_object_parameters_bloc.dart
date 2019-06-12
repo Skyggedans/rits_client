@@ -41,7 +41,7 @@ class ViewObjectParametersBloc
           userToken: event.userToken,
           parameters: params,
         );
-      } catch (_) {
+      } on ApiError {
         yield ViewObjectParametersError();
       }
     } else if (event is SaveViewObjectParameter) {
@@ -54,7 +54,7 @@ class ViewObjectParametersBloc
           viewObject: event.viewObject,
           userToken: event.userToken,
         ));
-      } catch (_) {
+      } on ApiError {
         yield ViewObjectParametersError();
       }
     }

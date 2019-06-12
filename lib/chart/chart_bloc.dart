@@ -18,7 +18,7 @@ class ChartBloc extends ViewObjectBloc {
               '${settings.chartUrl}/Charts/BaseChart?skypeBotToken=${event.userToken}&chart=${Uri.encodeFull(event.viewObject.name)}',
           userToken: event.userToken,
         );
-      } catch (_) {
+      } on ApiError {
         yield ViewObjectError();
       }
     } else {

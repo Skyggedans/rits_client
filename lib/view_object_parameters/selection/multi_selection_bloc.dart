@@ -31,7 +31,7 @@ class MultiSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
         final options = await _fetchParamOptions(event.param, event.userToken);
 
         yield SelectionOptionsLoaded(options: options);
-      } catch (_) {
+      } on ApiError {
         yield SelectionOptionsError();
       }
     } else if (event is UpdateSelection<Filter>) {

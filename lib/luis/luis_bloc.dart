@@ -34,7 +34,7 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
 
         yield UtteranceInput(
             luisProjectId: luisProjectId, userToken: event.userToken);
-      } catch (_) {
+      } on ApiError {
         yield LuisError();
       }
     } else if (event is ExecuteUtterance) {
@@ -53,7 +53,7 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
           yield UtteranceInput(
               luisProjectId: event.luisProjectId, userToken: event.userToken);
         }
-      } catch (_) {
+      } on ApiError {
         yield LuisError();
       }
     }
