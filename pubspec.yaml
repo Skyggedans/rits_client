@@ -39,6 +39,8 @@ dependencies:
     #path: ../flutter_pdf_viewer
   rw_speech_recognizer:
     path: ../rw_speech_recognizer
+  rw_camera:
+    path: ../rw_camera
 
 dev_dependencies:
   flutter_test:

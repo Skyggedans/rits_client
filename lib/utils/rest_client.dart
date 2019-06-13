@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:path/path.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import '../authentication/authentication.dart';
 import '../settings.dart' as settings;
 
 typedef RequestFunc = Future<http.Response> Function(String url,
-    {Map<String, String> headers, Map<String, String> body, Encoding encoding});
+    {Map<String, String> headers, dynamic body, Encoding encoding});
 
 class ApiError implements Exception {
   final String message;
@@ -81,7 +83,7 @@ abstract class AbstractRestClient {
 
   Map<String, String> _getHeaders();
 
-  http.Response _handleResponse(http.Response response);
+  http.BaseResponse _handleResponse(http.BaseResponse response);
 }
 
 class RestClient extends AbstractRestClient {
@@ -112,7 +114,7 @@ class RestClient extends AbstractRestClient {
       {Map<String, String> headers: const {}, body, encoding}) async {
     final func = _requestWrapper(super.post);
 
-    return await func(url, headers: headers);
+    return await func(url, headers: headers, body: body, encoding: encoding);
   }
 
   @override
@@ -128,14 +130,48 @@ class RestClient extends AbstractRestClient {
       {Map<String, String> headers: const {}, body, encoding}) async {
     final func = _requestWrapper(super.put);
 
-    return await func(url, headers: headers);
+    return await func(url, headers: headers, body: body, encoding: encoding);
+  }
+
+  Future<http.StreamedResponse> uploadFile(
+    String url, {
+    Map<String, String> headers: const {},
+    String field,
+    String filePath,
+    MediaType contentType,
+  }) async {
+    final allHeaders = <String, String>{}
+      ..addAll(_getHeaders())
+      ..addAll(headers);
+
+    final uri = Uri.parse(url);
+    final request = http.MultipartRequest('POST', uri);
+
+    request.headers.addAll(allHeaders);
+    request.files.add(await http.MultipartFile.fromPath(
+      field,
+      filePath,
+      contentType: contentType,
+    ));
+
+    try {
+      return _handleResponse(await request.send());
+    } on AccessDeniedError {
+      try {
+        await _tryRefreshToken();
+
+        return _handleResponse(await request.send());
+      } on TokenRevokedError {
+        throw AccessDeniedError();
+      }
+    }
   }
 
   RequestFunc _requestWrapper(RequestFunc func) {
     final newFunc = (
       String url, {
       Map<String, String> headers,
-      Map<String, String> body,
+      dynamic body,
       Encoding encoding,
     }) async {
       try {
@@ -143,16 +179,7 @@ class RestClient extends AbstractRestClient {
             headers: headers, body: body, encoding: encoding);
       } on AccessDeniedError {
         try {
-          final tokenResponse = await _requestAccessTokenByRefreshToken(
-              authRepository.refreshToken);
-
-          await authRepository.persistTokens(
-            tokenResponse['access_token'],
-            tokenResponse['refresh_token'],
-            DateTime.now().add(
-              Duration(seconds: tokenResponse['expires_in']),
-            ),
-          );
+          await _tryRefreshToken();
 
           return await func(url,
               headers: headers, body: body, encoding: encoding);
@@ -165,16 +192,29 @@ class RestClient extends AbstractRestClient {
     return newFunc;
   }
 
+  Future<void> _tryRefreshToken() async {
+    final tokenResponse =
+        await _requestAccessTokenByRefreshToken(authRepository.refreshToken);
+
+    return await authRepository.persistTokens(
+      tokenResponse['access_token'],
+      tokenResponse['refresh_token'],
+      DateTime.now().add(
+        Duration(seconds: tokenResponse['expires_in']),
+      ),
+    );
+  }
+
   Map<String, String> _getHeaders() {
     return {'Authorization': 'Bearer ${authRepository.accessToken}'};
   }
 
-  http.Response _handleResponse(http.Response response) {
+  http.BaseResponse _handleResponse(http.BaseResponse response) {
     final int statusCode = response.statusCode;
 
     if (statusCode == 401) {
       throw AccessDeniedError();
-    } else if (statusCode != 200) {
+    } else if (statusCode < 200 || statusCode >= 300) {
       throw ApiError('Error while fetching data');
     }
 
@@ -225,10 +265,10 @@ class LuisClient extends AbstractRestClient {
   }
 
   @override
-  http.Response _handleResponse(http.Response response) {
+  http.BaseResponse _handleResponse(http.BaseResponse response) {
     final int statusCode = response.statusCode;
 
-    if (statusCode != 200) {
+    if (statusCode < 200 || statusCode >= 300) {
       throw ApiError('Error while fetching LUIS data');
     }
 

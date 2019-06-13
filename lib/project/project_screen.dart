@@ -1,18 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rw_camera/rw_camera.dart';
 
-import '../utils/rest_client.dart';
-import '../models/projects/projects.dart';
-import '../view_objects/view_objects.dart';
 import '../chart/chart.dart';
+import '../kpi/kpi.dart';
+import '../luis/luis.dart';
+import '../models/projects/projects.dart';
+import '../poi/poi.dart';
 import '../report/report.dart';
 import '../tabular_data/tabular_data.dart';
-import '../kpi/kpi.dart';
-import '../poi/poi.dart';
-import '../luis/luis.dart';
+import '../utils/rest_client.dart';
+import '../view_objects/view_objects.dart';
 import 'project.dart';
 
 class ProjectScreen extends StatefulWidget {
@@ -45,12 +45,28 @@ class _ProjectScreenState extends State<ProjectScreen> {
           child: BlocBuilder(
         bloc: _projectBloc,
         builder: (BuildContext context, ProjectState state) {
-          if (state is ProjectUninitialized) {
+          if (state is ProjectLoading) {
             return CircularProgressIndicator();
           } else if (state is ProjectLoaded) {
             return new Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  RaisedButton(
+                    child: const Text('Take Photo'),
+                    onPressed: () {
+                      RwCamera.takePhoto((bytes) {
+                        _projectBloc.dispatch(PhotoTaken(bytes));
+                      });
+                    },
+                  ),
+                  RaisedButton(
+                    child: const Text('Record Video'),
+                    onPressed: () {
+                      RwCamera.recordVideo((filePath) {
+                        _projectBloc.dispatch(VideoRecorded(filePath));
+                      });
+                    },
+                  ),
                   RaisedButton(
                     child: const Text('Scan Bar Code'),
                     onPressed: () {

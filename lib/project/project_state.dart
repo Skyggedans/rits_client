@@ -6,9 +6,9 @@ abstract class ProjectState extends Equatable {
   ProjectState([List props = const []]) : super(props);
 }
 
-class ProjectUninitialized extends ProjectState {
+class ProjectLoading extends ProjectState {
   @override
-  String toString() => 'ProjectUninitialized';
+  String toString() => 'ProjectLoading';
 }
 
 class ProjectLoaded extends ProjectState {
