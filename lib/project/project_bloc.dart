@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -43,7 +44,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       yield prevState;
     } else if (event is VideoRecorded) {
       yield ProjectLoading();
-      await _postVideo('movie', event.filePath);
+      await _postVideo(event.filePath);
       yield prevState;
     }
   }
@@ -59,24 +60,25 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   }
 
   Future<void> _postPhoto(bytes) async {
-    final url = 'http://192.168.1.159:3000/photo';
-
-    await restClient.post(
-      url,
-      headers: {
-        'Content-Type': 'image/png',
-        'Content-Transfer-Encoding': 'base64',
-      },
-      body: base64.encode(bytes),
-    );
-  }
-
-  Future<void> _postVideo(field, filePath) async {
-    final url = 'http://192.168.1.159:3000/video';
+    final url = 'https://109.86.209.81:44312/api/upload';
+    final fileName =
+        'IMG_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.png';
 
     await restClient.uploadFile(
       url,
-      field: field,
+      bytes: bytes,
+      field: 'photo',
+      fileName: fileName,
+      contentType: MediaType('image', 'png'),
+    );
+  }
+
+  Future<void> _postVideo(filePath) async {
+    final url = 'https://109.86.209.81:44312/api/upload';
+
+    await restClient.uploadFile(
+      url,
+      field: 'movie',
       filePath: filePath,
       contentType: MediaType('video', 'mp4'),
     );

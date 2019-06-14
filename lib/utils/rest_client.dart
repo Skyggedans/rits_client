@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:path/path.dart';
 
 import 'package:http/http.dart' as http;
@@ -138,6 +139,8 @@ class RestClient extends AbstractRestClient {
     Map<String, String> headers: const {},
     String field,
     String filePath,
+    String fileName,
+    Uint8List bytes,
     MediaType contentType,
   }) async {
     final allHeaders = <String, String>{}
@@ -148,11 +151,27 @@ class RestClient extends AbstractRestClient {
     final request = http.MultipartRequest('POST', uri);
 
     request.headers.addAll(allHeaders);
-    request.files.add(await http.MultipartFile.fromPath(
-      field,
-      filePath,
-      contentType: contentType,
-    ));
+
+    http.MultipartFile file;
+
+    if (filePath != null) {
+      file = await http.MultipartFile.fromPath(
+        field,
+        filePath,
+        contentType: contentType,
+      );
+    } else if (bytes != null) {
+      file = http.MultipartFile.fromBytes(
+        field,
+        bytes,
+        filename: fileName,
+        contentType: contentType,
+      );
+    }
+
+    if (file != null) {
+      request.files.add(file);
+    }
 
     try {
       return _handleResponse(await request.send());

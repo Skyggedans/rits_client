@@ -28,7 +28,9 @@ main() {
   HttpOverrides.global = _HttpOverrides();
   RestClient(authRepository: authRepository);
 
-  RwSpeechRecognizer.setCommands(<String>['Test'], (command) {});
+  // RwSpeechRecognizer.setCommands(<String>['Test'], (command) {
+  //   command;
+  // });
 
   runApp(RitsApp(authRepository: authRepository));
 }

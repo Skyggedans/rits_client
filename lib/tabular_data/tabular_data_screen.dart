@@ -5,6 +5,12 @@ import '../models/view_objects/view_objects.dart';
 import '../view_object/view_object.dart';
 import 'tabular_data.dart';
 
+enum RecordAction {
+  CANCEL,
+  EDIT,
+  REMOVE,
+}
+
 class TabularDataScreen extends ViewObjectScreen {
   static String route = '/tabular_data';
 
@@ -59,15 +65,27 @@ class _TabularDataScreenState
               itemBuilder: (context, index) {
                 final Map<String, dynamic> row = rows[index];
 
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: row.keys.toList().map((prop) {
-                    return Expanded(
-                      child: Text(
-                        (row[prop] ?? '').toString(),
-                      ),
-                    );
-                  }).toList(),
+                return InkWell(
+                  child: Semantics(
+                    button: true,
+                    value: 'Record $index',
+                    onTap: () {
+                      _showRecordDialog(context, row, index);
+                    },
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: row.keys.toList().map((prop) {
+                        return Expanded(
+                          child: Text(
+                            (row[prop] ?? '').toString(),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  onTap: () {
+                    _showRecordDialog(context, row, index);
+                  },
                 );
               },
             ),
@@ -77,5 +95,39 @@ class _TabularDataScreenState
     } else {
       return const Text('No data');
     }
+  }
+
+  Future<RecordAction> _showRecordDialog(
+      BuildContext context, dynamic row, int index) async {
+    return showDialog<RecordAction>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Record $index'),
+          content: const Text('Select required action'),
+          actions: <Widget>[
+            FlatButton(
+              child: const Text('EDIT'),
+              onPressed: () {
+                //Navigator.of(context).pop(ConfirmAction.ACCEPT);
+              },
+            ),
+            FlatButton(
+              child: const Text('REMOVE'),
+              onPressed: () {
+                //Navigator.of(context).pop(ConfirmAction.ACCEPT);
+              },
+            ),
+            FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                //Navigator.of(context).pop(ConfirmAction.CANCEL);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
