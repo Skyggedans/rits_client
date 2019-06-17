@@ -90,15 +90,21 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
             }
           },
         ),
-        // theme: ThemeData(
-        //   textTheme: TextTheme(
-        //     body1: TextStyle(fontSize: 20.0),
-        //     body2: TextStyle(fontSize: 20.0),
-        //     subhead: TextStyle(fontSize: 20.0),
-        //     button: TextStyle(fontSize: 20.0),
-        //     caption: TextStyle(fontSize: 20.0),
-        //   ),
-        // ),
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          accentColor: Colors.deepOrange,
+          buttonColor: Colors.deepOrange,
+          //   textTheme: TextTheme(
+          //     body1: TextStyle(fontSize: 20.0),
+          //     body2: TextStyle(fontSize: 20.0),
+          //     subhead: TextStyle(fontSize: 20.0),
+          //     button: TextStyle(fontSize: 20.0),
+          //     caption: TextStyle(fontSize: 20.0),
+          //   ),
+        ),
+        darkTheme: ThemeData(
+          brightness: Brightness.dark,
+        ),
       ),
     );
   }

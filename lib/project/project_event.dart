@@ -19,10 +19,20 @@ class LoadProject extends ProjectEvent {
   String toString() => 'LoadProject { project: ${project.name} }';
 }
 
+class ScanBarcode extends ProjectEvent {
+  final String userToken;
+
+  ScanBarcode({@required this.userToken}) : super([userToken]);
+
+  @override
+  String toString() => 'ScanBarcode';
+}
+
 class PhotoTaken extends ProjectEvent {
   final Uint8List bytes;
+  final String userToken;
 
-  PhotoTaken(this.bytes) : super([bytes]);
+  PhotoTaken(this.bytes, this.userToken) : super([bytes, userToken]);
 
   @override
   String toString() => 'PhotoTaken { size: ${bytes.length} bytes }';
@@ -30,8 +40,9 @@ class PhotoTaken extends ProjectEvent {
 
 class VideoRecorded extends ProjectEvent {
   final String filePath;
+  final String userToken;
 
-  VideoRecorded(this.filePath) : super([filePath]);
+  VideoRecorded(this.filePath, this.userToken) : super([filePath, userToken]);
 
   @override
   String toString() => 'VideoRecorded { file: $filePath }';

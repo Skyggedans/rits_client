@@ -36,11 +36,17 @@ dependencies:
   flutter_pdf_viewer:
     git:
       url: https://github.com/Skyggedans/flutter_pdf_viewer.git
-    #path: ../flutter_pdf_viewer
   rw_speech_recognizer:
-    path: ../rw_speech_recognizer
+    git:
+      url: https://github.com/Skyggedans/rw_speech_recognizer
   rw_camera:
+    #git:
+      #url: https://github.com/Skyggedans/rw_camera
     path: ../rw_camera
+  rw_barcode_reader:
+    path: ../rw_barcode_reader
+    #git:
+      #url: https://github.com/Skyggedans/rw_barcode_reader
 
 dev_dependencies:
   flutter_test:

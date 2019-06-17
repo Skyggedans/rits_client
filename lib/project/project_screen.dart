@@ -8,7 +8,6 @@ import '../chart/chart.dart';
 import '../kpi/kpi.dart';
 import '../luis/luis.dart';
 import '../models/projects/projects.dart';
-import '../poi/poi.dart';
 import '../report/report.dart';
 import '../tabular_data/tabular_data.dart';
 import '../utils/rest_client.dart';
@@ -51,117 +50,136 @@ class _ProjectScreenState extends State<ProjectScreen> {
             return new Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  RaisedButton(
-                    child: const Text('Take Photo'),
-                    onPressed: () {
-                      RwCamera.takePhoto((bytes) {
-                        _projectBloc.dispatch(PhotoTaken(bytes));
-                      });
-                    },
-                  ),
-                  RaisedButton(
-                    child: const Text('Record Video'),
-                    onPressed: () {
-                      RwCamera.recordVideo((filePath) {
-                        _projectBloc.dispatch(VideoRecorded(filePath));
-                      });
-                    },
+                  Visibility(
+                    visible: state.hierarchyLevel != null,
+                    child: Text(
+                      'Bound to: ${state.context}',
+                      style: TextStyle(
+                        fontSize: 24,
+                      ),
+                    ),
                   ),
                   RaisedButton(
                     child: const Text('Scan Bar Code'),
+                    color: Colors.blue,
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PoiScreen(
-                                project: _project,
-                                userToken: state.userToken,
-                              ),
-                        ),
-                      );
+                      _projectBloc
+                          .dispatch(ScanBarcode(userToken: state.userToken));
                     },
                   ),
-                  RaisedButton(
-                    child: const Text('Start LUIS'),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LuisScreen(
-                                project: _project,
-                                userToken: state.userToken,
-                              ),
+                  Wrap(
+                    alignment: WrapAlignment.spaceAround,
+                    spacing: 10,
+                    children: <Widget>[
+                      Visibility(
+                        visible: state.hierarchyLevel != null,
+                        maintainSize: false,
+                        child: RaisedButton(
+                          child: const Text('Take Photo'),
+                          onPressed: () async {
+                            _projectBloc.dispatch(PhotoTaken(
+                                await RwCamera.takePhoto(), state.userToken));
+                          },
                         ),
-                      );
-                    },
-                  ),
-                  RaisedButton(
-                    child: Text('Reports'),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ViewObjectsScreen(
-                                project: _project,
-                                type: 'Reports',
-                                detailsScreenRoute: ReportScreen.route,
-                                userToken: state.userToken,
-                              ),
+                      ),
+                      Visibility(
+                        visible: state.hierarchyLevel != null,
+                        maintainSize: false,
+                        child: RaisedButton(
+                          child: const Text('Record Video'),
+                          onPressed: () async {
+                            _projectBloc.dispatch(VideoRecorded(
+                                await RwCamera.recordVideo(), state.userToken));
+                          },
                         ),
-                      );
-                    },
-                  ),
-                  RaisedButton(
-                    child: Text('Charts'),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ViewObjectsScreen(
-                                project: _project,
-                                type: 'Charts',
-                                detailsScreenRoute: ChartScreen.route,
-                                userToken: state.userToken,
-                              ),
-                        ),
-                      );
-                    },
-                  ),
-                  RaisedButton(
-                    child: Text('Tabular Data'),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ViewObjectsScreen(
-                                project: _project,
-                                type: 'DataObjects',
-                                detailsScreenRoute: TabularDataScreen.route,
-                                userToken: state.userToken,
-                              ),
-                        ),
-                      );
-                    },
-                  ),
-                  RaisedButton(
-                    child: Text('KPIs'),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ViewObjectsScreen(
-                                project: _project,
-                                type: 'KPIs',
-                                detailsScreenRoute: KpiScreen.route,
-                                userToken: state.userToken,
-                              ),
-                        ),
-                      );
-                    },
-                  ),
+                      ),
+                      RaisedButton(
+                        child: const Text('Start LUIS'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LuisScreen(
+                                    project: _project,
+                                    userToken: state.userToken,
+                                  ),
+                            ),
+                          );
+                        },
+                      ),
+                      RaisedButton(
+                        child: Text('Reports'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ViewObjectsScreen(
+                                    project: _project,
+                                    type: 'Reports',
+                                    detailsScreenRoute: ReportScreen.route,
+                                    hierarchyLevel: state.hierarchyLevel,
+                                    userToken: state.userToken,
+                                  ),
+                            ),
+                          );
+                        },
+                      ),
+                      RaisedButton(
+                        child: Text('Charts'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ViewObjectsScreen(
+                                    project: _project,
+                                    type: 'Charts',
+                                    detailsScreenRoute: ChartScreen.route,
+                                    hierarchyLevel: state.hierarchyLevel,
+                                    userToken: state.userToken,
+                                  ),
+                            ),
+                          );
+                        },
+                      ),
+                      RaisedButton(
+                        child: Text('Tabular Data'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ViewObjectsScreen(
+                                    project: _project,
+                                    type: 'DataObjects',
+                                    detailsScreenRoute: TabularDataScreen.route,
+                                    hierarchyLevel: state.hierarchyLevel,
+                                    userToken: state.userToken,
+                                  ),
+                            ),
+                          );
+                        },
+                      ),
+                      RaisedButton(
+                        child: Text('KPIs'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ViewObjectsScreen(
+                                    project: _project,
+                                    type: 'KPIs',
+                                    detailsScreenRoute: KpiScreen.route,
+                                    hierarchyLevel: state.hierarchyLevel,
+                                    userToken: state.userToken,
+                                  ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  )
                 ]);
           } else if (state is ProjectError) {
-            return const Text('Failed to load project');
+            return Text(state.message);
           }
         },
       )),

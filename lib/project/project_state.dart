@@ -13,8 +13,11 @@ class ProjectLoading extends ProjectState {
 
 class ProjectLoaded extends ProjectState {
   final String userToken;
+  final String hierarchyLevel;
+  final String context;
 
-  ProjectLoaded({this.userToken}) : super([userToken]);
+  ProjectLoaded({@required this.userToken, this.hierarchyLevel, this.context})
+      : super([userToken, hierarchyLevel, context]);
 
   @override
   String toString() => 'ProjectLoaded';
@@ -30,6 +33,10 @@ class ItemScanned extends ProjectState {
 }
 
 class ProjectError extends ProjectState {
+  final String message;
+
+  ProjectError({this.message}) : super([message]);
+
   @override
-  String toString() => 'ProjectError';
+  String toString() => 'ProjectError { message: $message }';
 }
