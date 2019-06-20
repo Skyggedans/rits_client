@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rw_camera/rw_camera.dart';
 
 import '../chart/chart.dart';
 import '../kpi/kpi.dart';
@@ -77,8 +76,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         child: RaisedButton(
                           child: const Text('Take Photo'),
                           onPressed: () async {
-                            _projectBloc.dispatch(PhotoTaken(
-                                await RwCamera.takePhoto(), state.userToken));
+                            _projectBloc.dispatch(
+                                TakePhoto(userToken: state.userToken));
                           },
                         ),
                       ),
@@ -88,8 +87,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         child: RaisedButton(
                           child: const Text('Record Video'),
                           onPressed: () async {
-                            _projectBloc.dispatch(VideoRecorded(
-                                await RwCamera.recordVideo(), state.userToken));
+                            _projectBloc.dispatch(
+                                RecordVideo(userToken: state.userToken));
                           },
                         ),
                       ),
@@ -179,7 +178,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   )
                 ]);
           } else if (state is ProjectError) {
-            return Text(state.message);
+            return Text(state.message ?? '');
           }
         },
       )),

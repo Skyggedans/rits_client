@@ -1,7 +1,5 @@
-import 'dart:typed_data';
-
-import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 import '../models/projects/projects.dart';
 
@@ -28,22 +26,20 @@ class ScanBarcode extends ProjectEvent {
   String toString() => 'ScanBarcode';
 }
 
-class PhotoTaken extends ProjectEvent {
-  final Uint8List bytes;
+class TakePhoto extends ProjectEvent {
   final String userToken;
 
-  PhotoTaken(this.bytes, this.userToken) : super([bytes, userToken]);
+  TakePhoto({@required this.userToken}) : super([userToken]);
 
   @override
-  String toString() => 'PhotoTaken { size: ${bytes.length} bytes }';
+  String toString() => 'TakePhoto';
 }
 
-class VideoRecorded extends ProjectEvent {
-  final String filePath;
+class RecordVideo extends ProjectEvent {
   final String userToken;
 
-  VideoRecorded(this.filePath, this.userToken) : super([filePath, userToken]);
+  RecordVideo({@required this.userToken}) : super([userToken]);
 
   @override
-  String toString() => 'VideoRecorded { file: $filePath }';
+  String toString() => 'RecordVideo';
 }

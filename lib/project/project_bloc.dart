@@ -1,15 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:typed_data/typed_data.dart';
-import 'package:rw_barcode_reader/rw_barcode_reader.dart';
 
 import 'package:bloc/bloc.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
+import 'package:rw_barcode_reader/rw_barcode_reader.dart';
+import 'package:rw_camera/rw_camera.dart';
 import 'package:rxdart/rxdart.dart';
-import '../settings.dart' as settings;
 
 import '../models/projects/projects.dart';
 import '../settings.dart' as settings;
@@ -45,40 +44,52 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     } else if (event is ScanBarcode) {
       final String result = await RwBarcodeReader.scanBarcode();
 
-      try {
-        dynamic decodedResult = json.decode(result);
-        final levelName = await _setContextFromBarCode(
-            decodedResult['ritsData']['itemId'], event.userToken);
+      if (result != null) {
+        yield ProjectLoading();
 
-        if (levelName != null) {
-          yield ProjectLoaded(
-            hierarchyLevel: levelName,
-            context: decodedResult['ritsData']['itemId'],
-            userToken: event.userToken,
-          );
-        } else {
-          yield ProjectError(message: 'Unable to set context');
+        try {
+          dynamic decodedResult = json.decode(result);
+          final levelName = await _setContextFromBarCode(
+              decodedResult['ritsData']['itemId'], event.userToken);
+
+          if (levelName != null) {
+            yield ProjectLoaded(
+              hierarchyLevel: levelName,
+              context: decodedResult['ritsData']['itemId'],
+              userToken: event.userToken,
+            );
+          } else {
+            yield ProjectError(message: 'Unable to set context');
+          }
+        } on ApiError {
+          yield ProjectError(message: 'Unrecognized content: $result');
         }
-      } on ApiError {
-        yield ProjectError(message: 'Unrecognized content: $result');
       }
-    } else if (event is PhotoTaken) {
-      yield ProjectLoading();
+    } else if (event is TakePhoto) {
+      final bytes = await RwCamera.takePhoto();
 
-      try {
-        await _postPhoto(event.bytes, event.userToken);
-        yield prevState;
-      } on ApiError {
-        yield ProjectError(message: 'Unable to save photo');
+      if (bytes != null) {
+        yield ProjectLoading();
+
+        try {
+          await _postPhoto(bytes, event.userToken);
+          yield prevState;
+        } on ApiError {
+          yield ProjectError(message: 'Unable to save photo');
+        }
       }
-    } else if (event is VideoRecorded) {
-      yield ProjectLoading();
+    } else if (event is RecordVideo) {
+      final filePath = await RwCamera.recordVideo();
 
-      try {
-        await _postVideo(event.filePath, event.userToken);
-        yield prevState;
-      } on ApiError {
-        yield ProjectError(message: 'Unable to save video');
+      if (filePath != null) {
+        yield ProjectLoading();
+
+        try {
+          await _postVideo(filePath, event.userToken);
+          yield prevState;
+        } on ApiError {
+          yield ProjectError(message: 'Unable to save video');
+        }
       }
     }
   }
@@ -100,6 +111,11 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     final response = await restClient.get(url);
 
     return json.decode(response.body);
+  }
+
+  @override
+  void onError(Object error, StackTrace stacktrace) {
+    print(error);
   }
 
   Future<void> _postPhoto(Uint8List bytes, String userToken) async {

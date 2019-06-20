@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:path/path.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -10,6 +9,9 @@ import '../authentication/authentication.dart';
 import '../settings.dart' as settings;
 
 typedef RequestFunc = Future<http.Response> Function(String url,
+    {Map<String, String> headers});
+
+typedef BodiedRequestFunc = Future<http.Response> Function(String url,
     {Map<String, String> headers, dynamic body, Encoding encoding});
 
 class ApiError implements Exception {
@@ -23,7 +25,7 @@ class ApiError implements Exception {
 
 abstract class AbstractRestClient {
   Future<http.Response> get(String url,
-      {Map<String, String> headers: const {}, body, encoding}) async {
+      {Map<String, String> headers: const {}}) async {
     final allHeaders = <String, String>{}
       ..addAll(_getHeaders())
       ..addAll(headers);
@@ -53,7 +55,7 @@ abstract class AbstractRestClient {
   }
 
   Future<http.Response> delete(String url,
-      {Map<String, String> headers: const {}, body, encoding}) async {
+      {Map<String, String> headers: const {}}) async {
     final allHeaders = <String, String>{}
       ..addAll(_getHeaders())
       ..addAll(headers);
@@ -104,8 +106,8 @@ class RestClient extends AbstractRestClient {
 
   @override
   Future<http.Response> get(String url,
-      {Map<String, String> headers: const {}, body, encoding}) async {
-    final func = _requestWrapper(super.get);
+      {Map<String, String> headers: const {}}) async {
+    final RequestFunc func = _requestWrapper(super.get);
 
     return await func(url, headers: headers);
   }
@@ -113,15 +115,15 @@ class RestClient extends AbstractRestClient {
   @override
   Future<http.Response> post(String url,
       {Map<String, String> headers: const {}, body, encoding}) async {
-    final func = _requestWrapper(super.post);
+    final BodiedRequestFunc func = _requestWrapper(super.post);
 
     return await func(url, headers: headers, body: body, encoding: encoding);
   }
 
   @override
   Future<http.Response> delete(String url,
-      {Map<String, String> headers: const {}, body, encoding}) async {
-    final func = _requestWrapper(super.delete);
+      {Map<String, String> headers: const {}}) async {
+    final RequestFunc func = _requestWrapper(super.delete);
 
     return await func(url, headers: headers);
   }
@@ -129,7 +131,7 @@ class RestClient extends AbstractRestClient {
   @override
   Future<http.Response> put(String url,
       {Map<String, String> headers: const {}, body, encoding}) async {
-    final func = _requestWrapper(super.put);
+    final BodiedRequestFunc func = _requestWrapper(super.put);
 
     return await func(url, headers: headers, body: body, encoding: encoding);
   }
@@ -186,22 +188,37 @@ class RestClient extends AbstractRestClient {
     }
   }
 
-  RequestFunc _requestWrapper(RequestFunc func) {
+  Function _requestWrapper(Function func) {
     final newFunc = (
       String url, {
       Map<String, String> headers,
       dynamic body,
       Encoding encoding,
     }) async {
+      assert(func is RequestFunc || func is BodiedRequestFunc);
+
+      invokeRequest() async {
+        if (func is BodiedRequestFunc) {
+          return await func(
+            url,
+            headers: headers,
+            body: body,
+            encoding: encoding,
+          );
+        } else if (func is RequestFunc) {
+          return await func(url, headers: headers);
+        }
+
+        return null;
+      }
+
       try {
-        return await func(url,
-            headers: headers, body: body, encoding: encoding);
+        return await invokeRequest();
       } on AccessDeniedError {
         try {
           await _tryRefreshToken();
 
-          return await func(url,
-              headers: headers, body: body, encoding: encoding);
+          return await invokeRequest();
         } on TokenRevokedError {
           throw AccessDeniedError();
         }

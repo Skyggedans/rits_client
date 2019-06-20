@@ -16,8 +16,8 @@ const app = express();
 
 app.use(bodyParser.text({limit: '50mb'}));
 
-app.post('/photo', function (req, res) {
-  console.log(req.body);
+app.post('/photo', upload.single('photo'), (req, res) => {
+  console.log(req.body, req.file);
   res.send('OK');
 });
 
@@ -28,7 +28,7 @@ app.post('/video', upload.single('movie'), (req, res) => {
 })
 
 var server = app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
+  console.log('Test server listening on port 3000!');
 });
 
 server.timeout = 5 * 60 * 10; 
