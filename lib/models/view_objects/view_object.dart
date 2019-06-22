@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class ViewObject extends Equatable {
+  //final int id;
   final String name;
   final String title;
   final String itemType;
@@ -9,6 +10,7 @@ class ViewObject extends Equatable {
   final String inputForm;
 
   ViewObject({
+    //this.id,
     this.name,
     this.title,
     this.itemType,

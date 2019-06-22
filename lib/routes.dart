@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rits_client/associated_data_item/associated_data_item.dart';
 
 import 'chart/chart.dart';
 import 'report/report.dart';
@@ -34,6 +35,14 @@ final routes = <String, WidgetBuilder>{
     final dynamic args = ModalRoute.of(context).settings.arguments;
 
     return KpiScreen(
+      viewObject: args['viewObject'],
+      userToken: args['userToken'],
+    );
+  },
+  AssociatedDataItemScreen.route: (BuildContext context) {
+    final dynamic args = ModalRoute.of(context).settings.arguments;
+
+    return AssociatedDataItemScreen(
       viewObject: args['viewObject'],
       userToken: args['userToken'],
     );

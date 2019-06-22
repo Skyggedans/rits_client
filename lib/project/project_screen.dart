@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../associated_data_item/associated_data_item.dart';
+import '../associated_data_items/associated_data_items.dart';
 import '../chart/chart.dart';
 import '../kpi/kpi.dart';
 import '../luis/luis.dart';
@@ -168,6 +170,27 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                     type: 'KPIs',
                                     detailsScreenRoute: KpiScreen.route,
                                     hierarchyLevel: state.hierarchyLevel,
+                                    userToken: state.userToken,
+                                  ),
+                            ),
+                          );
+                        },
+                      ),
+                      RaisedButton(
+                        child: Text('Associated Data'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ViewObjectsScreen(
+                                    project: _project,
+                                    type: 'AssociatedData',
+                                    detailsScreenRoute:
+                                        AssociatedDataItemScreen.route,
+                                    //hierarchyLevel: state.hierarchyLevel,
+                                    viewObjectsRepository:
+                                        AssociatedDataItemsRepository(
+                                            restClient: RestClient()),
                                     userToken: state.userToken,
                                   ),
                             ),
