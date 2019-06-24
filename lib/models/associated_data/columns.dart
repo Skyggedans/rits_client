@@ -6,6 +6,8 @@ abstract class ColumnDef<T> extends Equatable {
   final T max;
   final List<T> options;
 
+  T get defaultValue;
+
   ColumnDef(this.name, {this.min, this.max, this.options});
 
   factory ColumnDef.fromJson(Map<String, dynamic> json) {
@@ -39,6 +41,8 @@ class NumericColumn extends ColumnDef<num> {
   NumericColumn(String name, {num min, num max, List<num> options})
       : super(name, min: min, max: max, options: options);
 
+  num get defaultValue => 0;
+
   factory NumericColumn.fromJson(Map<String, dynamic> json) {
     return NumericColumn(
       json['AttributeName'],
@@ -53,6 +57,8 @@ class StringColumn extends ColumnDef<String> {
   StringColumn(String name, {List<String> options})
       : super(name, options: options);
 
+  String get defaultValue => '';
+
   factory StringColumn.fromJson(Map<String, dynamic> json) {
     return StringColumn(
       json['AttributeName'],
@@ -64,6 +70,8 @@ class StringColumn extends ColumnDef<String> {
 class DateTimeColumn extends ColumnDef<DateTime> {
   DateTimeColumn(String name, {DateTime min, DateTime max})
       : super(name, min: min, max: max);
+
+  DateTime get defaultValue => DateTime.now();
 
   factory DateTimeColumn.fromJson(Map<String, dynamic> json) {
     return DateTimeColumn(

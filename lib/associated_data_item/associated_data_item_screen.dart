@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
+import '../models/associated_data/associated_data.dart';
 import '../models/view_objects/view_objects.dart';
+import '../row_editor/row_editor_screen.dart';
 import '../view_object/view_object.dart';
 import 'associated_data_item.dart';
 
@@ -33,6 +36,86 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
   AssociatedDataItemBloc viewObjectBloc = AssociatedDataItemBloc();
 
   @override
+  void initState() {
+    super.initState();
+    viewObjectBloc.dispatch(GenerateViewObject(viewObject, userToken));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder(
+      bloc: viewObjectBloc,
+      builder: (BuildContext context, ViewObjectState state) {
+        Widget bodyChild;
+
+        if (state is ViewObjectGeneration) {
+          bodyChild = CircularProgressIndicator();
+        } else if (state is AssociatedDataItemGenerated) {
+          bodyChild = buildOutputWidget(state);
+        } else if (state is ViewObjectError) {
+          bodyChild = const Text('Failed to generate associated data item');
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(viewObject.title ?? viewObject.name),
+            actions: <Widget>[
+              FlatButton(
+                child: Row(
+                  children: <Widget>[
+                    const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                    Text(
+                      'NEW RECORD',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                onPressed: () {
+                  if (state is AssociatedDataItemGenerated) {
+                    _onNewRecord(context, state.columnDefinitions, state.table);
+                  }
+                },
+              ),
+              FlatButton(
+                child: Row(
+                  children: <Widget>[
+                    const Icon(
+                      Icons.save,
+                      color: Colors.white,
+                    ),
+                    Text(
+                      'SAVE DATA',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                onPressed: () {
+                  if (state is AssociatedDataItemGenerated)
+                    viewObjectBloc.dispatch(SaveRows(
+                      table: state.table,
+                      viewObject: state.viewObject,
+                      userToken: state.userToken,
+                    ));
+                },
+              ),
+            ],
+          ),
+          body: Center(child: bodyChild),
+        );
+      },
+    );
+  }
+
+  @override
   Widget buildOutputWidget(AssociatedDataItemGenerated state) {
     final columns = state.table.columns;
     final rows = state.table.rows;
@@ -42,15 +125,24 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
         children: <Widget>[
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: columns.map((column) {
-              return Expanded(
-                child: Text(
-                  column,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              );
-            }).toList(),
+            children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      '#',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ] +
+                columns.map((column) {
+                  return Expanded(
+                    child: Text(
+                      column,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  );
+                }).toList(),
           ),
           Expanded(
             child: ListView.separated(
@@ -67,24 +159,35 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
                 return InkWell(
                   child: Semantics(
                     button: true,
-                    value: 'Record $index',
-                    onTap: () {
-                      _showRecordDialog(context, row, index);
-                    },
+                    value: 'Select Record ${index + 1}',
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: columns.map((prop) {
-                        return Expanded(
-                          child: Text(
-                            (row[prop] ?? '').toString(),
-                          ),
-                        );
-                      }).toList(),
+                      children: <Widget>[
+                            Expanded(
+                              child: Text((index + 1).toString()),
+                            )
+                          ] +
+                          columns.map((prop) {
+                            return Expanded(
+                              child: Text((row[prop] ?? '').toString()),
+                            );
+                          }).toList(),
                     ),
+                    onTap: () => _onRowTap(
+                          context,
+                          state.columnDefinitions,
+                          state.table,
+                          row,
+                          index,
+                        ),
                   ),
-                  onTap: () {
-                    _showRecordDialog(context, row, index);
-                  },
+                  onTap: () => _onRowTap(
+                        context,
+                        state.columnDefinitions,
+                        state.table,
+                        row,
+                        index,
+                      ),
                 );
               },
             ),
@@ -96,14 +199,74 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
     }
   }
 
+  @override
+  bool returnToMainScreen() => false;
+
+  void _onNewRecord(BuildContext context, List<ColumnDef> columnDefinitions,
+      AssociatedDataTable table) async {
+    final newRow = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RowEditorScreen(
+              columnDefinitions: columnDefinitions,
+              row: Map<String, dynamic>.fromIterable(columnDefinitions,
+                  key: (colDef) => colDef.name,
+                  value: (colDef) => colDef.defaultValue),
+            ),
+      ),
+    );
+
+    if (newRow != null) {
+      viewObjectBloc.dispatch(AddRow(table: table, row: newRow));
+    }
+  }
+
+  void _onRowTap(BuildContext context, List<ColumnDef> columnDefinitions,
+      AssociatedDataTable table, Map<String, dynamic> row, int index) async {
+    final dialogResult =
+        await _showRecordDialog(context, columnDefinitions, row, index);
+
+    switch (dialogResult) {
+      case RecordAction.EDIT:
+        {
+          final modifiedRow = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RowEditorScreen(
+                    columnDefinitions: columnDefinitions,
+                    row: Map<String, dynamic>.from(row),
+                  ),
+            ),
+          );
+
+          if (modifiedRow != null) {
+            viewObjectBloc.dispatch(
+                UpdateRow(table: table, row: modifiedRow, index: index));
+          }
+
+          break;
+        }
+      case RecordAction.REMOVE:
+        {
+          viewObjectBloc.dispatch(RemoveRow(table: table, index: index));
+
+          break;
+        }
+      default:
+    }
+  }
+
   Future<RecordAction> _showRecordDialog(
-      BuildContext context, dynamic row, int index) async {
-    return showDialog<RecordAction>(
+      BuildContext context,
+      List<ColumnDef> columnDefinitions,
+      Map<String, dynamic> row,
+      int index) async {
+    return await showDialog<RecordAction>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Record $index'),
+          title: Text('Record ${index + 1}'),
           content: const Text('Select required action'),
           actions: <Widget>[
             FlatButton(

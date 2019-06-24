@@ -18,7 +18,7 @@ class AssociatedDataItemsRepository
     String type,
     String userToken,
   ) async {
-    final url = '${settings.backendUrl}/GetAssociatedDataItems/$userToken';
+    final url = '${settings.backendUrl}/GetAssociatedDataItems/$userToken/2';
     final response = await restClient.get(url);
     final List body = json.decode(response.body);
 

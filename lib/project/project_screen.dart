@@ -187,7 +187,6 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                     type: 'AssociatedData',
                                     detailsScreenRoute:
                                         AssociatedDataItemScreen.route,
-                                    //hierarchyLevel: state.hierarchyLevel,
                                     viewObjectsRepository:
                                         AssociatedDataItemsRepository(
                                             restClient: RestClient()),

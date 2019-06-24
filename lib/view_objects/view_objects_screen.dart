@@ -14,8 +14,6 @@ class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
   final String hierarchyLevel;
   final ViewObjectsRepository viewObjectsRepository;
 
-  String get typePlural => '${type}s';
-
   ViewObjectsScreen({
     Key key,
     @required this.project,
@@ -24,7 +22,11 @@ class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
     @required this.type,
     this.viewObjectsRepository,
     this.hierarchyLevel,
-  }) : super(key: key);
+  })  : assert(project != null),
+        assert(userToken != null),
+        assert(detailsScreenRoute != null),
+        assert(type != null),
+        super(key: key);
 
   @override
   State createState() => _ViewObjectsScreenState(viewObjectsRepository);

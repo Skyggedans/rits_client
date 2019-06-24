@@ -21,21 +21,11 @@ abstract class ViewObjectScreen extends StatefulWidget {
 
 abstract class ViewObjectScreenState<T extends ViewObjectBloc,
     S extends ViewObjectState> extends State<ViewObjectScreen> {
-  ViewObject get _viewObject => widget.viewObject;
-  String get _userToken => widget.userToken;
+  ViewObject get viewObject => widget.viewObject;
+  String get userToken => widget.userToken;
 
   T viewObjectBloc;
   Widget buildOutputWidget(S state);
-
-  Future<bool> _onBackPressed() async {
-    if (viewObjectBloc.currentState != viewObjectBloc.initialState) {
-      viewObjectBloc.dispatch(ReturnToViewObjectMainScreen());
-
-      return false;
-    }
-
-    return true;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +33,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
       onWillPop: _onBackPressed,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(_viewObject.title ?? _viewObject.name),
+          title: Text(viewObject.title ?? viewObject.name),
         ),
         body: Center(
           child: BlocBuilder(
@@ -66,8 +56,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                             context,
                             MaterialPageRoute(
                               builder: (context) => ViewObjectParametersScreen(
-                                  viewObject: _viewObject,
-                                  userToken: _userToken),
+                                  viewObject: viewObject, userToken: userToken),
                             ),
                           );
                         },
@@ -76,8 +65,8 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                         child: const Text('View'),
                         onPressed: () {
                           viewObjectBloc.dispatch(GenerateViewObject(
-                            _viewObject,
-                            _userToken,
+                            viewObject,
+                            userToken,
                           ));
                         },
                       ),
@@ -94,5 +83,18 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
   void dispose() {
     viewObjectBloc.dispose();
     super.dispose();
+  }
+
+  bool returnToMainScreen() =>
+      viewObjectBloc.currentState != viewObjectBloc.initialState;
+
+  Future<bool> _onBackPressed() async {
+    if (returnToMainScreen()) {
+      viewObjectBloc.dispatch(ReturnToViewObjectMainScreen());
+
+      return false;
+    }
+
+    return true;
   }
 }

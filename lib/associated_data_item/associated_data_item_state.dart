@@ -1,13 +1,35 @@
-import 'package:rits_client/models/associated_data/associated_data.dart';
-
+import 'package:meta/meta.dart';
+import '../models/associated_data/associated_data.dart';
 import '../view_object/view_object.dart';
 
 class AssociatedDataItemGenerated extends ViewObjectState {
-  final List<ColumnDef> columns;
-  final Table table;
+  final List<ColumnDef> columnDefinitions;
+  final AssociatedDataTable table;
+  final BusinessObject viewObject;
+  final String userToken;
 
-  AssociatedDataItemGenerated({this.columns, this.table})
-      : super([columns, table]);
+  AssociatedDataItemGenerated({
+    @required this.columnDefinitions,
+    @required this.table,
+    this.viewObject,
+    this.userToken,
+  })  : assert(columnDefinitions != null),
+        assert(table != null),
+        assert(viewObject != null),
+        assert(userToken != null),
+        super([columnDefinitions, table, viewObject, userToken]);
+
+  AssociatedDataItemGenerated copyWith({
+    List<ColumnDef> columnDefinitions,
+    AssociatedDataTable table,
+  }) {
+    return AssociatedDataItemGenerated(
+      columnDefinitions: columnDefinitions ?? this.columnDefinitions,
+      table: table ?? this.table,
+      viewObject: this.viewObject,
+      userToken: this.userToken,
+    );
+  }
 
   @override
   String toString() => 'AssociatedDataItemGenerated';

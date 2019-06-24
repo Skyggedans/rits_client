@@ -56,7 +56,11 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
   @override
   void initState() {
     _authenticationBloc = AuthenticationBloc(authRepository: _authRepository);
-    _authenticationBloc.dispatch(AppStarted());
+
+    Future.delayed(Duration(seconds: 3), () {
+      _authenticationBloc.dispatch(AppStarted());
+    });
+
     super.initState();
   }
 
@@ -71,6 +75,7 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
     return BlocProvider<AuthenticationBloc>(
       bloc: _authenticationBloc,
       child: MaterialApp(
+        //showSemanticsDebugger: true,
         routes: routes,
         home: BlocBuilder<AuthenticationEvent, AuthenticationState>(
           bloc: _authenticationBloc,
