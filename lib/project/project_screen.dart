@@ -176,25 +176,28 @@ class _ProjectScreenState extends State<ProjectScreen> {
                           );
                         },
                       ),
-                      RaisedButton(
-                        child: Text('Associated Data'),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ViewObjectsScreen(
-                                    project: _project,
-                                    type: 'AssociatedData',
-                                    detailsScreenRoute:
-                                        AssociatedDataItemScreen.route,
-                                    viewObjectsRepository:
-                                        AssociatedDataItemsRepository(
-                                            restClient: RestClient()),
-                                    userToken: state.userToken,
-                                  ),
-                            ),
-                          );
-                        },
+                      Visibility(
+                        visible: state.hierarchyLevel != null,
+                        child: RaisedButton(
+                          child: Text('Associated Data'),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ViewObjectsScreen(
+                                      project: _project,
+                                      type: 'AssociatedData',
+                                      detailsScreenRoute:
+                                          AssociatedDataItemScreen.route,
+                                      viewObjectsRepository:
+                                          AssociatedDataItemsRepository(
+                                              restClient: RestClient()),
+                                      userToken: state.userToken,
+                                    ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   )

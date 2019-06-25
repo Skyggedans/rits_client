@@ -65,12 +65,16 @@ class _RowEditorScreenState extends State<RowEditorScreen> {
           spacing: 10,
           children: _columnDefinitions.map((columnDef) {
             if (columnDef is NumericColumn) {
+              final numValue = _row[columnDef.name];
+
               return SizedBox(
                 width: 250,
                 child: TextFormField(
                   autovalidate: true,
-                  initialValue: _row[columnDef.name].toString(),
-                  keyboardType: TextInputType.number,
+                  initialValue: numValue.truncateToDouble() == numValue
+                      ? numValue.toStringAsFixed(0)
+                      : numValue.toString(),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
                     labelText: columnDef.name,
                     helperText: columnDef.name,
@@ -126,9 +130,6 @@ class _RowEditorScreenState extends State<RowEditorScreen> {
                       decoration: InputDecoration(
                         labelText: columnDef.name,
                         helperText: columnDef.name,
-                        labelStyle: TextStyle(
-                          fontSize: 12,
-                        ),
                         helperStyle: TextStyle(
                           fontSize: 1,
                           color: Color.fromARGB(0, 0, 0, 0),
@@ -153,7 +154,7 @@ class _RowEditorScreenState extends State<RowEditorScreen> {
                   );
                 } else {
                   return TextFormField(
-                    initialValue: _row[columnDef.name],
+                    initialValue: _row[columnDef.name].toString(),
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
                       labelText: columnDef.name,
@@ -183,7 +184,11 @@ class _RowEditorScreenState extends State<RowEditorScreen> {
                   labelText: columnDef.name,
                   helperText: columnDef.name,
                   selectedDate: _row[columnDef.name],
-                  selectDate: (value) {},
+                  selectDate: (value) {
+                    setState(() {
+                      _row[columnDef.name] = value;
+                    });
+                  },
                 ),
               );
             } else {

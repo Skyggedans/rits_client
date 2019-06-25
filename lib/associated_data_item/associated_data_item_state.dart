@@ -34,3 +34,8 @@ class AssociatedDataItemGenerated extends ViewObjectState {
   @override
   String toString() => 'AssociatedDataItemGenerated';
 }
+
+class NoActiveContainerError extends ViewObjectState {
+  @override
+  String toString() => 'NoActiveContainerError';
+}

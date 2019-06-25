@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
 import '../models/associated_data/associated_data.dart';
@@ -47,67 +48,72 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
       bloc: viewObjectBloc,
       builder: (BuildContext context, ViewObjectState state) {
         Widget bodyChild;
+        String title = viewObject.title ?? viewObject.name;
 
         if (state is ViewObjectGeneration) {
           bodyChild = CircularProgressIndicator();
         } else if (state is AssociatedDataItemGenerated) {
+          title += '.${state.table.container.name}';
           bodyChild = buildOutputWidget(state);
+        } else if (state is NoActiveContainerError) {
+          bodyChild = const Text('There is no active container');
         } else if (state is ViewObjectError) {
           bodyChild = const Text('Failed to generate associated data item');
         }
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(viewObject.title ?? viewObject.name),
-            actions: <Widget>[
-              FlatButton(
-                child: Row(
-                  children: <Widget>[
-                    const Icon(
-                      Icons.add,
-                      color: Colors.white,
-                    ),
-                    Text(
-                      'NEW RECORD',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+            title: Text(title),
+            actions: state is AssociatedDataItemGenerated
+                ? <Widget>[
+                    FlatButton(
+                      child: Row(
+                        children: <Widget>[
+                          const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          Text(
+                            'NEW RECORD',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
+                      onPressed: () {
+                        _onNewRecord(
+                            context, state.columnDefinitions, state.table);
+                      },
                     ),
-                  ],
-                ),
-                onPressed: () {
-                  if (state is AssociatedDataItemGenerated) {
-                    _onNewRecord(context, state.columnDefinitions, state.table);
-                  }
-                },
-              ),
-              FlatButton(
-                child: Row(
-                  children: <Widget>[
-                    const Icon(
-                      Icons.save,
-                      color: Colors.white,
-                    ),
-                    Text(
-                      'SAVE DATA',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                    FlatButton(
+                      child: Row(
+                        children: <Widget>[
+                          const Icon(
+                            Icons.save,
+                            color: Colors.white,
+                          ),
+                          Text(
+                            'SAVE DATA',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
+                      onPressed: () {
+                        if (state is AssociatedDataItemGenerated)
+                          viewObjectBloc.dispatch(SaveRows(
+                            table: state.table,
+                            viewObject: state.viewObject,
+                            userToken: state.userToken,
+                          ));
+                      },
                     ),
-                  ],
-                ),
-                onPressed: () {
-                  if (state is AssociatedDataItemGenerated)
-                    viewObjectBloc.dispatch(SaveRows(
-                      table: state.table,
-                      viewObject: state.viewObject,
-                      userToken: state.userToken,
-                    ));
-                },
-              ),
-            ],
+                  ]
+                : null,
           ),
           body: Center(child: bodyChild),
         );
@@ -117,7 +123,7 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
 
   @override
   Widget buildOutputWidget(AssociatedDataItemGenerated state) {
-    final columns = state.table.columns;
+    final columns = state.columnDefinitions; //state.table.columns;
     final rows = state.table.rows;
 
     if (rows.length > 0) {
@@ -134,10 +140,10 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
                     ),
                   )
                 ] +
-                columns.map((column) {
+                columns.map((colDef) {
                   return Expanded(
                     child: Text(
-                      column,
+                      colDef.name,
                       textAlign: TextAlign.center,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
@@ -167,9 +173,22 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
                               child: Text((index + 1).toString()),
                             )
                           ] +
-                          columns.map((prop) {
+                          columns.map((colDef) {
+                            final value = row[colDef.name];
+                            String text = (value ?? '').toString();
+
+                            if (colDef is NumericColumn && value is num) {
+                              text = value.truncateToDouble() == value
+                                  ? value.toStringAsFixed(0)
+                                  : value.toString();
+                            } else if (colDef is DateTimeColumn) {
+                              final format = DateFormat.yMd('en_US');
+
+                              text = format.format(value);
+                            }
+
                             return Expanded(
-                              child: Text((row[prop] ?? '').toString()),
+                              child: Text(text),
                             );
                           }).toList(),
                     ),
@@ -195,7 +214,7 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
         ],
       );
     } else {
-      return const Text('No data');
+      return const Text('There is no data yet, please add something');
     }
   }
 

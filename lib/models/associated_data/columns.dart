@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 
 abstract class ColumnDef<T> extends Equatable {
   final String name;
@@ -12,15 +13,15 @@ abstract class ColumnDef<T> extends Equatable {
 
   factory ColumnDef.fromJson(Map<String, dynamic> json) {
     switch (json['AttributeTypeName']) {
-      case 0:
+      case 'Numeric':
         {
           return NumericColumn.fromJson(json) as ColumnDef<T>;
         }
-      case 1:
+      case 'Text':
         {
           return StringColumn.fromJson(json) as ColumnDef<T>;
         }
-      case 2:
+      case 'Date':
         {
           return DateTimeColumn.fromJson(json) as ColumnDef<T>;
         }
@@ -74,10 +75,26 @@ class DateTimeColumn extends ColumnDef<DateTime> {
   DateTime get defaultValue => DateTime.now();
 
   factory DateTimeColumn.fromJson(Map<String, dynamic> json) {
+    final DateFormat format = DateFormat('MM/dd/yyyy hh:mm:ss a');
+    DateTime min;
+    DateTime max;
+
+    try {
+      min = format.parse(json['InclusionMin']);
+    } catch (_) {
+      min = null;
+    }
+
+    try {
+      max = format.parse(json['InclusionMax']);
+    } catch (_) {
+      max = null;
+    }
+
     return DateTimeColumn(
       json['AttributeName'],
-      // min: json['InclusionMin'],
-      // max: json['InclusionMax'],
+      min: min,
+      max: max,
     );
   }
 }

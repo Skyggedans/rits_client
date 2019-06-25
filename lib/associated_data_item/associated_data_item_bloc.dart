@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
+
 import '../models/associated_data/associated_data.dart';
 import '../models/associated_data/business_object.dart';
 import '../models/associated_data/table.dart';
@@ -25,6 +28,11 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
         final columns =
             await _getColumnDefinitions(event.viewObject, event.userToken);
         final data = await _getData(event.viewObject, event.userToken);
+
+        if (data == null) {
+          yield NoActiveContainerError();
+          return;
+        }
 
         yield AssociatedDataItemGenerated(
           columnDefinitions: columns,
@@ -81,26 +89,46 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
     }
   }
 
+  // Future<AssociatedDataContainer> _getActiveContainer(
+  //     BusinessObject viewObject, String userToken) async {
+  //   final url =
+  //       '${settings.backendUrl}/GetAssociatedDataForItem/$userToken/${viewObject.id}';
+
+  //   final response = await restClient.get(url);
+  //   final body = json.decode(response.body);
+
+  //   final List<AssociatedDataContainer> containers =
+  //       body.map<AssociatedDataContainer>((item) {
+  //     return AssociatedDataContainer.fromJson(item);
+  //   }).toList();
+
+  //   return containers.firstWhere(
+  //       (AssociatedDataContainer container) => container.isActive,
+  //       orElse: () => null);
+  // }
+
   Future<AssociatedDataTable> _getData(
       BusinessObject viewObject, String userToken) async {
-    // final url1 =
-    //     '${settings.backendUrl}/GetAssociatedDataForItem/$userToken/${viewObject.id}';
-
-    // final url2 =
-    //     '${settings.backendUrl}/EditAssociatedData/$userToken/FormSource22/313';
-
-    // final url3 =
-    //     '${settings.backendUrl}/GetAssociatedDataValidation/$userToken/${viewObject.name}';
+    //final container = await _getActiveContainer(viewObject, userToken);
 
     final url =
-        '${settings.backendUrl}/GetBusObjectAssociatedData/$userToken/1080';
+        '${settings.backendUrl}/GetAssociatedDataContainer/$userToken/${viewObject.id}';
 
     final response = await restClient.get(url);
-    final body = json.decode(response.body);
+
+    final body = json.decode(response.body, reviver: (key, value) {
+      if (value is String) {
+        return DateTime.tryParse(value) ?? value;
+      }
+
+      return value;
+    });
 
     return AssociatedDataTable(
-        columns: body['columns'].cast<String>(),
-        rows: body['data'].cast<Map<String, dynamic>>());
+      container: AssociatedDataContainer.fromJson(body),
+      columns: body['columns'].cast<String>(),
+      rows: body['data'].cast<Map<String, dynamic>>(),
+    );
   }
 
   Future<List<ColumnDef>> _getColumnDefinitions(
@@ -109,18 +137,32 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
         '${settings.backendUrl}/GetAssociatedDataValidation/$userToken/${viewObject.name}';
 
     final response = await restClient.get(url);
-    final List body = json.decode(response.body);
+    final body = json.decode(response.body);
 
-    return body.map((param) {
-      return ColumnDef.fromJson(param);
+    return body.map<ColumnDef>((colDef) {
+      return ColumnDef.fromJson(colDef);
     }).toList();
   }
 
   Future<void> _saveRows(AssociatedDataTable table, BusinessObject viewObject,
       String userToken) async {
     final url =
-        '${settings.backendUrl}/GetAssociatedDataValidation/$userToken/${viewObject.id}';
+        '${settings.backendUrl}/UpdateBusObjectAssociatedData/$userToken/${table.container.id}';
 
-    await restClient.post(url, body: json.encode(table.rows));
+    table.rows.forEach((row) {
+      row['AssociatedDataHeaderID'] = table.container.id;
+    });
+
+    await restClient.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(table.rows, toEncodable: (object) {
+        if (object is DateTime) {
+          final format = DateFormat('MM/dd/yyyy hh:mm:ss a');
+
+          return format.format(object);
+        }
+      }),
+    );
   }
 }
