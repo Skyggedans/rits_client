@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:rits_client/associated_data_item/associated_data_item.dart';
 
+import 'associated_data_item/associated_data_item.dart';
 import 'chart/chart.dart';
+import 'kpi/kpi.dart';
 import 'report/report.dart';
 import 'tabular_data/tabular_data.dart';
-import 'kpi/kpi.dart';
 
 final routes = <String, WidgetBuilder>{
   ReportScreen.route: (BuildContext context) {

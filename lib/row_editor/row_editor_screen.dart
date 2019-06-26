@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/semantics.dart';
 
 import '../models/associated_data/associated_data.dart';
 import '../widgets/widgets.dart';
@@ -113,43 +116,47 @@ class _RowEditorScreenState extends State<RowEditorScreen> {
                           ? _row[columnDef.name]
                           : null;
 
+                  final dropDownKey = GlobalKey<State>();
+
                   return Semantics(
                     button: true,
-                    excludeSemantics: true,
-                    //explicitChildNodes: true,
-                    focused: true,
-                    //value: columnDef.name,
-                    //hint: columnDef.name,
-                    label: columnDef.name,
+                    value: columnDef.name,
                     onTap: () {
-                      //Finder.byType(MyChildWidget);
-                      print('test');
+                      final RenderBox renderObject =
+                          dropDownKey.currentState.context.findRenderObject();
+                      final hitTestResult = HitTestResult();
+
+                      renderObject.hitTest(hitTestResult,
+                          position: Offset.fromDirection(0, 10));
                     },
-                    child: DropdownButtonFormField<String>(
-                      value: dropDownValue,
-                      decoration: InputDecoration(
-                        labelText: columnDef.name,
-                        helperText: columnDef.name,
-                        helperStyle: TextStyle(
-                          fontSize: 1,
-                          color: Color.fromARGB(0, 0, 0, 0),
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          _row[columnDef.name] = value;
-                        });
-                      },
-                      items: columnDef.options
-                          .map<DropdownMenuItem<String>>((value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: SizedBox(
-                            width: 200,
-                            child: Text(value),
+                    child: MergeSemantics(
+                      child: DropdownButtonFormField<String>(
+                        key: dropDownKey,
+                        value: dropDownValue,
+                        decoration: InputDecoration(
+                          labelText: columnDef.name,
+                          helperText: columnDef.name,
+                          helperStyle: TextStyle(
+                            fontSize: 1,
+                            color: Color.fromARGB(0, 0, 0, 0),
                           ),
-                        );
-                      }).toList(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _row[columnDef.name] = value;
+                          });
+                        },
+                        items: columnDef.options
+                            .map<DropdownMenuItem<String>>((value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: SizedBox(
+                              width: 200,
+                              child: Text(value),
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   );
                 } else {

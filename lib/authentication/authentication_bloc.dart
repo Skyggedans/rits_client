@@ -202,7 +202,7 @@ class AuthenticationBloc
   Future<Map<String, dynamic>> _requestAccessTokenByRefreshToken(
       String refreshToken) async {
     final response = await http.post(
-      settings.authUrl,
+      settings.authTokenUrl,
       body: {
         'client_id': settings.authClientId,
         'client_secret': settings.authClientSecret,

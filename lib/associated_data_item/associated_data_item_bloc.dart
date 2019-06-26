@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 import '../models/associated_data/associated_data.dart';
@@ -109,8 +108,6 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
 
   Future<AssociatedDataTable> _getData(
       BusinessObject viewObject, String userToken) async {
-    //final container = await _getActiveContainer(viewObject, userToken);
-
     final url =
         '${settings.backendUrl}/GetAssociatedDataContainer/$userToken/${viewObject.id}';
 

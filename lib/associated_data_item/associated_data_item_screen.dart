@@ -104,12 +104,11 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
                         ],
                       ),
                       onPressed: () {
-                        if (state is AssociatedDataItemGenerated)
-                          viewObjectBloc.dispatch(SaveRows(
-                            table: state.table,
-                            viewObject: state.viewObject,
-                            userToken: state.userToken,
-                          ));
+                        viewObjectBloc.dispatch(SaveRows(
+                          table: state.table,
+                          viewObject: state.viewObject,
+                          userToken: state.userToken,
+                        ));
                       },
                     ),
                   ]
