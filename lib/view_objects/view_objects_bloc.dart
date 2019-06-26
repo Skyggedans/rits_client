@@ -1,20 +1,17 @@
 import 'dart:async';
-import 'dart:convert';
-
 import 'package:meta/meta.dart';
-import 'package:rxdart/rxdart.dart';
-import 'package:bloc/bloc.dart';
 
-import '../settings.dart' as settings;
+import 'package:bloc/bloc.dart';
+import 'package:rxdart/rxdart.dart';
+
 import '../utils/rest_client.dart';
-import '../models/view_objects/view_objects.dart';
-import '../models/projects/projects.dart';
 import 'view_objects.dart';
 
 class ViewObjectsBloc extends Bloc<ViewObjectsEvent, ViewObjectsState> {
-  final RestClient restClient;
+  final ViewObjectsRepository viewObjectsRepository;
 
-  ViewObjectsBloc({@required this.restClient});
+  ViewObjectsBloc({@required this.viewObjectsRepository})
+      : assert(viewObjectsRepository != null);
 
   @override
   Stream<ViewObjectsEvent> transform(Stream<ViewObjectsEvent> events) {
@@ -30,55 +27,25 @@ class ViewObjectsBloc extends Bloc<ViewObjectsEvent, ViewObjectsState> {
     if (event is FetchViewObjects) {
       try {
         if (currentState is ViewObjectsUninitialized) {
-          final reports = event.hierarchyLevel?.isNotEmpty == true
-              ? await _fetchHierarchyViewObjects(
+          final viewObjects = event.hierarchyLevel?.isNotEmpty == true
+              ? await viewObjectsRepository.fetchHierarchyViewObjects(
                   event.project,
                   event.type,
                   event.hierarchyLevel,
                   event.userToken,
                 )
-              : await _fetchViewObjects(
+              : await viewObjectsRepository.fetchViewObjects(
                   event.project,
                   event.type,
                   event.userToken,
                 );
 
           yield ViewObjectsLoaded(
-              viewObjects: reports, userToken: event.userToken);
+              viewObjects: viewObjects, userToken: event.userToken);
         }
       } on ApiError {
         yield ViewObjectsError();
       }
     }
-  }
-
-  Future<List<ViewObject>> _fetchViewObjects(
-    Project project,
-    String type,
-    String userToken,
-  ) async {
-    final url = '${settings.backendUrl}/ViewObjects/$userToken/$type';
-    final response = await restClient.get(url);
-    final List body = json.decode(response.body);
-
-    return body.map((report) {
-      return ViewObject.fromJson(report);
-    }).toList();
-  }
-
-  Future<List<ViewObject>> _fetchHierarchyViewObjects(
-    Project project,
-    String type,
-    String hierarchyLevel,
-    String userToken,
-  ) async {
-    final url =
-        '${settings.backendUrl}/Hierarchy/$userToken/$hierarchyLevel/$type';
-    final response = await restClient.get(url);
-    final List body = json.decode(response.body);
-
-    return body.map((report) {
-      return ViewObject.fromJson(report);
-    }).toList();
   }
 }

@@ -11,7 +11,7 @@ import 'view_object.dart';
 abstract class ViewObjectBloc extends Bloc<ViewObjectEvent, ViewObjectState> {
   final RestClient restClient;
 
-  ViewObjectBloc({@required this.restClient});
+  ViewObjectBloc({@required this.restClient}) : assert(restClient != null);
 
   @override
   get initialState => ViewObjectIdle();

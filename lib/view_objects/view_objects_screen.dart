@@ -1,9 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rits_client/utils/utils.dart';
 
-import '../utils/rest_client.dart';
 import '../models/projects/projects.dart';
 import 'view_objects.dart';
 
@@ -13,8 +12,7 @@ class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
   final String type;
   final String userToken;
   final String hierarchyLevel;
-
-  String get typePlural => '${type}s';
+  final ViewObjectsRepository viewObjectsRepository;
 
   ViewObjectsScreen({
     Key key,
@@ -22,26 +20,40 @@ class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
     @required this.userToken,
     @required this.detailsScreenRoute,
     @required this.type,
+    this.viewObjectsRepository,
     this.hierarchyLevel,
-  }) : super(key: key);
+  })  : assert(project != null),
+        assert(userToken != null),
+        assert(detailsScreenRoute != null),
+        assert(type != null),
+        super(key: key);
 
   @override
-  State createState() => _ViewObjectsScreenState();
+  State createState() => _ViewObjectsScreenState(viewObjectsRepository);
 }
 
 class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
-  final ViewObjectsBloc _viewObjectsBloc =
-      ViewObjectsBloc(restClient: RestClient());
+  final ViewObjectsBloc viewObjectsBloc;
 
   Project get _project => widget.project;
   String get _type => widget.type;
   String get _userToken => widget.userToken;
   String get _hierarchyLevel => widget.hierarchyLevel;
 
+  _ViewObjectsScreenState._({this.viewObjectsBloc});
+
+  factory _ViewObjectsScreenState(ViewObjectsRepository viewObjectsRepository) {
+    return _ViewObjectsScreenState._(
+      viewObjectsBloc: ViewObjectsBloc(
+          viewObjectsRepository: viewObjectsRepository ??
+              ViewObjectsRepository(restClient: RestClient())),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
-    _viewObjectsBloc.dispatch(FetchViewObjects(
+    viewObjectsBloc.dispatch(FetchViewObjects(
       project: _project,
       type: _type,
       userToken: _userToken,
@@ -57,13 +69,13 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
       ),
       body: Center(
           child: BlocBuilder(
-        bloc: _viewObjectsBloc,
+        bloc: viewObjectsBloc,
         builder: (BuildContext context, ViewObjectsState state) {
           if (state is ViewObjectsUninitialized) {
             return CircularProgressIndicator();
           } else if (state is ViewObjectsLoaded) {
             return BlocProvider(
-              bloc: _viewObjectsBloc,
+              bloc: viewObjectsBloc,
               child: _ViewObjectButtons(),
             );
           } else if (state is ViewObjectsError) {
@@ -76,7 +88,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
 
   @override
   void dispose() {
-    _viewObjectsBloc.dispose();
+    viewObjectsBloc.dispose();
     super.dispose();
   }
 }

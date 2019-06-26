@@ -5,11 +5,8 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text(
-          'RITS for HMT-1 Demonstration',
-          style: TextStyle(
-            fontSize: 24
-          ),
+        child: Image(
+          image: AssetImage('assets/banner.png'),
         ),
       ),
     );
