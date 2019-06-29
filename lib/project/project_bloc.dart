@@ -9,6 +9,7 @@ import 'package:meta/meta.dart';
 import 'package:rw_barcode_reader/rw_barcode_reader.dart';
 import 'package:rw_camera/rw_camera.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../models/projects/projects.dart';
 import '../settings.dart' as settings;
@@ -79,6 +80,18 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         }
       }
     } else if (event is RecordVideo) {
+      PermissionStatus permission = await PermissionHandler()
+          .checkPermissionStatus(PermissionGroup.storage);
+
+      if (permission != PermissionStatus.granted) {
+        final permissions = await PermissionHandler()
+            .requestPermissions([PermissionGroup.storage]);
+
+        if (permissions[PermissionGroup.storage] != PermissionStatus.granted) {
+          return;
+        }
+      }
+
       final filePath = await RwCamera.recordVideo();
 
       if (filePath != null) {
