@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:device_info/device_info.dart';
 
 import '../associated_data_item/associated_data_item.dart';
 import '../associated_data_items/associated_data_items.dart';
@@ -26,12 +27,20 @@ class ProjectScreen extends StatefulWidget {
 
 class _ProjectScreenState extends State<ProjectScreen> {
   final ProjectBloc _projectBloc = ProjectBloc(restClient: RestClient());
+  bool _isRealWearDevice = false;
 
   Project get _project => widget.project;
 
   @override
   void initState() {
     super.initState();
+
+    _checkDevice().then((value) {
+      setState(() {
+        _isRealWearDevice = value;
+      });
+    });
+
     _projectBloc.dispatch(LoadProject(_project));
   }
 
@@ -60,20 +69,45 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       ),
                     ),
                   ),
-                  RaisedButton(
-                    child: const Text('Scan Bar Code'),
-                    color: Colors.blue,
-                    onPressed: () {
-                      _projectBloc
-                          .dispatch(ScanBarcode(userToken: state.userToken));
-                    },
+                  Visibility(
+                    visible: _isRealWearDevice,
+                    child: RaisedButton(
+                      child: const Text('Scan Bar Code'),
+                      color: Colors.blue,
+                      onPressed: () {
+                        _projectBloc
+                            .dispatch(ScanBarcode(userToken: state.userToken));
+                      },
+                    ),
+                  ),
+                  Visibility(
+                    visible: !_isRealWearDevice,
+                    child: SizedBox(
+                      width: 300,
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          labelText: 'Context',
+                          helperText: 'Context',
+                          helperStyle: TextStyle(
+                            fontSize: 1,
+                            color: Color.fromARGB(0, 0, 0, 0),
+                          ),
+                        ),
+                        onFieldSubmitted: (value) {
+                          _projectBloc.dispatch(SetContextFromString(
+                              context: value, userToken: state.userToken));
+                        },
+                      ),
+                    ),
                   ),
                   Wrap(
                     alignment: WrapAlignment.spaceAround,
                     spacing: 10,
                     children: <Widget>[
                       Visibility(
-                        visible: state.hierarchyLevel != null,
+                        visible:
+                            _isRealWearDevice && state.hierarchyLevel != null,
                         maintainSize: false,
                         child: RaisedButton(
                           child: const Text('Take Photo'),
@@ -84,7 +118,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: state.hierarchyLevel != null,
+                        visible:
+                            _isRealWearDevice && state.hierarchyLevel != null,
                         maintainSize: false,
                         child: RaisedButton(
                           child: const Text('Record Video'),
@@ -214,5 +249,12 @@ class _ProjectScreenState extends State<ProjectScreen> {
   void dispose() {
     _projectBloc.dispose();
     super.dispose();
+  }
+
+  static Future<bool> _checkDevice() async {
+    final deviceInfo = DeviceInfoPlugin();
+    final androidInfo = await deviceInfo.androidInfo;
+
+    return androidInfo?.brand == 'RealWear';
   }
 }

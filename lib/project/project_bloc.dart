@@ -63,8 +63,25 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
             yield ProjectError(message: 'Unable to set context');
           }
         } on ApiError {
-          yield ProjectError(message: 'Unrecognized content: $result');
+          yield ProjectError(message: 'Unrecognized bar code content: $result');
         }
+      }
+    } else if (event is SetContextFromString) {
+      try {
+        final levelName =
+            await _setContextFromBarCode(event.context, event.userToken);
+
+        if (levelName != null) {
+          yield ProjectLoaded(
+            hierarchyLevel: levelName,
+            context: event.context,
+            userToken: event.userToken,
+          );
+        } else {
+          yield ProjectError(message: 'Unable to set context');
+        }
+      } on ApiError {
+        yield ProjectError(message: 'Unrecognized context: ${event.context}');
       }
     } else if (event is TakePhoto) {
       final bytes = await RwCamera.takePhoto();
