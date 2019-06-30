@@ -67,6 +67,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         }
       }
     } else if (event is SetContextFromString) {
+      yield ProjectLoading();
+
       try {
         final levelName =
             await _setContextFromBarCode(event.context, event.userToken);
