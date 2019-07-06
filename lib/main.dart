@@ -96,8 +96,8 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
         ),
         theme: ThemeData(
           brightness: Brightness.dark,
-          accentColor: Colors.deepOrange,
-          buttonColor: Colors.deepOrange,
+          accentColor: Color(0xff1fe086),
+          buttonColor: Color(0xff1fe086),
           //   textTheme: TextTheme(
           //     body1: TextStyle(fontSize: 20.0),
           //     body2: TextStyle(fontSize: 20.0),
