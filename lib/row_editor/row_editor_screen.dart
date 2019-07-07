@@ -131,10 +131,14 @@ class _RowEditorScreenState extends State<RowEditorScreen> {
                       onTap: () {
                         final RenderBox renderObject =
                             dropDownKey.currentState.context.findRenderObject();
-                        final hitTestResult = HitTestResult();
 
-                        renderObject.hitTest(hitTestResult,
-                            position: Offset.fromDirection(0, 10));
+                        renderObject.visitChildrenForSemantics((element) {
+                          if (element is RenderSemanticsAnnotations &&
+                              element.child is RenderSemanticsGestureHandler) {
+                            (element.child as RenderSemanticsGestureHandler)
+                                .onTap();
+                          }
+                        });
                       },
                       child: MergeSemantics(
                         child: DropdownButtonFormField<String>(
@@ -148,7 +152,7 @@ class _RowEditorScreenState extends State<RowEditorScreen> {
                               color: Color.fromARGB(0, 0, 0, 0),
                             ),
                           ),
-                          onSaved: (value) {
+                          onChanged: (value) {
                             setState(() {
                               _row[columnDef.name] = value;
                             });

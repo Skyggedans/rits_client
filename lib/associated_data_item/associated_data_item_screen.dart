@@ -61,7 +61,8 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
           if (rowCount > 0) {
             final rowRange = rowCount == 1 ? '1' : '1-$rowCount';
 
-            RwHelp.setCommands(['Say "Select record ${rowRange}"']);
+            RwHelp.setCommands(
+                ['Say "Select record ${rowRange}" for record actions']);
           } else {
             RwHelp.setCommands([]);
           }
