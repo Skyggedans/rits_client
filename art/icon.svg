@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="200"
+   height="200"
+   viewBox="0 0 52.91652 52.916672"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="icon.svg"
+   inkscape:export-filename="D:\Projects\rits_client\assets\rect4511.png"
+   inkscape:export-xdpi="491.51999"
+   inkscape:export-ydpi="491.51999">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#000000"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.919596"
+     inkscape:cx="124.10593"
+     inkscape:cy="107.83162"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="3745"
+     inkscape:window-height="2126"
+     inkscape:window-x="1704"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="true" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer 2">
+    <rect
+       id="rect3728"
+       width="52.916672"
+       height="52.916672"
+       x="0.033332694"
+       y="-0.0026994781"
+       style="stroke-width:0.26458335"
+       inkscape:export-filename="D:\Projects\rits_client\assets\rect3728.png"
+       inkscape:export-xdpi="492.00003"
+       inkscape:export-ydpi="492.00003" />
+  </g>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-244.08329)">
+    <rect
+       style="fill:#ffffff;fill-opacity:0.94117647;stroke:#000000;stroke-width:0.11167859;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4505"
+       width="11"
+       height="19.955368"
+       x="227.90273"
+       y="336.98419"
+       transform="matrix(1,0,-0.59760689,0.80178925,0,0)"
+       inkscape:export-filename="D:\Projects\rits_client\assets\rect4511.png"
+       inkscape:export-xdpi="810.53174"
+       inkscape:export-ydpi="810.53174" />
+    <rect
+       transform="matrix(1,0,-0.59760689,0.80178925,0,0)"
+       y="317.02881"
+       x="216.90273"
+       height="19.955368"
+       width="11"
+       id="rect4511"
+       style="fill:#03793d;fill-opacity:1;stroke:#000000;stroke-width:0.11167859;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       inkscape:export-filename="D:\Projects\rits_client\assets\rect4511.png"
+       inkscape:export-xdpi="810.53174"
+       inkscape:export-ydpi="810.53174" />
+  </g>
+</svg>
