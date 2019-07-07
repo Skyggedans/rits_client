@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
+import 'package:rw_help/rw_help.dart';
 
 import '../models/associated_data/associated_data.dart';
 import '../models/view_objects/view_objects.dart';
@@ -54,6 +55,16 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
           bodyChild = CircularProgressIndicator();
         } else if (state is AssociatedDataItemGenerated) {
           title += '.${state.table.container.name}';
+
+          final rowCount = state.table.rows.length;
+
+          if (rowCount > 0) {
+            final rowRange = rowCount == 1 ? '1' : '1-$rowCount';
+
+            RwHelp.setCommands(['Say "Select record ${rowRange}"']);
+          } else {
+            RwHelp.setCommands([]);
+          }
           bodyChild = buildOutputWidget(state);
         } else if (state is NoActiveContainerError) {
           bodyChild = const Text('There is no active container');
@@ -219,6 +230,12 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
 
   @override
   bool returnToMainScreen() => false;
+
+  @override
+  void dispose() {
+    RwHelp.setCommands([]);
+    super.dispose();
+  }
 
   void _onNewRecord(BuildContext context, List<ColumnDef> columnDefinitions,
       AssociatedDataTable table) async {

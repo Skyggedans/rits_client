@@ -47,6 +47,9 @@ dependencies:
   rw_barcode_reader:
     git:
       url: https://github.com/Skyggedans/rw_barcode_reader
+  rw_help:
+    git:
+      url: https://github.com/Skyggedans/rw_help
 
 dev_dependencies:
   flutter_test:
