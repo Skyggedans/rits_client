@@ -44,10 +44,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        // ndk {
-        //     abiFilters 'armeabi-v7a'
-        // }
+        //setProperty("archivesBaseName", "astudio-$versionName")
     }
 
     buildTypes {

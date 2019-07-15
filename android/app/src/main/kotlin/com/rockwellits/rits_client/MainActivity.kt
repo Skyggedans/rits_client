@@ -24,7 +24,6 @@ class MainActivity : FlutterActivity() {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-
         }
     }
 }

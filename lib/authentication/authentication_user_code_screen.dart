@@ -98,7 +98,7 @@ class _AuthenticationUserCodeScreenState
                             return CustomPaint(
                               painter: TimerPainter(
                                   animation: _animationController,
-                                  backgroundColor: Colors.orangeAccent,
+                                  backgroundColor: Color(0xff128750),
                                   color: Theme.of(context).accentColor),
                             );
                           },

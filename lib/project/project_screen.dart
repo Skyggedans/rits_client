@@ -136,60 +136,61 @@ class _ProjectScreenState extends State<ProjectScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => LuisScreen(
-                                    project: _project,
-                                    userToken: state.userToken,
-                                  ),
+                                project: _project,
+                                userToken: state.userToken,
+                              ),
                             ),
                           );
                         },
                       ),
                       RaisedButton(
-                        child: Text('Reports'),
+                        child: Text('Show Reports'),
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => ViewObjectsScreen(
-                                    project: _project,
-                                    type: 'Reports',
-                                    detailsScreenRoute: ReportScreen.route,
-                                    hierarchyLevel: state.hierarchyLevel,
-                                    userToken: state.userToken,
-                                  ),
+                                project: _project,
+                                type: 'Reports',
+                                detailsScreenRoute: ReportScreen.route,
+                                hierarchyLevel: state.hierarchyLevel,
+                                userToken: state.userToken,
+                              ),
                             ),
                           );
                         },
                       ),
                       RaisedButton(
-                        child: Text('Charts'),
+                        child: Text('Show Charts'),
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => ViewObjectsScreen(
-                                    project: _project,
-                                    type: 'Charts',
-                                    detailsScreenRoute: ChartScreen.route,
-                                    hierarchyLevel: state.hierarchyLevel,
-                                    userToken: state.userToken,
-                                  ),
+                                project: _project,
+                                type: 'Charts',
+                                detailsScreenRoute: ChartScreen.route,
+                                hierarchyLevel: state.hierarchyLevel,
+                                userToken: state.userToken,
+                              ),
                             ),
                           );
                         },
                       ),
                       RaisedButton(
-                        child: Text('Tabular Data'),
+                        child: Text('Show Tabular Data'),
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => ViewObjectsScreen(
-                                    project: _project,
-                                    type: 'DataObjects',
-                                    detailsScreenRoute: TabularDataScreen.route,
-                                    hierarchyLevel: state.hierarchyLevel,
-                                    userToken: state.userToken,
-                                  ),
+                                project: _project,
+                                title: 'Tabular Data',
+                                type: 'DataObjects',
+                                detailsScreenRoute: TabularDataScreen.route,
+                                hierarchyLevel: state.hierarchyLevel,
+                                userToken: state.userToken,
+                              ),
                             ),
                           );
                         },
@@ -201,12 +202,12 @@ class _ProjectScreenState extends State<ProjectScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => ViewObjectsScreen(
-                                    project: _project,
-                                    type: 'KPIs',
-                                    detailsScreenRoute: KpiScreen.route,
-                                    hierarchyLevel: state.hierarchyLevel,
-                                    userToken: state.userToken,
-                                  ),
+                                project: _project,
+                                type: 'KPIs',
+                                detailsScreenRoute: KpiScreen.route,
+                                hierarchyLevel: state.hierarchyLevel,
+                                userToken: state.userToken,
+                              ),
                             ),
                           );
                         },
@@ -214,21 +215,21 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       Visibility(
                         visible: state.hierarchyLevel != null,
                         child: RaisedButton(
-                          child: Text('Associated Data'),
+                          child: Text('Show Associated Data'),
                           onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ViewObjectsScreen(
-                                      project: _project,
-                                      type: 'AssociatedData',
-                                      detailsScreenRoute:
-                                          AssociatedDataItemScreen.route,
-                                      viewObjectsRepository:
-                                          AssociatedDataItemsRepository(
-                                              restClient: RestClient()),
-                                      userToken: state.userToken,
-                                    ),
+                                  project: _project,
+                                  title: 'Associated Data',
+                                  detailsScreenRoute:
+                                      AssociatedDataItemScreen.route,
+                                  viewObjectsRepository:
+                                      AssociatedDataItemsRepository(
+                                          restClient: RestClient()),
+                                  userToken: state.userToken,
+                                ),
                               ),
                             );
                           },

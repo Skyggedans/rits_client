@@ -48,8 +48,6 @@ class _LuisScreenState extends State<LuisScreen> {
             return Center(
               child: TextFormField(
                 autofocus: true,
-                initialValue:
-                    'Generate the Total Orders by Product report from 01/01/2017 to 12/31/2017',
                 decoration: InputDecoration(
                   labelText: 'Please enter the utterance',
                   helperText: '',

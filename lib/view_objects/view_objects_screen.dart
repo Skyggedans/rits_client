@@ -1,14 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rits_client/utils/utils.dart';
 
 import '../models/projects/projects.dart';
+import '../utils/utils.dart';
 import 'view_objects.dart';
 
 class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
   final Project project;
   final String detailsScreenRoute;
+  final String title;
   final String type;
   final String userToken;
   final String hierarchyLevel;
@@ -19,6 +20,7 @@ class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
     @required this.project,
     @required this.userToken,
     @required this.detailsScreenRoute,
+    @required this.title,
     @required this.type,
     this.viewObjectsRepository,
     this.hierarchyLevel,
@@ -36,6 +38,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
   final ViewObjectsBloc viewObjectsBloc;
 
   Project get _project => widget.project;
+  String get _title => widget.title;
   String get _type => widget.type;
   String get _userToken => widget.userToken;
   String get _hierarchyLevel => widget.hierarchyLevel;
@@ -65,7 +68,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_type),
+        title: Text(_title ?? _type),
       ),
       body: Center(
           child: BlocBuilder(

@@ -75,7 +75,7 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
       bloc: _authenticationBloc,
       child: MaterialApp(
         //showSemanticsDebugger: true,
-        routes: routes,
+        routes: Routes.get(authRepository: _authRepository),
         home: BlocBuilder<AuthenticationEvent, AuthenticationState>(
           bloc: _authenticationBloc,
           builder: (BuildContext context, AuthenticationState state) {
