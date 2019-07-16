@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
-import 'package:rw_help/rw_help.dart';
+//import 'package:rw_help/rw_help.dart';
 
 import '../models/associated_data/associated_data.dart';
 import '../models/view_objects/view_objects.dart';
@@ -58,14 +58,14 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
 
           final rowCount = state.table.rows.length;
 
-          if (rowCount > 0) {
-            final rowRange = rowCount == 1 ? '1' : '1-$rowCount';
+          // if (rowCount > 0) {
+          //   final rowRange = rowCount == 1 ? '1' : '1-$rowCount';
 
-            RwHelp.setCommands(
-                ['Say "Select record ${rowRange}" for record actions']);
-          } else {
-            RwHelp.setCommands([]);
-          }
+          //   RwHelp.setCommands(
+          //       ['Say "Select record $rowRange" for record actions']);
+          // } else {
+          //   RwHelp.setCommands([]);
+          // }
           bodyChild = buildOutputWidget(state);
         } else if (state is NoActiveContainerError) {
           bodyChild = const Text('There is no active container');
@@ -204,20 +204,20 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
                           }).toList(),
                     ),
                     onTap: () => _onRowTap(
-                          context,
-                          state.columnDefinitions,
-                          state.table,
-                          row,
-                          index,
-                        ),
+                      context,
+                      state.columnDefinitions,
+                      state.table,
+                      row,
+                      index,
+                    ),
                   ),
                   onTap: () => _onRowTap(
-                        context,
-                        state.columnDefinitions,
-                        state.table,
-                        row,
-                        index,
-                      ),
+                    context,
+                    state.columnDefinitions,
+                    state.table,
+                    row,
+                    index,
+                  ),
                 );
               },
             ),
@@ -234,7 +234,7 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
 
   @override
   void dispose() {
-    RwHelp.setCommands([]);
+    //RwHelp.setCommands([]);
     super.dispose();
   }
 
@@ -244,11 +244,11 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
       context,
       MaterialPageRoute(
         builder: (context) => RowEditorScreen(
-              columnDefinitions: columnDefinitions,
-              row: Map<String, dynamic>.fromIterable(columnDefinitions,
-                  key: (colDef) => colDef.name,
-                  value: (colDef) => colDef.defaultValue),
-            ),
+          columnDefinitions: columnDefinitions,
+          row: Map<String, dynamic>.fromIterable(columnDefinitions,
+              key: (colDef) => colDef.name,
+              value: (colDef) => colDef.defaultValue),
+        ),
       ),
     );
 
@@ -269,9 +269,9 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
             context,
             MaterialPageRoute(
               builder: (context) => RowEditorScreen(
-                    columnDefinitions: columnDefinitions,
-                    row: Map<String, dynamic>.from(row),
-                  ),
+                columnDefinitions: columnDefinitions,
+                row: Map<String, dynamic>.from(row),
+              ),
             ),
           );
 

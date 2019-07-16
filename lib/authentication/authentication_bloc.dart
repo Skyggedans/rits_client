@@ -199,24 +199,24 @@ class AuthenticationBloc
     return body;
   }
 
-  Future<Map<String, dynamic>> _requestAccessTokenByRefreshToken(
-      String refreshToken) async {
-    final response = await http.post(
-      settings.authTokenUrl,
-      body: {
-        'client_id': settings.authClientId,
-        'client_secret': settings.authClientSecret,
-        'refresh_token': refreshToken,
-        'grant_type': 'refresh_token'
-      },
-    );
+  // Future<Map<String, dynamic>> _requestAccessTokenByRefreshToken(
+  //     String refreshToken) async {
+  //   final response = await http.post(
+  //     settings.authTokenUrl,
+  //     body: {
+  //       'client_id': settings.authClientId,
+  //       'client_secret': settings.authClientSecret,
+  //       'refresh_token': refreshToken,
+  //       'grant_type': 'refresh_token'
+  //     },
+  //   );
 
-    final body = json.decode(response.body);
+  //   final body = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      return body;
-    } else {
-      throw TokenRevokedError();
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     return body;
+  //   } else {
+  //     throw TokenRevokedError();
+  //   }
+  // }
 }

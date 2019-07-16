@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+//import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:meta/meta.dart';
 
 import '../authentication/authentication.dart';
@@ -35,9 +35,9 @@ class _ChartScreenState
 
   @override
   Widget buildOutputWidget(ChartPresentation state) {
-    return WebviewScaffold(
-      url: state.url,
-      headers: {'Authorization': 'Bearer ${_authRepository.accessToken}'},
-    );
+    // return WebviewScaffold(
+    //   url: state.url,
+    //   headers: {'Authorization': 'Bearer ${_authRepository.accessToken}'},
+    // );
   }
 }

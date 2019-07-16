@@ -20,14 +20,13 @@ class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
     @required this.project,
     @required this.userToken,
     @required this.detailsScreenRoute,
-    @required this.title,
-    @required this.type,
+    this.title,
+    this.type,
     this.viewObjectsRepository,
     this.hierarchyLevel,
   })  : assert(project != null),
         assert(userToken != null),
         assert(detailsScreenRoute != null),
-        assert(type != null),
         super(key: key);
 
   @override

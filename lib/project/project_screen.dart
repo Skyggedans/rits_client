@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:device_info/device_info.dart';
+//import 'package:device_info/device_info.dart';
 
 import '../associated_data_item/associated_data_item.dart';
 import '../associated_data_items/associated_data_items.dart';
@@ -253,9 +253,10 @@ class _ProjectScreenState extends State<ProjectScreen> {
   }
 
   static Future<bool> _checkDevice() async {
-    final deviceInfo = DeviceInfoPlugin();
-    final androidInfo = await deviceInfo.androidInfo;
+    // final deviceInfo = DeviceInfoPlugin();
+    // final androidInfo = await deviceInfo.androidInfo;
 
-    return androidInfo?.brand == 'RealWear';
+    // return androidInfo?.brand == 'RealWear';
+    return false;
   }
 }

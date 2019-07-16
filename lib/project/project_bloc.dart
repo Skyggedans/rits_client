@@ -6,10 +6,10 @@ import 'package:bloc/bloc.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
-import 'package:rw_barcode_reader/rw_barcode_reader.dart';
-import 'package:rw_camera/rw_camera.dart';
+//import 'package:rw_barcode_reader/rw_barcode_reader.dart';
+//import 'package:rw_camera/rw_camera.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:permission_handler/permission_handler.dart';
+//import 'package:permission_handler/permission_handler.dart';
 
 import '../models/projects/projects.dart';
 import '../settings.dart' as settings;
@@ -43,29 +43,29 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         yield ProjectError();
       }
     } else if (event is ScanBarcode) {
-      final String result = await RwBarcodeReader.scanBarcode();
+      // final String result = await RwBarcodeReader.scanBarcode();
 
-      if (result != null) {
-        yield ProjectLoading();
+      // if (result != null) {
+      //   yield ProjectLoading();
 
-        try {
-          dynamic decodedResult = json.decode(result);
-          final levelName = await _setContextFromBarCode(
-              decodedResult['ritsData']['itemId'], event.userToken);
+      //   try {
+      //     dynamic decodedResult = json.decode(result);
+      //     final levelName = await _setContextFromBarCode(
+      //         decodedResult['ritsData']['itemId'], event.userToken);
 
-          if (levelName != null) {
-            yield ProjectLoaded(
-              hierarchyLevel: levelName,
-              context: decodedResult['ritsData']['itemId'],
-              userToken: event.userToken,
-            );
-          } else {
-            yield ProjectError(message: 'Unable to set context');
-          }
-        } on ApiError {
-          yield ProjectError(message: 'Unrecognized bar code content: $result');
-        }
-      }
+      //     if (levelName != null) {
+      //       yield ProjectLoaded(
+      //         hierarchyLevel: levelName,
+      //         context: decodedResult['ritsData']['itemId'],
+      //         userToken: event.userToken,
+      //       );
+      //     } else {
+      //       yield ProjectError(message: 'Unable to set context');
+      //     }
+      //   } on ApiError {
+      //     yield ProjectError(message: 'Unrecognized bar code content: $result');
+      //   }
+      // }
     } else if (event is SetContextFromString) {
       yield ProjectLoading();
 
@@ -86,43 +86,43 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         yield ProjectError(message: 'Unrecognized context: ${event.context}');
       }
     } else if (event is TakePhoto) {
-      final bytes = await RwCamera.takePhoto();
+      // final bytes = await RwCamera.takePhoto();
 
-      if (bytes != null) {
-        yield ProjectLoading();
+      // if (bytes != null) {
+      //   yield ProjectLoading();
 
-        try {
-          await _postPhoto(bytes, event.userToken);
-          yield prevState;
-        } on ApiError {
-          yield ProjectError(message: 'Unable to save photo');
-        }
-      }
+      //   try {
+      //     await _postPhoto(bytes, event.userToken);
+      //     yield prevState;
+      //   } on ApiError {
+      //     yield ProjectError(message: 'Unable to save photo');
+      //   }
+      // }
     } else if (event is RecordVideo) {
-      PermissionStatus permission = await PermissionHandler()
-          .checkPermissionStatus(PermissionGroup.storage);
+      // PermissionStatus permission = await PermissionHandler()
+      //     .checkPermissionStatus(PermissionGroup.storage);
 
-      if (permission != PermissionStatus.granted) {
-        final permissions = await PermissionHandler()
-            .requestPermissions([PermissionGroup.storage]);
+      // if (permission != PermissionStatus.granted) {
+      //   final permissions = await PermissionHandler()
+      //       .requestPermissions([PermissionGroup.storage]);
 
-        if (permissions[PermissionGroup.storage] != PermissionStatus.granted) {
-          return;
-        }
-      }
+      //   if (permissions[PermissionGroup.storage] != PermissionStatus.granted) {
+      //     return;
+      //   }
+      // }
 
-      final filePath = await RwCamera.recordVideo();
+      // final filePath = await RwCamera.recordVideo();
 
-      if (filePath != null) {
-        yield ProjectLoading();
+      // if (filePath != null) {
+      //   yield ProjectLoading();
 
-        try {
-          await _postVideo(filePath, event.userToken);
-          yield prevState;
-        } on ApiError {
-          yield ProjectError(message: 'Unable to save video');
-        }
-      }
+      //   try {
+      //     await _postVideo(filePath, event.userToken);
+      //     yield prevState;
+      //   } on ApiError {
+      //     yield ProjectError(message: 'Unable to save video');
+      //   }
+      // }
     }
   }
 

@@ -159,6 +159,8 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
 
           return format.format(object);
         }
+
+        return object;
       }),
     );
   }

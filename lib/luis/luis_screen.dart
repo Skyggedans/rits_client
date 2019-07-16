@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+//import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import '../models/projects/projects.dart';
 import '../utils/rest_client.dart';
@@ -67,9 +67,9 @@ class _LuisScreenState extends State<LuisScreen> {
             );
           } else if (state is UtteranceExecutedWithUrl) {
             if (state.url.startsWith('http')) {
-              return WebviewScaffold(
-                url: state.url,
-              );
+              // return WebviewScaffold(
+              //   url: state.url,
+              // );
             } else {
               return new Center(
                 child: Text(state.url),

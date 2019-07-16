@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import 'package:flutter_pdf_viewer/flutter_pdf_viewer.dart';
+//import 'package:flutter_pdf_viewer/flutter_pdf_viewer.dart';
 
 import '../models/view_objects/view_objects.dart';
 import '../view_object/view_object.dart';
@@ -32,7 +32,7 @@ class _ReportScreenState
   Widget buildOutputWidget(ReportGenerated state) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (state.bytes.lengthInBytes > 0) {
-        PdfViewer.loadBytes(state.bytes);
+        //PdfViewer.loadBytes(state.bytes);
       }
     });
 

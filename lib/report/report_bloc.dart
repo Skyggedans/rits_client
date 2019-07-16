@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_pdf_viewer/flutter_pdf_viewer.dart';
+//import 'package:flutter_pdf_viewer/flutter_pdf_viewer.dart';
 
 import '../models/view_objects/view_objects.dart';
 import '../settings.dart' as settings;
@@ -25,9 +25,9 @@ class ReportBloc extends ViewObjectBloc {
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (reportBytes.lengthInBytes > 0) {
-            PdfViewer.loadBytes(reportBytes,
-                config: PdfViewerConfig(
-                    pageSnap: true, pageFling: true, enableSwipe: true));
+            // PdfViewer.loadBytes(reportBytes,
+            //     config: PdfViewerConfig(
+            //         pageSnap: true, pageFling: true, enableSwipe: true));
           }
         });
       } on ApiError {
