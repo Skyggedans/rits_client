@@ -38,18 +38,22 @@ dependencies:
   flutter_pdf_viewer:
     git:
       url: https://github.com/Skyggedans/flutter_pdf_viewer.git
-  rw_speech_recognizer:
-    git:
-      url: https://github.com/Skyggedans/rw_speech_recognizer
+  # rw_speech_recognizer:
+  #   git:
+  #     url: https://github.com/Skyggedans/rw_speech_recognizer.git
+  #     ref: androidx
   rw_camera:
     git:
-      url: https://github.com/Skyggedans/rw_camera
+      url: https://github.com/Skyggedans/rw_camera.git
+      ref: androidx
   rw_barcode_reader:
     git:
-      url: https://github.com/Skyggedans/rw_barcode_reader
+      url: https://github.com/Skyggedans/rw_barcode_reader.git
+      ref: androidx
   rw_help:
     git:
-      url: https://github.com/Skyggedans/rw_help
+      url: https://github.com/Skyggedans/rw_help.git
+      ref: androidx
 
 dev_dependencies:
   flutter_test:
