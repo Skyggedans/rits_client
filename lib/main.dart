@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rits_client/app_config.dart';
 
 import 'authentication/authentication.dart';
 import 'projects/projects.dart';
@@ -31,7 +32,11 @@ main() {
   //   command;
   // });
 
-  runApp(RitsApp(authRepository: authRepository));
+  runApp(
+    AppConfig(
+      child: RitsApp(authRepository: authRepository),
+    ),
+  );
 }
 
 class RitsApp extends StatefulWidget {

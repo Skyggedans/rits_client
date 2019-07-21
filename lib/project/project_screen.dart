@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:device_info/device_info.dart';
 
+import '../app_config.dart';
 import '../associated_data_item/associated_data_item.dart';
 import '../associated_data_items/associated_data_items.dart';
 import '../chart/chart.dart';
@@ -27,25 +27,19 @@ class ProjectScreen extends StatefulWidget {
 
 class _ProjectScreenState extends State<ProjectScreen> {
   final ProjectBloc _projectBloc = ProjectBloc(restClient: RestClient());
-  bool _isRealWearDevice = false;
 
   Project get _project => widget.project;
 
   @override
   void initState() {
     super.initState();
-
-    _checkDevice().then((value) {
-      setState(() {
-        _isRealWearDevice = value;
-      });
-    });
-
     _projectBloc.dispatch(LoadProject(_project));
   }
 
   @override
   Widget build(BuildContext context) {
+    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_project.name),
@@ -70,7 +64,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     ),
                   ),
                   Visibility(
-                    visible: _isRealWearDevice,
+                    visible: isRealWearDevice,
                     child: RaisedButton(
                       child: const Text('Scan Bar Code'),
                       color: Colors.blue,
@@ -81,7 +75,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     ),
                   ),
                   Visibility(
-                    visible: !_isRealWearDevice,
+                    visible: !isRealWearDevice,
                     child: SizedBox(
                       width: 300,
                       child: TextFormField(
@@ -107,7 +101,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     children: <Widget>[
                       Visibility(
                         visible:
-                            _isRealWearDevice && state.hierarchyLevel != null,
+                            isRealWearDevice && state.hierarchyLevel != null,
                         maintainSize: false,
                         child: RaisedButton(
                           child: const Text('Take Photo'),
@@ -119,7 +113,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       ),
                       Visibility(
                         visible:
-                            _isRealWearDevice && state.hierarchyLevel != null,
+                            isRealWearDevice && state.hierarchyLevel != null,
                         maintainSize: false,
                         child: RaisedButton(
                           child: const Text('Record Video'),
@@ -250,12 +244,5 @@ class _ProjectScreenState extends State<ProjectScreen> {
   void dispose() {
     _projectBloc.dispose();
     super.dispose();
-  }
-
-  static Future<bool> _checkDevice() async {
-    final deviceInfo = DeviceInfoPlugin();
-    final androidInfo = await deviceInfo.androidInfo;
-
-    return androidInfo?.brand == 'RealWear';
   }
 }
