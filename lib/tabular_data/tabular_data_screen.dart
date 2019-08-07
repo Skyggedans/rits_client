@@ -33,7 +33,7 @@ class _TabularDataScreenState
   TabularDataBloc viewObjectBloc = TabularDataBloc();
 
   @override
-  Widget buildOutputWidget(TabularDataGenerated state) {
+  Widget buildOutputWidget(BuildContext context, TabularDataGenerated state) {
     final rows = state.data;
 
     if (rows.length > 0) {

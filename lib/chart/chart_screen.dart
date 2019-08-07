@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:meta/meta.dart';
@@ -34,8 +35,26 @@ class _ChartScreenState
   AuthRepository get _authRepository => (widget as ChartScreen).authRepository;
 
   @override
-  Widget buildOutputWidget(ChartPresentation state) {
+  Widget buildOutputWidget(BuildContext context, ChartPresentation state) {
     return WebviewScaffold(
+      debuggingEnabled: true,
+      clearCache: true,
+      appCacheEnabled: false,
+      appBar: AppBar(
+        actions: <Widget>[
+          RaisedButton(
+            child: const Text('Reload'),
+            onPressed: () {
+              context.visitChildElements((child) {
+                if (child.widget is WebviewScaffold) {
+                  ((child as StatefulElement).state as dynamic)
+                      .reloadUrl(state.url);
+                }
+              });
+            },
+          )
+        ],
+      ),
       url: state.url,
       headers: {'Authorization': 'Bearer ${_authRepository.accessToken}'},
     );

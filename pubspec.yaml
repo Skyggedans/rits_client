@@ -25,13 +25,17 @@ dependencies:
   cupertino_icons: ^0.1.2
   http: 0.12.0+1
   oauth2: 1.2.3
-  android_intent: 0.3.0+1
   datetime_picker_formfield: 0.1.8
   equatable: 0.2.3
   flutter_bloc: 0.9.1
   rxdart: 0.21.0
   path_provider: any
-  flutter_webview_plugin: 0.3.4
+  flutter_webview_plugin: #0.3.4
+    path: ../flutter_webview_plugin
+    #git:
+      #url: https://github.com/Skyggedans/flutter_webview_plugin.git
+      #url: https://github.com/fluttercommunity/flutter_webview_plugin.git
+
   sqflite: 1.1.0
   permission_handler: 3.1.0
   device_info: 0.4.0+2

@@ -25,7 +25,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
   String get userToken => widget.userToken;
 
   T viewObjectBloc;
-  Widget buildOutputWidget(S state);
+  Widget buildOutputWidget(BuildContext context, S state);
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
               if (state is ViewObjectGeneration) {
                 return CircularProgressIndicator();
               } else if (state is S) {
-                return buildOutputWidget(state);
+                return buildOutputWidget(context, state);
               } else if (state is ViewObjectError) {
                 return const Text('Failed to generate view object');
               } else {

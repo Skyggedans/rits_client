@@ -66,7 +66,7 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
           } else {
             RwHelp.setCommands([]);
           }
-          bodyChild = buildOutputWidget(state);
+          bodyChild = buildOutputWidget(context, state);
         } else if (state is NoActiveContainerError) {
           bodyChild = const Text('There is no active container');
         } else if (state is ViewObjectError) {
@@ -133,7 +133,10 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
   }
 
   @override
-  Widget buildOutputWidget(AssociatedDataItemGenerated state) {
+  Widget buildOutputWidget(
+    BuildContext context,
+    AssociatedDataItemGenerated state,
+  ) {
     final columns = state.columnDefinitions; //state.table.columns;
     final rows = state.table.rows;
 
@@ -204,20 +207,20 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
                           }).toList(),
                     ),
                     onTap: () => _onRowTap(
-                          context,
-                          state.columnDefinitions,
-                          state.table,
-                          row,
-                          index,
-                        ),
+                      context,
+                      state.columnDefinitions,
+                      state.table,
+                      row,
+                      index,
+                    ),
                   ),
                   onTap: () => _onRowTap(
-                        context,
-                        state.columnDefinitions,
-                        state.table,
-                        row,
-                        index,
-                      ),
+                    context,
+                    state.columnDefinitions,
+                    state.table,
+                    row,
+                    index,
+                  ),
                 );
               },
             ),
@@ -244,11 +247,11 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
       context,
       MaterialPageRoute(
         builder: (context) => RowEditorScreen(
-              columnDefinitions: columnDefinitions,
-              row: Map<String, dynamic>.fromIterable(columnDefinitions,
-                  key: (colDef) => colDef.name,
-                  value: (colDef) => colDef.defaultValue),
-            ),
+          columnDefinitions: columnDefinitions,
+          row: Map<String, dynamic>.fromIterable(columnDefinitions,
+              key: (colDef) => colDef.name,
+              value: (colDef) => colDef.defaultValue),
+        ),
       ),
     );
 
@@ -269,9 +272,9 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
             context,
             MaterialPageRoute(
               builder: (context) => RowEditorScreen(
-                    columnDefinitions: columnDefinitions,
-                    row: Map<String, dynamic>.from(row),
-                  ),
+                columnDefinitions: columnDefinitions,
+                row: Map<String, dynamic>.from(row),
+              ),
             ),
           );
 

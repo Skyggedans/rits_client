@@ -75,7 +75,7 @@ class _KpiScreenState extends ViewObjectScreenState<KpiBloc, KpiGenerated> {
   KpiBloc viewObjectBloc = KpiBloc();
 
   @override
-  Widget buildOutputWidget(KpiGenerated state) {
+  Widget buildOutputWidget(BuildContext context, KpiGenerated state) {
     final kpis = state.kpis;
 
     if (kpis.length > 0) {

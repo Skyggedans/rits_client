@@ -29,7 +29,7 @@ class _ReportScreenState
   ReportBloc viewObjectBloc = ReportBloc();
 
   @override
-  Widget buildOutputWidget(ReportGenerated state) {
+  Widget buildOutputWidget(BuildContext context, ReportGenerated state) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (state.bytes.lengthInBytes > 0) {
         PdfViewer.loadBytes(state.bytes);
