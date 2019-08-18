@@ -15,6 +15,7 @@ class ChartBloc extends ViewObjectBloc {
         yield ChartPresentation(
           viewObject: event.viewObject,
           url:
+              //'${settings.backendUrl}/showchart/${event.userToken}/${Uri.encodeFull(event.viewObject.name)}',
               '${settings.chartUrl}/Charts/BaseChart?skypeBotToken=${event.userToken}&chart=${Uri.encodeFull(event.viewObject.name)}',
           userToken: event.userToken,
         );

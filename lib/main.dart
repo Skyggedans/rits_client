@@ -103,13 +103,13 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
           brightness: Brightness.dark,
           accentColor: Color(0xff1fe086),
           buttonColor: Color(0xff1fe086),
-          //   textTheme: TextTheme(
-          //     body1: TextStyle(fontSize: 20.0),
-          //     body2: TextStyle(fontSize: 20.0),
-          //     subhead: TextStyle(fontSize: 20.0),
-          //     button: TextStyle(fontSize: 20.0),
-          //     caption: TextStyle(fontSize: 20.0),
-          //   ),
+          textTheme: TextTheme(
+            body1: TextStyle(fontSize: 18.0),
+            body2: TextStyle(fontSize: 18.0),
+            subhead: TextStyle(fontSize: 18.0),
+            button: TextStyle(fontSize: 18.0),
+            caption: TextStyle(fontSize: 18.0),
+          ),
         ),
         darkTheme: ThemeData(
           brightness: Brightness.dark,
