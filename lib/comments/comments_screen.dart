@@ -1,11 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:rits_client/comments/comments_event.dart';
-import 'package:rits_client/models/comments/comment.dart';
-import 'package:rits_client/utils/utils.dart';
+import 'package:rw_help/rw_help.dart';
 
+import '../models/comments/comment.dart';
+import '../utils/utils.dart';
 import 'comments.dart';
+
+abstract class CommentAction {
+  final Comment comment;
+
+  CommentAction(this.comment);
+}
+
+class SaveAction extends CommentAction {
+  SaveAction({@required comment})
+      : assert(comment != null),
+        super(comment);
+}
+
+class RemoveAction extends CommentAction {
+  RemoveAction({@required comment})
+      : assert(comment != null),
+        super(comment);
+}
+
+class CancelAction extends CommentAction {
+  CancelAction() : super(null);
+}
 
 class CommentsScreen extends StatefulWidget {
   final String userToken;
@@ -52,7 +75,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 ),
               ],
             ),
-            onPressed: () {},
+            onPressed: () {
+              _onAddCommentPressed(context);
+            },
           ),
         ],
       ),
@@ -65,7 +90,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
             } else if (state is CommentsLoaded) {
               return _buildComments(context, state);
             } else if (state is CommentsError) {
-              return const Text('Unable to fetch comments');
+              return Text(state.message);
             }
           },
         ),
@@ -75,6 +100,15 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   Widget _buildComments(BuildContext context, CommentsLoaded state) {
     final comments = state.comments;
+
+    if (comments.length > 0) {
+      final commentsRange = comments.length == 1 ? '1' : '1-${comments.length}';
+
+      RwHelp.setCommands(
+          ['Say "Select comment ${commentsRange}" for comment actions']);
+    } else {
+      RwHelp.setCommands([]);
+    }
 
     return ListView.builder(
       padding: const EdgeInsets.all(10.0),
@@ -91,86 +125,94 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 title: Text(comment.text),
               ),
             ),
-            // onTap: () => _onCommentTap(
-            //   context,
-            //   comment,
-            //   index,
-            // ),
+            onTap: () => _onCommentTap(
+              context,
+              comment,
+            ),
           ),
-          // onTap: () => _onCommentTap(
-          //   context,
-          //   comment,
-          //   index,
-          // ),
+          onTap: () => _onCommentTap(
+            context,
+            comment,
+          ),
         );
       },
     );
   }
 
-  // void _onCommentTap(BuildContext context, Comment comment, int index) async {
-  //   final dialogResult = await _showCommentDialog(context, comment, index);
+  void _onAddCommentPressed(BuildContext context) async {
+    final newComment = Comment();
+    final dialogResult = await _showCommentDialog(context, newComment);
 
-  //   switch (dialogResult) {
-  //     case RecordAction.EDIT:
-  //       {
-  //         final modifiedRow = await Navigator.push(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (context) => RowEditorScreen(
-  //               columnDefinitions: columnDefinitions,
-  //               row: Map<String, dynamic>.from(comment),
-  //             ),
-  //           ),
-  //         );
+    if (dialogResult is SaveAction) {
+      _commentsBloc.dispatch(AddComment(
+        comment: dialogResult.comment,
+        userToken: _userToken,
+      ));
+    }
+  }
 
-  //         if (modifiedRow != null) {
-  //           viewObjectBloc.dispatch(
-  //               UpdateRow(table: table, row: modifiedRow, index: index));
-  //         }
+  void _onCommentTap(BuildContext context, Comment comment) async {
+    final dialogResult = await _showCommentDialog(context, comment);
 
-  //         break;
-  //       }
-  //     case RecordAction.REMOVE:
-  //       {
-  //         viewObjectBloc.dispatch(RemoveRow(table: table, index: index));
+    if (dialogResult is SaveAction) {
+      _commentsBloc.dispatch(UpdateComment(
+        comment: dialogResult.comment,
+        userToken: _userToken,
+      ));
+    } else if (dialogResult is RemoveAction) {
+      _commentsBloc.dispatch(RemoveComment(
+        comment: dialogResult.comment,
+        userToken: _userToken,
+      ));
+    }
+  }
 
-  //         break;
-  //       }
-  //     default:
-  //   }
-  // }
+  Future<CommentAction> _showCommentDialog(
+      BuildContext context, Comment comment) async {
+    final formKey = GlobalKey<FormState>();
+    Comment modifiedComment;
 
-  // Future<RecordAction> _showCommentDialog(
-  //     BuildContext context, Comment comment, int index) async {
-  //   return await showDialog<RecordAction>(
-  //     context: context,
-  //     barrierDismissible: false,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text('Record ${index + 1}'),
-  //         content: const Text('Select required action'),
-  //         actions: <Widget>[
-  //           FlatButton(
-  //             child: const Text('CANCEL'),
-  //             onPressed: () {
-  //               Navigator.of(context).pop(RecordAction.CANCEL);
-  //             },
-  //           ),
-  //           FlatButton(
-  //             child: const Text('EDIT'),
-  //             onPressed: () {
-  //               Navigator.of(context).pop(RecordAction.EDIT);
-  //             },
-  //           ),
-  //           FlatButton(
-  //             child: const Text('REMOVE'),
-  //             onPressed: () {
-  //               Navigator.of(context).pop(RecordAction.REMOVE);
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
+    return await showDialog<CommentAction>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Form(
+            key: formKey,
+            child: TextFormField(
+              initialValue: comment.text,
+              maxLines: null,
+              autofocus: true,
+              keyboardType: TextInputType.multiline,
+              onSaved: (value) {
+                modifiedComment = comment.copyWith(text: value);
+              },
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.of(context).pop(CancelAction());
+              },
+            ),
+            FlatButton(
+              child: const Text('SAVE'),
+              onPressed: () {
+                formKey.currentState.save();
+                Navigator.of(context)
+                    .pop(SaveAction(comment: modifiedComment ?? comment));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    RwHelp.setCommands([]);
+    super.dispose();
+  }
 }

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import 'package:rits_client/models/comments/comments.dart';
+import '../models/comments/comments.dart';
 
 abstract class CommentsState extends Equatable {
   CommentsState([List props = const []]) : super(props);
@@ -9,11 +9,6 @@ abstract class CommentsState extends Equatable {
 class CommentsInProgress extends CommentsState {
   @override
   String toString() => 'CommentsUninitialized';
-}
-
-class CommentsError extends CommentsState {
-  @override
-  String toString() => 'CommentsError';
 }
 
 class CommentsLoaded extends CommentsState {
@@ -40,4 +35,13 @@ class CommentSelected extends CommentsState {
   final String userToken;
 
   CommentSelected({this.comment, this.userToken}) : super([comment, userToken]);
+}
+
+class CommentsError extends CommentsState {
+  final String message;
+
+  CommentsError({this.message}) : super([message]);
+
+  @override
+  String toString() => 'CommentsError { message: $message }';
 }

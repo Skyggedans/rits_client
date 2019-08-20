@@ -1,15 +1,13 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:rits_client/comments/comments_event.dart';
-import 'package:rits_client/comments/comments_state.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../models/comments/comments.dart';
 import '../settings.dart' as settings;
 import '../utils/rest_client.dart';
+import 'comments.dart';
 
 class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
   final RestClient restClient;
@@ -35,24 +33,83 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
 
         yield CommentsLoaded(comments: comments);
       } on ApiError {
-        yield CommentsError();
+        yield CommentsError(message: 'Unable to fetch comments');
+      }
+    } else if (event is AddComment) {
+      yield CommentsInProgress();
+
+      try {
+        await _addComment(event.comment, event.userToken);
+        dispatch(FetchComments(userToken: event.userToken));
+      } on ApiError {
+        yield CommentsError(message: 'Unable to add comment');
+      }
+    } else if (event is UpdateComment) {
+      yield CommentsInProgress();
+
+      try {
+        await _updateComment(event.comment, event.userToken);
+        dispatch(FetchComments(userToken: event.userToken));
+      } on ApiError {
+        yield CommentsError(message: 'Unable to update comment');
+      }
+    } else if (event is RemoveComment) {
+      yield CommentsInProgress();
+
+      try {
+        await _removeComment(event.comment, event.userToken);
+        dispatch(FetchComments(userToken: event.userToken));
+      } on ApiError {
+        yield CommentsError(message: 'Unable to remove comment');
       }
     }
   }
 
   Future<List<Comment>> _fetchComments(String userToken) async {
-    final url = '${settings.backendUrl}/GetVoiceToTextMemo/$userToken';
-    // final response = await restClient.get(url);
-    // final body = json.decode(response.body);
+    final url = '${settings.backendUrl}/GetVoiceToTextMemos/$userToken';
+    final response = await restClient.get(url);
+    final body = json.decode(response.body);
 
-    // return body.map<Comment>((comment) {
-    //   return Comment.fromJson(comment);
-    // }).toList();
-    return Future.delayed(Duration(seconds: 3), () {
-      return [
-        Comment(text: 'comment 1'),
-        Comment(text: 'comment 2'),
-      ];
-    });
+    return body.map<Comment>((comment) {
+      return Comment.fromJson(comment);
+    }).toList();
+
+    // return Future.delayed(Duration(seconds: 3), () {
+    //   return [
+    //     Comment(id: 1, text: 'comment 1'),
+    //     Comment(id: 2, text: 'comment 2'),
+    //   ];
+    // });
   }
+
+  Future<Null> _addComment(Comment comment, String userToken) async {
+    final url = '${settings.backendUrl}/AddVoiceToTextMemo/$userToken';
+
+    final requestBody = {
+      'Comment': comment.text,
+    };
+
+    await restClient.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(requestBody),
+    );
+  }
+
+  Future<Null> _updateComment(Comment comment, String userToken) async {
+    final url = '${settings.backendUrl}/UpdateVoiceToTextMemo/$userToken';
+
+    final requestBody = {
+      'CommentID': comment.id,
+      'Comment': comment.text,
+    };
+
+    await restClient.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(requestBody),
+    );
+  }
+
+  Future<Null> _removeComment(Comment comment, String userToken) {}
 }

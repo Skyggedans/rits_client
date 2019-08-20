@@ -37,29 +37,27 @@ class _ChartScreenState
   @override
   Widget buildOutputWidget(BuildContext context, ChartPresentation state) {
     return WebviewScaffold(
-      debuggingEnabled: true,
-      clearCache: true,
-      appCacheEnabled: false,
-      appBar: AppBar(
-        actions: <Widget>[
-          RaisedButton(
-            child: const Text('Reload'),
-            onPressed: () {
-              context.visitChildElements((child) {
-                if (child.widget is WebviewScaffold) {
-                  ((child as StatefulElement).state as dynamic)
-                      .reloadUrl(state.url);
-                }
-              });
-            },
-          )
-        ],
-      ),
+      // debuggingEnabled: true,
+      // clearCache: true,
+      // appCacheEnabled: false,
+      // appBar: AppBar(
+      //   actions: <Widget>[
+      //     RaisedButton(
+      //       child: const Text('Reload'),
+      //       onPressed: () {
+      //         context.visitChildElements((child) {
+      //           if (child.widget is WebviewScaffold) {
+      //             ((child as StatefulElement).state as dynamic)
+      //                 .reloadUrl(state.url);
+      //           }
+      //         });
+      //       },
+      //     )
+      //   ],
+      // ),
       url: state.url,
       headers: {
         'Authorization': 'Bearer ${_authRepository.accessToken}',
-        'Accept':
-            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
       },
     );
   }

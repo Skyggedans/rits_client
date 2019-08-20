@@ -1,19 +1,10 @@
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 import '../models/comments/comments.dart';
-import 'package:meta/meta.dart';
 
 abstract class CommentsEvent extends Equatable {
   CommentsEvent([List props = const []]) : super(props);
-}
-
-class SelectComment extends CommentsEvent {
-  final Comment comment;
-
-  SelectComment(this.comment) : super([comment]);
-
-  @override
-  String toString() => 'SelectComment { comment: ${comment.text} }';
 }
 
 class FetchComments extends CommentsEvent {
@@ -23,4 +14,34 @@ class FetchComments extends CommentsEvent {
 
   @override
   String toString() => 'FetchComments';
+}
+
+abstract class CommentActionEvent extends CommentsEvent {
+  final Comment comment;
+  final String userToken;
+
+  CommentActionEvent(this.comment, this.userToken)
+      : super([comment, userToken]);
+
+  @override
+  String toString() => '${runtimeType.toString()} { comment: ${comment.text} }';
+}
+
+class SelectComment extends CommentActionEvent {
+  SelectComment({Comment comment, String userToken})
+      : super(comment, userToken);
+}
+
+class AddComment extends CommentActionEvent {
+  AddComment({Comment comment, String userToken}) : super(comment, userToken);
+}
+
+class UpdateComment extends CommentActionEvent {
+  UpdateComment({Comment comment, String userToken})
+      : super(comment, userToken);
+}
+
+class RemoveComment extends CommentActionEvent {
+  RemoveComment({Comment comment, String userToken})
+      : super(comment, userToken);
 }
