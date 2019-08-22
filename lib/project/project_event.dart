@@ -28,17 +28,30 @@ class ScanBarcode extends ProjectEvent {
   String toString() => 'ScanBarcode';
 }
 
-class SetContextFromString extends ProjectEvent {
+class SetContextFromBarCode extends ProjectEvent {
   final String context;
   final String userToken;
 
-  SetContextFromString({@required this.context, @required this.userToken})
+  SetContextFromBarCode({@required this.context, @required this.userToken})
       : assert(context != null),
         assert(userToken != null),
         super([context, userToken]);
 
   @override
   String toString() => 'SetContextFromString { context: $context }';
+}
+
+class SetContextFromSearch extends ProjectEvent {
+  final String context;
+  final String userToken;
+
+  SetContextFromSearch({@required this.context, @required this.userToken})
+      : assert(context != null),
+        assert(userToken != null),
+        super([context, userToken]);
+
+  @override
+  String toString() => 'SetContextFromSearch { context: $context }';
 }
 
 class TakePhoto extends ProjectEvent {

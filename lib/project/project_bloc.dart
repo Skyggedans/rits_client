@@ -66,12 +66,31 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
           yield ProjectError(message: 'Unrecognized bar code content: $result');
         }
       }
-    } else if (event is SetContextFromString) {
+    } else if (event is SetContextFromBarCode) {
       yield ProjectLoading();
 
       try {
         final levelName =
             await _setContextFromBarCode(event.context, event.userToken);
+
+        if (levelName != null) {
+          yield ProjectLoaded(
+            hierarchyLevel: levelName,
+            context: event.context,
+            userToken: event.userToken,
+          );
+        } else {
+          yield ProjectError(message: 'Unable to set context');
+        }
+      } on ApiError {
+        yield ProjectError(message: 'Unrecognized context: ${event.context}');
+      }
+    } else if (event is SetContextFromSearch) {
+      yield ProjectLoading();
+
+      try {
+        final levelName =
+            await _setContextFromSearch(event.context, event.userToken);
 
         if (levelName != null) {
           yield ProjectLoaded(
@@ -143,6 +162,15 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     final response = await restClient.get(url);
 
     return json.decode(response.body);
+  }
+
+  Future<String> _setContextFromSearch(String context, String userToken) async {
+    final url =
+        '${settings.backendUrl}/SetObservedItemContext/$userToken/${Uri.encodeFull(context)}';
+    final response = await restClient.get(url);
+    final body = json.decode(response.body);
+
+    return body['ResultData'];
   }
 
   @override

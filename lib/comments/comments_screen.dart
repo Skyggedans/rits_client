@@ -122,6 +122,15 @@ class _CommentsScreenState extends State<CommentsScreen> {
             value: 'Select Comment ${index + 1}',
             child: Card(
               child: ListTile(
+                leading: SizedBox(
+                  width: 50,
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.comment),
+                      Text('${index + 1}'),
+                    ],
+                  ),
+                ),
                 title: Text(comment.text),
               ),
             ),
