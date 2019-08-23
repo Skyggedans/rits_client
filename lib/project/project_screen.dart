@@ -213,7 +213,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     },
                   ),
                   RaisedButton(
-                    child: Text('KPIs'),
+                    child: Text('Show KPIs'),
                     onPressed: () {
                       Navigator.push(
                         context,
