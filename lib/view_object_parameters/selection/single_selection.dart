@@ -1,18 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
-import '../../utils/rest_client.dart';
+import '../../models/projects/projects.dart';
 import '../../models/view_objects/view_objects.dart';
+import '../../utils/rest_client.dart';
 import 'selection.dart';
 
 class SingleSelection extends StatefulWidget {
   final ViewObjectParameter param;
-  final String userToken;
 
-  SingleSelection({Key key, @required this.param, @required this.userToken})
-      : super(key: key);
+  SingleSelection({
+    Key key,
+    @required this.param,
+  })  : assert(param != null),
+        super(key: key);
 
   @override
   State createState() => _SingleSelectionState();
@@ -24,15 +27,18 @@ class _SingleSelectionState extends State<SingleSelection> {
 
   ViewObjectParameter get _param => widget.param;
 
-  String get _userToken => widget.userToken;
-
   @override
-  void initState() {
-    super.initState();
-    _selectionBloc.dispatch(FetchSelectionOptions(
-      param: _param,
-      userToken: _userToken,
-    ));
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_selectionBloc.currentState == _selectionBloc.initialState) {
+      final projectContext = Provider.of<ProjectContext>(context);
+
+      _selectionBloc.dispatch(FetchSelectionOptions(
+        param: _param,
+        userToken: projectContext.userToken,
+      ));
+    }
   }
 
   @override

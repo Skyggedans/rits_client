@@ -1,22 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
-import '../utils/rest_client.dart';
+import '../models/projects/projects.dart';
 import '../models/view_objects/view_objects.dart';
+import '../utils/rest_client.dart';
 import '../widgets/widgets.dart';
 import 'selection/selection.dart';
 import 'view_object_parameters.dart';
 
 class ViewObjectParametersScreen extends StatefulWidget {
   final ViewObject viewObject;
-  final String userToken;
 
-  ViewObjectParametersScreen(
-      {Key key, @required this.viewObject, @required this.userToken})
-      : super(key: key);
+  ViewObjectParametersScreen({
+    Key key,
+    @required this.viewObject,
+  }) : super(key: key);
 
   @override
   State createState() => _ViewObjectParametersScreenState();
@@ -29,15 +30,18 @@ class _ViewObjectParametersScreenState
 
   ViewObject get _viewObject => widget.viewObject;
 
-  String get _userToken => widget.userToken;
-
   @override
-  void initState() {
-    super.initState();
-    _projectsBloc.dispatch(FetchViewObjectParameters(
-      viewObject: _viewObject,
-      userToken: _userToken,
-    ));
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_projectsBloc.currentState == _projectsBloc.initialState) {
+      final projectContext = Provider.of<ProjectContext>(context);
+
+      _projectsBloc.dispatch(FetchViewObjectParameters(
+        viewObject: _viewObject,
+        userToken: projectContext.userToken,
+      ));
+    }
   }
 
   @override
@@ -84,6 +88,7 @@ class _ReportParameters extends StatelessWidget {
       bloc: _reportParametersBloc,
       builder: (BuildContext context, ViewObjectParametersState state) {
         final concreteState = (state as ViewObjectParametersLoaded);
+        final projectContext = Provider.of<ProjectContext>(context);
 
         return Padding(
           padding: EdgeInsets.all(10.0),
@@ -104,7 +109,7 @@ class _ReportParameters extends StatelessWidget {
                           _reportParametersBloc
                               .dispatch(SaveViewObjectParameter(
                             viewObject: concreteState.viewObject,
-                            userToken: concreteState.userToken,
+                            userToken: projectContext.userToken,
                             parameter: param.copyWith(value: value),
                           ));
                         },
@@ -130,7 +135,7 @@ class _ReportParameters extends StatelessWidget {
                           _reportParametersBloc
                               .dispatch(SaveViewObjectParameter(
                             viewObject: concreteState.viewObject,
-                            userToken: concreteState.userToken,
+                            userToken: projectContext.userToken,
                             parameter: param.copyWith(value: text),
                           ));
                         },
@@ -145,10 +150,7 @@ class _ReportParameters extends StatelessWidget {
                         final selection = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SingleSelection(
-                                  param: param,
-                                  userToken: concreteState.userToken,
-                                ),
+                            builder: (context) => SingleSelection(param: param),
                           ),
                         );
 
@@ -156,7 +158,7 @@ class _ReportParameters extends StatelessWidget {
                           _reportParametersBloc
                               .dispatch(SaveViewObjectParameter(
                             viewObject: concreteState.viewObject,
-                            userToken: concreteState.userToken,
+                            userToken: projectContext.userToken,
                             parameter: param.copyWith(value: selection),
                           ));
                         }
@@ -191,10 +193,7 @@ class _ReportParameters extends StatelessWidget {
                         final selection = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MultiSelection(
-                                  param: param,
-                                  userToken: concreteState.userToken,
-                                ),
+                            builder: (context) => MultiSelection(param: param),
                           ),
                         );
 
@@ -202,7 +201,7 @@ class _ReportParameters extends StatelessWidget {
                           _reportParametersBloc
                               .dispatch(SaveViewObjectParameter(
                             viewObject: concreteState.viewObject,
-                            userToken: concreteState.userToken,
+                            userToken: projectContext.userToken,
                             parameter: param.copyWith(value: selection),
                           ));
                         }

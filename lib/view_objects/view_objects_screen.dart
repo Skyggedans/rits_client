@@ -1,32 +1,25 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 import '../models/projects/projects.dart';
 import '../utils/utils.dart';
 import 'view_objects.dart';
 
 class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
-  final Project project;
   final String detailsScreenRoute;
   final String title;
   final String type;
-  final String userToken;
-  final String hierarchyLevel;
   final ViewObjectsRepository viewObjectsRepository;
 
   ViewObjectsScreen({
     Key key,
-    @required this.project,
-    @required this.userToken,
     @required this.detailsScreenRoute,
     this.title,
     this.type,
     this.viewObjectsRepository,
-    this.hierarchyLevel,
-  })  : assert(project != null),
-        assert(userToken != null),
-        assert(detailsScreenRoute != null),
+  })  : assert(detailsScreenRoute != null),
         assert(type != null),
         super(key: key);
 
@@ -37,11 +30,8 @@ class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
 class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
   final ViewObjectsBloc viewObjectsBloc;
 
-  Project get _project => widget.project;
   String get _title => widget.title;
   String get _type => widget.type;
-  String get _userToken => widget.userToken;
-  String get _hierarchyLevel => widget.hierarchyLevel;
 
   _ViewObjectsScreenState._({this.viewObjectsBloc});
 
@@ -54,14 +44,19 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    viewObjectsBloc.dispatch(FetchViewObjects(
-      project: _project,
-      type: _type,
-      userToken: _userToken,
-      hierarchyLevel: _hierarchyLevel,
-    ));
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (viewObjectsBloc.currentState == viewObjectsBloc.initialState) {
+      final projectContext = Provider.of<ProjectContext>(context);
+
+      viewObjectsBloc.dispatch(FetchViewObjects(
+        type: _type,
+        project: projectContext.project,
+        userToken: projectContext.userToken,
+        hierarchyLevel: projectContext.hierarchyLevel,
+      ));
+    }
   }
 
   @override
@@ -82,7 +77,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
               child: _ViewObjectButtons(),
             );
           } else if (state is ViewObjectsError) {
-            return const Text('Failed to fetch view objects');
+            return Text('Failed to fetch ${_title ?? _type}');
           }
         },
       )),
@@ -114,6 +109,8 @@ class _ViewObjectButtons extends StatelessWidget {
             return RaisedButton(
                 child: Text(viewObject.title ?? viewObject.name),
                 onPressed: () async {
+                  final projectContext = Provider.of<ProjectContext>(context);
+
                   Navigator.pushNamed(
                     context,
                     screen.detailsScreenRoute,

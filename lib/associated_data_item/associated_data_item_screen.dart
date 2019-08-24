@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
+import 'package:provider/provider.dart';
 import 'package:rw_help/rw_help.dart';
 
 import '../models/associated_data/associated_data.dart';
 import '../models/view_objects/view_objects.dart';
 import '../row_editor/row_editor_screen.dart';
 import '../view_object/view_object.dart';
+import '../models/projects/projects.dart';
 import 'associated_data_item.dart';
 
 enum RecordAction {
@@ -38,9 +40,17 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
   AssociatedDataItemBloc viewObjectBloc = AssociatedDataItemBloc();
 
   @override
-  void initState() {
-    super.initState();
-    viewObjectBloc.dispatch(GenerateViewObject(viewObject, userToken));
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (viewObjectBloc.currentState == viewObjectBloc.initialState) {
+      final projectContext = Provider.of<ProjectContext>(context);
+
+      viewObjectBloc.dispatch(GenerateViewObject(
+        viewObject,
+        projectContext.userToken,
+      ));
+    }
   }
 
   @override
@@ -48,8 +58,9 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
     return BlocBuilder(
       bloc: viewObjectBloc,
       builder: (BuildContext context, ViewObjectState state) {
-        Widget bodyChild;
+        final projectContext = Provider.of<ProjectContext>(context);
         String title = viewObject.title ?? viewObject.name;
+        Widget bodyChild;
 
         if (state is ViewObjectGeneration) {
           bodyChild = CircularProgressIndicator();
@@ -119,7 +130,7 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
                         viewObjectBloc.dispatch(SaveRows(
                           table: state.table,
                           viewObject: state.viewObject,
-                          userToken: state.userToken,
+                          userToken: projectContext.userToken,
                         ));
                       },
                     ),

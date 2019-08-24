@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:rits_client/project/project.dart';
 
+import '../models/projects/projects.dart';
 import '../models/view_objects/view_objects.dart';
 import '../view_object_parameters/view_object_parameters.dart';
 import 'view_object.dart';
@@ -22,13 +24,16 @@ abstract class ViewObjectScreen extends StatefulWidget {
 abstract class ViewObjectScreenState<T extends ViewObjectBloc,
     S extends ViewObjectState> extends State<ViewObjectScreen> {
   ViewObject get viewObject => widget.viewObject;
-  String get userToken => widget.userToken;
+  String get _userToken => widget.userToken;
 
   T viewObjectBloc;
   Widget buildOutputWidget(BuildContext context, S state);
 
   @override
   Widget build(BuildContext context) {
+    final projectWrapper = ProjectWrapper.of(context);
+    final projectContext = Provider.of<ProjectContext>(context);
+
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: Scaffold(
@@ -39,6 +44,8 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
           child: BlocBuilder(
             bloc: viewObjectBloc,
             builder: (BuildContext context, ViewObjectState state) {
+              //final projectContext = Provider.of<ProjectContext>(context);
+
               if (state is ViewObjectGeneration) {
                 return CircularProgressIndicator();
               } else if (state is S) {
@@ -56,7 +63,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                             context,
                             MaterialPageRoute(
                               builder: (context) => ViewObjectParametersScreen(
-                                  viewObject: viewObject, userToken: userToken),
+                                  viewObject: viewObject),
                             ),
                           );
                         },
@@ -66,7 +73,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                         onPressed: () {
                           viewObjectBloc.dispatch(GenerateViewObject(
                             viewObject,
-                            userToken,
+                            _userToken,
                           ));
                         },
                       ),

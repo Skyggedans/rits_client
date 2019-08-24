@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:provider/provider.dart';
 import 'package:rw_help/rw_help.dart';
 
 import '../models/comments/comment.dart';
 import '../utils/utils.dart';
+import '../models/projects/projects.dart';
 import 'comments.dart';
 
 abstract class CommentAction {
@@ -31,13 +33,6 @@ class CancelAction extends CommentAction {
 }
 
 class CommentsScreen extends StatefulWidget {
-  final String userToken;
-
-  CommentsScreen({
-    Key key,
-    @required this.userToken,
-  }) : assert(userToken != null);
-
   @override
   State createState() => _CommentsScreenState();
 }
@@ -45,12 +40,16 @@ class CommentsScreen extends StatefulWidget {
 class _CommentsScreenState extends State<CommentsScreen> {
   final _commentsBloc = CommentsBloc(restClient: RestClient());
 
-  String get _userToken => widget.userToken;
-
   @override
-  void initState() {
-    super.initState();
-    _commentsBloc.dispatch(FetchComments(userToken: _userToken));
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_commentsBloc.currentState == _commentsBloc.initialState) {
+      final projectContext = Provider.of<ProjectContext>(context);
+
+      _commentsBloc
+          .dispatch(FetchComments(userToken: projectContext.userToken));
+    }
   }
 
   @override
@@ -149,29 +148,31 @@ class _CommentsScreenState extends State<CommentsScreen> {
   }
 
   void _onAddCommentPressed(BuildContext context) async {
+    final projectContext = Provider.of<ProjectContext>(context);
     final newComment = Comment();
     final dialogResult = await _showCommentDialog(context, newComment);
 
     if (dialogResult is SaveAction) {
       _commentsBloc.dispatch(AddComment(
         comment: dialogResult.comment,
-        userToken: _userToken,
+        userToken: projectContext.userToken,
       ));
     }
   }
 
   void _onCommentTap(BuildContext context, Comment comment) async {
+    final projectContext = Provider.of<ProjectContext>(context);
     final dialogResult = await _showCommentDialog(context, comment);
 
     if (dialogResult is SaveAction) {
       _commentsBloc.dispatch(UpdateComment(
         comment: dialogResult.comment,
-        userToken: _userToken,
+        userToken: projectContext.userToken,
       ));
     } else if (dialogResult is RemoveAction) {
       _commentsBloc.dispatch(RemoveComment(
         comment: dialogResult.comment,
-        userToken: _userToken,
+        userToken: projectContext.userToken,
       ));
     }
   }

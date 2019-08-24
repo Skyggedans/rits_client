@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'associated_data_item/associated_data_item.dart';
 import 'authentication/authentication.dart';
@@ -6,6 +7,7 @@ import 'chart/chart.dart';
 import 'kpi/kpi.dart';
 import 'report/report.dart';
 import 'tabular_data/tabular_data.dart';
+import 'models/projects/projects.dart';
 
 class Routes {
   static Map<String, WidgetBuilder> get({
@@ -15,6 +17,7 @@ class Routes {
 
     final routes = <String, WidgetBuilder>{
       ReportScreen.route: (BuildContext context) {
+        //final projectContext = Provider.of<ProjectContext>(context);
         final dynamic args = ModalRoute.of(context).settings.arguments;
 
         return ReportScreen(

@@ -50,7 +50,7 @@ class ReportBloc extends ViewObjectBloc {
   Future<Uint8List> _getReportBytes(
       ViewObject viewObject, String userToken) async {
     final url = await _getReportUrl(viewObject, userToken);
-    final response = await restClient.get(url['URL']);
+    final response = await restClient.get(url['URL'] ?? url['Value']);
 
     return response.bodyBytes;
   }

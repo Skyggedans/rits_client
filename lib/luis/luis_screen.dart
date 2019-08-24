@@ -3,18 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:provider/provider.dart';
 
 import '../models/projects/projects.dart';
 import '../utils/rest_client.dart';
 import 'luis.dart';
 
 class LuisScreen extends StatefulWidget {
-  final Project project;
-  final String userToken;
-
-  LuisScreen({Key key, @required this.project, @required this.userToken})
-      : super(key: key);
-
   @override
   State createState() => _LuisScreenState();
 }
@@ -23,13 +18,18 @@ class _LuisScreenState extends State<LuisScreen> {
   final LuisBloc _luisBloc =
       LuisBloc(restClient: RestClient(), luisClient: LuisClient());
 
-  Project get _project => widget.project;
-  String get _userToken => widget.userToken;
-
   @override
-  void initState() {
-    super.initState();
-    _luisBloc.dispatch(LoadLuisProject(_project, _userToken));
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_luisBloc.currentState == _luisBloc.initialState) {
+      final projectContext = Provider.of<ProjectContext>(context);
+
+      _luisBloc.dispatch(LoadLuisProject(
+        projectContext.project,
+        projectContext.userToken,
+      ));
+    }
   }
 
   @override

@@ -2,21 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:provider/provider.dart';
 import 'package:rw_help/rw_help.dart';
 
 import '../utils/utils.dart';
+import '../models/projects/projects.dart';
 import 'matching_items_search.dart';
 
 class MatchingItemsSearchScreen extends StatefulWidget {
   final String searchString;
-  final String userToken;
 
   MatchingItemsSearchScreen({
     Key key,
     @required this.searchString,
-    @required this.userToken,
-  })  : assert(searchString != null),
-        assert(userToken != null);
+  }) : assert(searchString != null);
 
   @override
   State createState() => _MatchingItemsSearchScreenState();
@@ -27,15 +26,20 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
       MatchingItemsSearchBloc(restClient: RestClient());
 
   String get _searchString => widget.searchString;
-  String get _userToken => widget.userToken;
 
   @override
-  void initState() {
-    super.initState();
-    _matchingItemsSearchBloc.dispatch(SearchMatchingItems(
-      searchString: _searchString,
-      userToken: _userToken,
-    ));
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_matchingItemsSearchBloc.currentState ==
+        _matchingItemsSearchBloc.initialState) {
+      final projectContext = Provider.of<ProjectContext>(context);
+
+      _matchingItemsSearchBloc.dispatch(SearchMatchingItems(
+        searchString: _searchString,
+        userToken: projectContext.userToken,
+      ));
+    }
   }
 
   @override
