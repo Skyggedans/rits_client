@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:rits_client/project/project.dart';
 
 import '../models/projects/projects.dart';
 import '../models/view_objects/view_objects.dart';
@@ -12,26 +11,23 @@ import 'view_object.dart';
 
 abstract class ViewObjectScreen extends StatefulWidget {
   final ViewObject viewObject;
-  final String userToken;
 
   ViewObjectScreen({
     Key key,
     @required this.viewObject,
-    @required this.userToken,
-  }) : super(key: key);
+  })  : assert(viewObject != null),
+        super(key: key);
 }
 
 abstract class ViewObjectScreenState<T extends ViewObjectBloc,
     S extends ViewObjectState> extends State<ViewObjectScreen> {
   ViewObject get viewObject => widget.viewObject;
-  String get _userToken => widget.userToken;
 
   T viewObjectBloc;
   Widget buildOutputWidget(BuildContext context, S state);
 
   @override
   Widget build(BuildContext context) {
-    final projectWrapper = ProjectWrapper.of(context);
     final projectContext = Provider.of<ProjectContext>(context);
 
     return WillPopScope(
@@ -71,10 +67,12 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                       RaisedButton(
                         child: const Text('View'),
                         onPressed: () {
-                          viewObjectBloc.dispatch(GenerateViewObject(
-                            viewObject,
-                            _userToken,
-                          ));
+                          viewObjectBloc.dispatch(
+                            GenerateViewObject(
+                              viewObject,
+                              projectContext.userToken,
+                            ),
+                          );
                         },
                       ),
                     ]);

@@ -20,7 +20,6 @@ class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
     this.type,
     this.viewObjectsRepository,
   })  : assert(detailsScreenRoute != null),
-        assert(type != null),
         super(key: key);
 
   @override

@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:rits_client/authentication/authentication_provider.dart';
-import 'package:rits_client/authentication/authentication_repository.dart';
-import 'package:rits_client/routes.dart';
 
 import '../app_config.dart';
 import '../associated_data_item/associated_data_item.dart';
 import '../associated_data_items/associated_data_items.dart';
+import '../authentication/authentication_provider.dart';
+import '../authentication/authentication_repository.dart';
 import '../chart/chart.dart';
 import '../comments/comments_screen.dart';
 import '../kpi/kpi.dart';
@@ -18,6 +17,7 @@ import '../luis/luis.dart';
 import '../matching_items_search/matching_items_search.dart';
 import '../models/projects/projects.dart';
 import '../report/report.dart';
+import '../routes.dart';
 import '../tabular_data/tabular_data.dart';
 import '../utils/rest_client.dart';
 import '../view_objects/view_objects.dart';
@@ -44,57 +44,29 @@ class _ProjectScreenState extends State<ProjectScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder(
       bloc: _projectBloc,
       builder: (BuildContext context, ProjectState state) {
-        final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
-        String title = _project.name;
         Widget bodyChild;
-        List<Widget> actions;
 
         if (state is ProjectLoading) {
           bodyChild = CircularProgressIndicator();
         } else if (state is ProjectLoaded) {
-          title = state.context != null
-              ? '${_project.name} - ${state.context}'
-              : _project.name;
-
-          Route<BuildContext> _getRoutes(RouteSettings settings) {
-            var builder = Routes.get(
-                authRepository: AuthRepository(
-                    authProvider: AuthProvider()))[settings.name];
-
-            if (builder != null) {
-              return new MaterialPageRoute(
-                settings: settings,
-                builder: builder,
-              );
-            } else {
-              return MaterialPageRoute(
-                builder: (context) {
-                  return _buildButtons(context, state);
-                },
-              );
-            }
-
-            return null;
-          }
-
-          bodyChild = Navigator(
-            onGenerateRoute: _getRoutes,
-          );
-
-          return _injectProjectContext(
-            Scaffold(
-              appBar: AppBar(
-                title: Text(title),
-                actions: _buildActions(context, state),
-              ),
-              body: Center(child: bodyChild),
+          return Provider<ProjectContext>.value(
+            value: ProjectContext(
+              project: _project,
+              userToken: state.userToken,
+              hierarchyLevel: state.hierarchyLevel,
             ),
-            state.userToken,
-            state.hierarchyLevel,
+            child: Navigator(
+              onGenerateRoute: _getRoutes,
+            ),
           );
         } else if (state is ProjectError) {
           bodyChild = Text(state.message ?? '');
@@ -102,7 +74,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(title),
+            title: Text(_project.name),
           ),
           body: Center(child: bodyChild),
         );
@@ -114,6 +86,50 @@ class _ProjectScreenState extends State<ProjectScreen> {
   void dispose() {
     _projectBloc.dispose();
     super.dispose();
+  }
+
+  Route<BuildContext> _getRoutes(RouteSettings settings) {
+    var builder = Routes.get(
+        authRepository:
+            AuthRepository(authProvider: AuthProvider()))[settings.name];
+
+    if (builder != null) {
+      return new MaterialPageRoute(
+        settings: settings,
+        builder: builder,
+      );
+    } else {
+      final parentContext = context;
+
+      return MaterialPageRoute(
+        builder: (context) {
+          Future.delayed(Duration.zero, () {
+            ModalRoute.of(context).addLocalHistoryEntry(LocalHistoryEntry(
+              onRemove: () {
+                Navigator.pop(parentContext);
+              },
+            ));
+          });
+
+          return _buildPage(context);
+        },
+      );
+    }
+  }
+
+  Widget _buildPage(BuildContext context) {
+    final state = _projectBloc.currentState as ProjectLoaded;
+    final title = state.context != null
+        ? '${_project.name} - ${state.context}'
+        : _project.name;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        actions: _buildActions(context, state),
+      ),
+      body: Center(child: _buildButtons(context, state)),
+    );
   }
 
   List<Widget> _buildActions(BuildContext context, ProjectLoaded state) {
@@ -214,11 +230,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => _injectProjectContext(
-                      LuisScreen(),
-                      state.userToken,
-                      state.hierarchyLevel,
-                    ),
+                    builder: (context) => LuisScreen(),
                   ),
                 );
               },
@@ -243,13 +255,9 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => _injectProjectContext(
-                      ViewObjectsScreen(
-                        type: 'Charts',
-                        detailsScreenRoute: ChartScreen.route,
-                      ),
-                      state.userToken,
-                      state.hierarchyLevel,
+                    builder: (context) => ViewObjectsScreen(
+                      type: 'Charts',
+                      detailsScreenRoute: ChartScreen.route,
                     ),
                   ),
                 );
@@ -261,14 +269,10 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => _injectProjectContext(
-                      ViewObjectsScreen(
-                        title: 'Tabular Data',
-                        type: 'DataObjects',
-                        detailsScreenRoute: TabularDataScreen.route,
-                      ),
-                      state.userToken,
-                      state.hierarchyLevel,
+                    builder: (context) => ViewObjectsScreen(
+                      title: 'Tabular Data',
+                      type: 'DataObjects',
+                      detailsScreenRoute: TabularDataScreen.route,
                     ),
                   ),
                 );
@@ -280,13 +284,9 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => _injectProjectContext(
-                      ViewObjectsScreen(
-                        type: 'KPIs',
-                        detailsScreenRoute: KpiScreen.route,
-                      ),
-                      state.userToken,
-                      state.hierarchyLevel,
+                    builder: (context) => ViewObjectsScreen(
+                      type: 'KPIs',
+                      detailsScreenRoute: KpiScreen.route,
                     ),
                   ),
                 );
@@ -300,15 +300,11 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => _injectProjectContext(
-                        ViewObjectsScreen(
-                          title: 'Associated Data',
-                          detailsScreenRoute: AssociatedDataItemScreen.route,
-                          viewObjectsRepository: AssociatedDataItemsRepository(
-                              restClient: RestClient()),
-                        ),
-                        state.userToken,
-                        state.hierarchyLevel,
+                      builder: (context) => ViewObjectsScreen(
+                        title: 'Associated Data',
+                        detailsScreenRoute: AssociatedDataItemScreen.route,
+                        viewObjectsRepository: AssociatedDataItemsRepository(
+                            restClient: RestClient()),
                       ),
                     ),
                   );
@@ -323,11 +319,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => _injectProjectContext(
-                        CommentsScreen(),
-                        state.userToken,
-                        state.hierarchyLevel,
-                      ),
+                      builder: (context) => CommentsScreen(),
                     ),
                   );
                 },
@@ -338,29 +330,4 @@ class _ProjectScreenState extends State<ProjectScreen> {
       ],
     );
   }
-
-  Widget _injectProjectContext(Widget screen, String userToken,
-      [String hierarchyLevel]) {
-    return Provider<ProjectContext>.value(
-      value: ProjectContext(
-        project: _project,
-        userToken: userToken,
-        hierarchyLevel: hierarchyLevel,
-      ),
-      child: screen,
-    );
-  }
-}
-
-class ProjectWrapper extends InheritedWidget {
-  final ProjectContext projectContext;
-
-  ProjectWrapper({Widget child, this.projectContext}) : super(child: child);
-
-  static ProjectWrapper of(BuildContext context) {
-    return context.inheritFromWidgetOfExactType(ProjectWrapper);
-  }
-
-  @override
-  bool updateShouldNotify(InheritedWidget oldWidget) => false;
 }

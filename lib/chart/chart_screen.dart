@@ -16,12 +16,10 @@ class ChartScreen extends ViewObjectScreen {
     Key key,
     @required this.authRepository,
     @required ViewObject viewObject,
-    @required String userToken,
   })  : assert(authRepository != null),
         super(
           key: key,
           viewObject: viewObject,
-          userToken: userToken,
         );
 
   @override

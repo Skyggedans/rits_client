@@ -17,11 +17,9 @@ class TabularDataScreen extends ViewObjectScreen {
   TabularDataScreen({
     Key key,
     @required ViewObject viewObject,
-    @required String userToken,
   }) : super(
           key: key,
           viewObject: viewObject,
-          userToken: userToken,
         );
 
   @override
