@@ -11,8 +11,6 @@ import '../view_object/view_object.dart';
 import 'associated_data_item.dart';
 
 class AssociatedDataItemBloc extends ViewObjectBloc {
-  AssociatedDataItemBloc() : super(restClient: RestClient());
-
   @override
   get initialState => ViewObjectGeneration();
 
@@ -37,7 +35,6 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
           columnDefinitions: columns,
           table: data,
           viewObject: event.viewObject,
-          userToken: event.userToken,
         );
       } on ApiError {
         yield ViewObjectError();
@@ -159,6 +156,8 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
 
           return format.format(object);
         }
+
+        return object;
       }),
     );
   }

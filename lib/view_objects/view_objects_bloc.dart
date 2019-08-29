@@ -40,8 +40,7 @@ class ViewObjectsBloc extends Bloc<ViewObjectsEvent, ViewObjectsState> {
                   event.userToken,
                 );
 
-          yield ViewObjectsLoaded(
-              viewObjects: viewObjects, userToken: event.userToken);
+          yield ViewObjectsLoaded(viewObjects: viewObjects);
         }
       } on ApiError {
         yield ViewObjectsError();

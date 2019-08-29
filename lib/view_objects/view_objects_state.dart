@@ -1,5 +1,5 @@
-import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 import '../models/view_objects/view_objects.dart';
 
@@ -20,15 +20,13 @@ class ViewObjectsError extends ViewObjectsState {
 
 class ViewObjectsLoaded extends ViewObjectsState {
   final List<ViewObject> viewObjects;
-  final String userToken;
 
-  ViewObjectsLoaded({this.viewObjects, this.userToken})
-      : super([viewObjects, userToken]);
+  ViewObjectsLoaded({this.viewObjects}) : super([viewObjects]);
 
-  ViewObjectsLoaded copyWith({List<ViewObject> viewObjects, String userToken}) {
+  ViewObjectsLoaded copyWith({List<ViewObject> viewObjects}) {
     return ViewObjectsLoaded(
-        viewObjects: viewObjects ?? this.viewObjects,
-        userToken: userToken ?? this.userToken);
+      viewObjects: viewObjects ?? this.viewObjects,
+    );
   }
 
   @override

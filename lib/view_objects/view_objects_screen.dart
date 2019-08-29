@@ -108,15 +108,10 @@ class _ViewObjectButtons extends StatelessWidget {
             return RaisedButton(
                 child: Text(viewObject.title ?? viewObject.name),
                 onPressed: () async {
-                  final projectContext = Provider.of<ProjectContext>(context);
-
                   Navigator.pushNamed(
                     context,
                     screen.detailsScreenRoute,
-                    arguments: {
-                      'viewObject': viewObject,
-                      'userToken': (state as ViewObjectsLoaded).userToken,
-                    },
+                    arguments: {'viewObject': viewObject},
                   );
                 });
           }).toList(),

@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rits_client/app_config.dart';
+import 'package:provider/provider.dart';
 
 import 'authentication/authentication.dart';
+import 'models/app_config.dart';
 import 'projects/projects.dart';
-import 'routes.dart';
+import 'settings.dart';
 import 'splash/splash.dart';
 import 'utils/rest_client.dart';
 
@@ -33,17 +33,17 @@ main() {
   // });
 
   runApp(
-    AppConfig(
-      child: RitsApp(authRepository: authRepository),
+    MultiProvider(
+      providers: [
+        Provider<AppConfig>.value(value: AppConfig(settings: Settings())),
+        Provider<AuthRepository>.value(value: authRepository),
+      ],
+      child: RitsApp(),
     ),
   );
 }
 
 class RitsApp extends StatefulWidget {
-  final AuthRepository authRepository;
-
-  RitsApp({Key key, @required this.authRepository}) : super(key: key);
-
   @override
   State<RitsApp> createState() => _RitsAppState();
 }
@@ -55,17 +55,19 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
     BlocSupervisor().delegate = this;
   }
 
-  AuthRepository get _authRepository => widget.authRepository;
-
   @override
-  void initState() {
-    _authenticationBloc = AuthenticationBloc(authRepository: _authRepository);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    Future.delayed(Duration(seconds: 3), () {
-      _authenticationBloc.dispatch(AppStarted());
-    });
+    if (_authenticationBloc == null) {
+      final authRepository = Provider.of<AuthRepository>(context);
 
-    super.initState();
+      _authenticationBloc = AuthenticationBloc(authRepository: authRepository);
+
+      Future.delayed(Duration(seconds: 3), () {
+        _authenticationBloc.dispatch(AppStarted());
+      });
+    }
   }
 
   @override
@@ -80,7 +82,6 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
       bloc: _authenticationBloc,
       child: MaterialApp(
         //showSemanticsDebugger: true,
-        //routes: Routes.get(authRepository: _authRepository),
         home: BlocBuilder<AuthenticationEvent, AuthenticationState>(
           bloc: _authenticationBloc,
           builder: (BuildContext context, AuthenticationState state) {

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:meta/meta.dart';
+import 'package:provider/provider.dart';
 
 import '../authentication/authentication.dart';
 import '../models/view_objects/view_objects.dart';
@@ -10,14 +11,11 @@ import 'chart.dart';
 
 class ChartScreen extends ViewObjectScreen {
   static String route = '/chart';
-  final AuthRepository authRepository;
 
   ChartScreen({
     Key key,
-    @required this.authRepository,
     @required ViewObject viewObject,
-  })  : assert(authRepository != null),
-        super(
+  }) : super(
           key: key,
           viewObject: viewObject,
         );
@@ -30,10 +28,10 @@ class _ChartScreenState
     extends ViewObjectScreenState<ChartBloc, ChartPresentation> {
   ChartBloc viewObjectBloc = ChartBloc();
 
-  AuthRepository get _authRepository => (widget as ChartScreen).authRepository;
-
   @override
   Widget buildOutputWidget(BuildContext context, ChartPresentation state) {
+    final authRepository = Provider.of<AuthRepository>(context);
+
     return WebviewScaffold(
       // debuggingEnabled: true,
       // clearCache: true,
@@ -55,7 +53,7 @@ class _ChartScreenState
       // ),
       url: state.url,
       headers: {
-        'Authorization': 'Bearer ${_authRepository.accessToken}',
+        'Authorization': 'Bearer ${authRepository.accessToken}',
       },
     );
   }

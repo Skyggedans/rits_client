@@ -17,7 +17,8 @@ class ProjectLoaded extends ProjectState {
   final String context;
 
   ProjectLoaded({@required this.userToken, this.hierarchyLevel, this.context})
-      : super([userToken, hierarchyLevel, context]);
+      : assert(userToken != null),
+        super([userToken, hierarchyLevel, context]);
 
   @override
   String toString() => 'ProjectLoaded';

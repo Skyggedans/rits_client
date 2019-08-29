@@ -32,9 +32,10 @@ class CommentsLoaded extends CommentsState {
 
 class CommentSelected extends CommentsState {
   final Comment comment;
-  final String userToken;
 
-  CommentSelected({this.comment, this.userToken}) : super([comment, userToken]);
+  CommentSelected({this.comment})
+      : assert(comment != null),
+        super([comment]);
 }
 
 class CommentsError extends CommentsState {

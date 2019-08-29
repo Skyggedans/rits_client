@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 
-import 'package:rits_client/models/projects/projects.dart';
+import '../models/projects/projects.dart';
 
 abstract class ProjectsState extends Equatable {
   ProjectsState([List props = const []]) : super(props);
@@ -32,12 +33,16 @@ class ProjectsLoaded extends ProjectsState {
   }
 
   @override
-  String toString() => 'ProjectsLoaded { parameters: ${projects.length} }';
+  String toString() => 'ProjectsLoaded { projects: ${projects.length} }';
 }
 
 class ProjectSelected extends ProjectsState {
   final Project project;
-  final String userToken;
 
-  ProjectSelected({this.project, this.userToken}) : super([project, userToken]);
+  ProjectSelected({@required this.project})
+      : assert(project != null),
+        super([project]);
+
+  @override
+  String toString() => 'ProjectSelected { project: ${project.name} }';
 }

@@ -10,8 +10,6 @@ import '../utils/rest_client.dart';
 import '../view_object/view_object.dart';
 
 class ReportBloc extends ViewObjectBloc {
-  ReportBloc() : super(restClient: RestClient());
-
   @override
   Stream<ViewObjectState> mapEventToState(ViewObjectEvent event) async* {
     if (event is GenerateViewObject) {

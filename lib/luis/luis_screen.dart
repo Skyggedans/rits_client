@@ -42,6 +42,8 @@ class _LuisScreenState extends State<LuisScreen> {
           child: BlocBuilder(
         bloc: _luisBloc,
         builder: (BuildContext context, LuisState state) {
+          final projectContext = Provider.of<ProjectContext>(context);
+
           if (state is LuisUninitialized || state is UtteranceExecution) {
             return CircularProgressIndicator();
           } else if (state is UtteranceInput) {
@@ -60,7 +62,7 @@ class _LuisScreenState extends State<LuisScreen> {
                   _luisBloc.dispatch(ExecuteUtterance(
                     utteranceText: text,
                     luisProjectId: state.luisProjectId,
-                    userToken: state.userToken,
+                    userToken: projectContext.userToken,
                   ));
                 },
               ),

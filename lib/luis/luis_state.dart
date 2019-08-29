@@ -14,10 +14,10 @@ class LuisUninitialized extends LuisState {
 
 class UtteranceInput extends LuisState {
   final String luisProjectId;
-  final String userToken;
 
-  UtteranceInput({@required this.luisProjectId, @required this.userToken})
-      : super([luisProjectId, userToken]);
+  UtteranceInput({@required this.luisProjectId})
+      : assert(luisProjectId != null),
+        super([luisProjectId]);
 
   @override
   String toString() => 'UtteranceInput';
@@ -31,10 +31,12 @@ class UtteranceExecution extends LuisState {
 class UtteranceExecutedWithUrl extends LuisState {
   final String url;
 
-  UtteranceExecutedWithUrl({@required this.url}) : super([url]);
+  UtteranceExecutedWithUrl({@required this.url})
+      : assert(url != null),
+        super([url]);
 
   @override
-  String toString() => 'UtteranceExecuted { info: $url }';
+  String toString() => 'UtteranceExecutedWithUrl { url: $url }';
 }
 
 class LuisError extends LuisState {

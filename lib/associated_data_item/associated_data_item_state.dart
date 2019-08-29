@@ -6,18 +6,19 @@ class AssociatedDataItemGenerated extends ViewObjectState {
   final List<ColumnDef> columnDefinitions;
   final AssociatedDataTable table;
   final BusinessObject viewObject;
-  final String userToken;
 
   AssociatedDataItemGenerated({
     @required this.columnDefinitions,
     @required this.table,
     this.viewObject,
-    this.userToken,
   })  : assert(columnDefinitions != null),
         assert(table != null),
         assert(viewObject != null),
-        assert(userToken != null),
-        super([columnDefinitions, table, viewObject, userToken]);
+        super([
+          columnDefinitions,
+          table,
+          viewObject,
+        ]);
 
   AssociatedDataItemGenerated copyWith({
     List<ColumnDef> columnDefinitions,
@@ -27,7 +28,6 @@ class AssociatedDataItemGenerated extends ViewObjectState {
       columnDefinitions: columnDefinitions ?? this.columnDefinitions,
       table: table ?? this.table,
       viewObject: this.viewObject,
-      userToken: this.userToken,
     );
   }
 

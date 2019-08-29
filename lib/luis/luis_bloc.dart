@@ -32,8 +32,7 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
       try {
         final luisProjectId = await _getLuisProjectId(event.project);
 
-        yield UtteranceInput(
-            luisProjectId: luisProjectId, userToken: event.userToken);
+        yield UtteranceInput(luisProjectId: luisProjectId);
       } on ApiError {
         yield LuisError();
       }
@@ -50,8 +49,7 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
         if (response.containsKey('url')) {
           yield UtteranceExecutedWithUrl(url: response['url']);
         } else {
-          yield UtteranceInput(
-              luisProjectId: event.luisProjectId, userToken: event.userToken);
+          yield UtteranceInput(luisProjectId: event.luisProjectId);
         }
       } on ApiError {
         yield LuisError();

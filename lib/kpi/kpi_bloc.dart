@@ -8,8 +8,6 @@ import '../view_object/view_object.dart';
 import 'kpi.dart';
 
 class KpiBloc extends ViewObjectBloc {
-  KpiBloc() : super(restClient: RestClient());
-
   @override
   Stream<ViewObjectState> mapEventToState(ViewObjectEvent event) async* {
     if (event is GenerateViewObject) {

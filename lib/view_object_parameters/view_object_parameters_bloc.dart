@@ -38,7 +38,6 @@ class ViewObjectParametersBloc
 
         yield ViewObjectParametersLoaded(
           viewObject: event.viewObject,
-          userToken: event.userToken,
           parameters: params,
         );
       } on ApiError {

@@ -4,8 +4,6 @@ import '../view_object/view_object.dart';
 import 'chart.dart';
 
 class ChartBloc extends ViewObjectBloc {
-  ChartBloc() : super(restClient: RestClient());
-
   @override
   Stream<ViewObjectState> mapEventToState(ViewObjectEvent event) async* {
     if (event is GenerateViewObject) {
@@ -15,9 +13,7 @@ class ChartBloc extends ViewObjectBloc {
         yield ChartPresentation(
           viewObject: event.viewObject,
           url:
-              //'${settings.backendUrl}/showchart/${event.userToken}/${Uri.encodeFull(event.viewObject.name)}',
-              '${settings.chartUrl}/Charts/BaseChart?skypeBotToken=${event.userToken}&chart=${Uri.encodeFull(event.viewObject.name)}',
-          userToken: event.userToken,
+              '${settings.webUrl}/Charts/BaseChart?skypeBotToken=${event.userToken}&chart=${Uri.encodeFull(event.viewObject.name)}',
         );
       } on ApiError {
         yield ViewObjectError();

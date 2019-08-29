@@ -73,13 +73,6 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
     return body.map<Comment>((comment) {
       return Comment.fromJson(comment);
     }).toList();
-
-    // return Future.delayed(Duration(seconds: 3), () {
-    //   return [
-    //     Comment(id: 1, text: 'comment 1'),
-    //     Comment(id: 2, text: 'comment 2'),
-    //   ];
-    // });
   }
 
   Future<Null> _addComment(Comment comment, String userToken) async {

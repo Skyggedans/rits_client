@@ -4,11 +4,17 @@ import '../view_object/view_object.dart';
 class ChartPresentation extends ViewObjectState {
   final ViewObject viewObject;
   final String url;
-  final String userToken;
 
-  ChartPresentation({this.viewObject, this.url, this.userToken})
-      : super([viewObject, url, userToken]);
+  ChartPresentation({
+    this.viewObject,
+    this.url,
+  })  : assert(viewObject != null),
+        assert(url != null),
+        super([
+          viewObject,
+          url,
+        ]);
 
   @override
-  String toString() => 'ChartGenerated';
+  String toString() => 'ChartPresentation';
 }

@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../app_config.dart';
 import '../associated_data_item/associated_data_item.dart';
 import '../associated_data_items/associated_data_items.dart';
 import '../authentication/authentication_provider.dart';
@@ -17,10 +16,10 @@ import '../luis/luis.dart';
 import '../matching_items_search/matching_items_search.dart';
 import '../models/projects/projects.dart';
 import '../report/report.dart';
-import '../routes.dart';
 import '../tabular_data/tabular_data.dart';
 import '../utils/rest_client.dart';
 import '../view_objects/view_objects.dart';
+import '../models/app_config.dart';
 import 'project.dart';
 
 class ProjectScreen extends StatefulWidget {
@@ -89,9 +88,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
   }
 
   Route<BuildContext> _getRoutes(RouteSettings settings) {
-    var builder = Routes.get(
-        authRepository:
-            AuthRepository(authProvider: AuthProvider()))[settings.name];
+    var builder = ProjectRoutes.routes[settings.name];
 
     if (builder != null) {
       return new MaterialPageRoute(
@@ -133,7 +130,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
   }
 
   List<Widget> _buildActions(BuildContext context, ProjectLoaded state) {
-    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+    final isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
 
     return <Widget>[
       Visibility(
@@ -194,7 +191,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
   }
 
   Widget _buildButtons(BuildContext context, ProjectLoaded state) {
-    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+    final isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

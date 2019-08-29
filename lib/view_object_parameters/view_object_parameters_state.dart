@@ -13,14 +13,15 @@ class ViewObjectParametersInProgress extends ViewObjectParametersState {
 
 class ViewObjectParametersLoaded extends ViewObjectParametersState {
   final ViewObject viewObject;
-  final String userToken;
   final List<ViewObjectParameter> parameters;
 
   ViewObjectParametersLoaded({
     this.viewObject,
-    this.userToken,
     this.parameters,
-  }) : super([viewObject, userToken, parameters]);
+  }) : super([
+          viewObject,
+          parameters,
+        ]);
 
   ViewObjectParametersLoaded copyWith({List<ViewObjectParameter> parameters}) {
     return ViewObjectParametersLoaded(
