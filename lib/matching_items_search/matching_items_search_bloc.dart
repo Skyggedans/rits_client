@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
+import '../utils/utils.dart';
 import 'matching_items_search.dart';
 
 class MatchingItemsSearchBloc

@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'package:meta/meta.dart';
 
 import 'package:bloc/bloc.dart';
+import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../utils/rest_client.dart';
+import '../utils/utils.dart';
 import 'view_objects.dart';
 
 class ViewObjectsBloc extends Bloc<ViewObjectsEvent, ViewObjectsState> {

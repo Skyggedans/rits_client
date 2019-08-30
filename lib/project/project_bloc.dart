@@ -13,7 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../models/projects/projects.dart';
 import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
+import '../utils/utils.dart';
 import 'project.dart';
 
 class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {

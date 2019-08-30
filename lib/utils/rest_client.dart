@@ -7,21 +7,13 @@ import 'package:http_parser/http_parser.dart';
 
 import '../authentication/authentication.dart';
 import '../settings.dart' as settings;
+import 'utils.dart';
 
 typedef RequestFunc = Future<http.Response> Function(String url,
     {Map<String, String> headers});
 
 typedef BodiedRequestFunc = Future<http.Response> Function(String url,
     {Map<String, String> headers, dynamic body, Encoding encoding});
-
-class ApiError implements Exception {
-  final String message;
-
-  ApiError(this.message);
-
-  @override
-  String toString() => message;
-}
 
 abstract class AbstractRestClient {
   Future<http.Response> get(String url,

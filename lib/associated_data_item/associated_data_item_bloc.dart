@@ -6,7 +6,7 @@ import '../models/associated_data/associated_data.dart';
 import '../models/associated_data/business_object.dart';
 import '../models/associated_data/table.dart';
 import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
+import '../utils/utils.dart';
 import '../view_object/view_object.dart';
 import 'associated_data_item.dart';
 

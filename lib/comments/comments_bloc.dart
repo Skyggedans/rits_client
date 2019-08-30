@@ -6,6 +6,7 @@ import 'package:rxdart/rxdart.dart';
 
 import '../models/comments/comments.dart';
 import '../settings.dart' as settings;
+import '../utils/errors.dart';
 import '../utils/rest_client.dart';
 import 'comments.dart';
 

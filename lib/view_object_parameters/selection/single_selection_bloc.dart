@@ -6,7 +6,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:bloc/bloc.dart';
 
 import '../../settings.dart' as settings;
-import '../../utils/rest_client.dart';
+import '../../utils/utils.dart';
 import '../../models/view_objects/view_objects.dart';
 import 'selection.dart';
 

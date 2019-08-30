@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import '../models/view_objects/view_objects.dart';
 import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
+import '../utils/utils.dart';
 import '../view_object/view_object.dart';
 import 'tabular_data.dart';
 

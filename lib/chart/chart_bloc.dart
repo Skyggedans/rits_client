@@ -1,5 +1,5 @@
 import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
+import '../utils/errors.dart';
 import '../view_object/view_object.dart';
 import 'chart.dart';
 

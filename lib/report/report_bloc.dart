@@ -6,7 +6,7 @@ import 'package:flutter_pdf_viewer/flutter_pdf_viewer.dart';
 
 import '../models/view_objects/view_objects.dart';
 import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
+import '../utils/utils.dart';
 import '../view_object/view_object.dart';
 
 class ReportBloc extends ViewObjectBloc {

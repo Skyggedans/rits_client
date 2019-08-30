@@ -8,7 +8,7 @@ import 'package:rxdart/rxdart.dart';
 
 import '../models/projects/projects.dart';
 import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
+import '../utils/utils.dart';
 import 'luis.dart';
 
 class LuisBloc extends Bloc<LuisEvent, LuisState> {
