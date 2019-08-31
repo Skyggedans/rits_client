@@ -36,26 +36,16 @@ class _ChartScreenState
 
   @override
   Widget buildOutputWidget(BuildContext context, ChartPresentation state) {
+    final uri = Uri.parse(state.url);
+    final params = uri.queryParameters;
+    final newParams = {'id_token': _authRepository.accessToken};
+
+    newParams.addAll(params);
+
+    final newUri = uri.replace(queryParameters: newParams);
+
     return WebviewScaffold(
-      // debuggingEnabled: true,
-      // clearCache: true,
-      // appCacheEnabled: false,
-      // appBar: AppBar(
-      //   actions: <Widget>[
-      //     RaisedButton(
-      //       child: const Text('Reload'),
-      //       onPressed: () {
-      //         context.visitChildElements((child) {
-      //           if (child.widget is WebviewScaffold) {
-      //             ((child as StatefulElement).state as dynamic)
-      //                 .reloadUrl(state.url);
-      //           }
-      //         });
-      //       },
-      //     )
-      //   ],
-      // ),
-      url: state.url,
+      url: newUri.toString(),
       headers: {
         'Authorization': 'Bearer ${_authRepository.accessToken}',
       },
