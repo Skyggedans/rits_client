@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../models/projects/projects.dart';
+import 'package:rits_client/models/projects/projects.dart';
 
 abstract class ProjectsState extends Equatable {
   ProjectsState([List props = const []]) : super(props);

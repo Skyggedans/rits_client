@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../models/projects/projects.dart';
-import '../models/view_objects/view_objects.dart';
-import '../utils/rest_client.dart';
-import '../widgets/widgets.dart';
+import 'package:rits_client/models/projects/projects.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rits_client/widgets/widgets.dart';
 import 'selection/selection.dart';
 import 'view_object_parameters.dart';
 
@@ -25,8 +25,7 @@ class ViewObjectParametersScreen extends StatefulWidget {
 
 class _ViewObjectParametersScreenState
     extends State<ViewObjectParametersScreen> {
-  final ViewObjectParametersBloc _projectsBloc =
-      ViewObjectParametersBloc(restClient: RestClient());
+  final ViewObjectParametersBloc _projectsBloc = ViewObjectParametersBloc();
 
   ViewObject get _viewObject => widget.viewObject;
 

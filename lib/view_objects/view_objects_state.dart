@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
-import '../models/view_objects/view_objects.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
 
 @immutable
 abstract class ViewObjectsState extends Equatable {

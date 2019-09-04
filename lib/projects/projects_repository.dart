@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/projects/project.dart';
+import 'package:rits_client/models/projects/project.dart';
 import 'projects.dart';
 
 class ProjectsRepository {

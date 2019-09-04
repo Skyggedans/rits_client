@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/projects/projects.dart';
-import '../../models/view_objects/view_objects.dart';
-import '../../utils/rest_client.dart';
+import 'package:rits_client/models/projects/projects.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/utils/rest_client.dart';
 import 'selection.dart';
 
 class SingleSelection extends StatefulWidget {
@@ -23,7 +23,7 @@ class SingleSelection extends StatefulWidget {
 
 class _SingleSelectionState extends State<SingleSelection> {
   final SingleSelectionBloc _selectionBloc =
-      SingleSelectionBloc(restClient: RestClient());
+      SingleSelectionBloc(restClient: RitsClient());
 
   ViewObjectParameter get _param => widget.param;
 

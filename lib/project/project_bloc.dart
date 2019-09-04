@@ -5,21 +5,19 @@ import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:intl/intl.dart';
-import 'package:meta/meta.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:rits_client/locator.dart';
+import 'package:rits_client/models/projects/projects.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/utils.dart';
 import 'package:rw_barcode_reader/rw_barcode_reader.dart';
 import 'package:rw_camera/rw_camera.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:permission_handler/permission_handler.dart';
 
-import '../models/projects/projects.dart';
-import '../settings.dart' as settings;
-import '../utils/utils.dart';
 import 'project.dart';
 
 class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
-  final RestClient restClient;
-
-  ProjectBloc({@required this.restClient});
+  final _restClient = locator<RestClient>();
 
   @override
   get initialState => ProjectLoading();
@@ -150,7 +148,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     const skypeId = 'User';
     final url =
         '${settings.backendUrl}/StartSkypeSession/$skypeId/$userId/${Uri.encodeFull(project.name)}';
-    final response = await restClient.get(url);
+    final response = await _restClient.get(url);
 
     return json.decode(response.body);
   }
@@ -159,7 +157,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       String contextId, String userToken) async {
     final url =
         '${settings.backendUrl}/SetContextFromBarCode/$userToken/${Uri.encodeFull(contextId)}';
-    final response = await restClient.get(url);
+    final response = await _restClient.get(url);
 
     return json.decode(response.body);
   }
@@ -167,7 +165,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   Future<String> _setContextFromSearch(String context, String userToken) async {
     final url =
         '${settings.backendUrl}/SetObservedItemContext/$userToken/${Uri.encodeFull(context)}';
-    final response = await restClient.get(url);
+    final response = await _restClient.get(url);
     final body = json.decode(response.body);
 
     return body['ResultData'];
@@ -183,7 +181,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     final fileName =
         'IMG_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.png';
 
-    await restClient.uploadFile(
+    await _restClient.uploadFile(
       url,
       bytes: bytes,
       field: 'photo',
@@ -195,7 +193,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   Future<void> _postVideo(filePath, String userToken) async {
     final url = '${settings.backendUrl}/uploadFile/$userToken';
 
-    await restClient.uploadFile(
+    await _restClient.uploadFile(
       url,
       field: 'movie',
       filePath: filePath,

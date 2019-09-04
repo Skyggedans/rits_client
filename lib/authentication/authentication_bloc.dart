@@ -3,20 +3,16 @@ import 'dart:convert';
 import 'dart:core';
 
 import 'package:bloc/bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:meta/meta.dart';
 import 'package:oauth2/oauth2.dart';
 
-import '../settings.dart' as settings;
+import 'package:rits_client/settings.dart' as settings;
 import 'authentication.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
-  final AuthRepository authRepository;
-
-  AuthenticationBloc({@required this.authRepository}) {
-    assert(authRepository != null);
-  }
+  final AuthRepository _authRepository = GetIt.instance<AuthRepository>();
 
   @override
   AuthenticationState get initialState => AuthenticationUninitialized();
@@ -43,7 +39,7 @@ class AuthenticationBloc
   }
 
   Stream<AuthenticationState> _mapAppStarted() async* {
-    if (await authRepository.hasAccessToken()) {
+    if (await _authRepository.hasAccessToken()) {
       yield Authenticated();
       // } else if (await authRepository.hasRefreshToken()) {
       //   try {
@@ -100,7 +96,7 @@ class AuthenticationBloc
             timer.cancel();
             print('Access granted for ${tokenResponse['expires_in']} seconds');
 
-            await authRepository.persistTokens(
+            await _authRepository.persistTokens(
               tokenResponse['access_token'],
               tokenResponse['refresh_token'],
               DateTime.now().add(

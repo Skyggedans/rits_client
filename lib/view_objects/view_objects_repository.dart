@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:meta/meta.dart';
 
-import '../models/projects/projects.dart';
-import '../models/view_objects/view_objects.dart';
-import '../settings.dart' as settings;
-import '../utils/utils.dart';
+import 'package:rits_client/models/projects/projects.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/utils.dart';
 
 class ViewObjectsRepository<T extends ViewObject> {
-  final AbstractRestClient restClient;
+  final RestClient restClient;
 
   const ViewObjectsRepository({@required this.restClient})
       : assert(restClient != null);

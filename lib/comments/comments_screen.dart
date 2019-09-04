@@ -5,9 +5,9 @@ import 'package:meta/meta.dart';
 import 'package:provider/provider.dart';
 import 'package:rw_help/rw_help.dart';
 
-import '../models/comments/comment.dart';
-import '../utils/utils.dart';
-import '../models/projects/projects.dart';
+import 'package:rits_client/models/comments/comment.dart';
+import 'package:rits_client/utils/utils.dart';
+import 'package:rits_client/models/projects/projects.dart';
 import 'comments.dart';
 
 abstract class CommentAction {
@@ -38,7 +38,7 @@ class CommentsScreen extends StatefulWidget {
 }
 
 class _CommentsScreenState extends State<CommentsScreen> {
-  final _commentsBloc = CommentsBloc(restClient: RestClient());
+  final _commentsBloc = CommentsBloc(restClient: RitsClient());
 
   @override
   void didChangeDependencies() {

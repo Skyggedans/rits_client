@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/semantics.dart';
 
-import '../models/associated_data/associated_data.dart';
-import '../widgets/widgets.dart';
+import 'package:rits_client/models/associated_data/associated_data.dart';
+import 'package:rits_client/widgets/widgets.dart';
 
 class RowEditorScreen extends StatefulWidget {
   final List<ColumnDef> columnDefinitions;

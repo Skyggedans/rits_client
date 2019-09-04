@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:meta/meta.dart';
 
-import '../models/associated_data/associated_data.dart';
-import '../models/projects/project.dart';
-import '../settings.dart' as settings;
-import '../view_objects/view_objects.dart';
+import 'package:rits_client/models/associated_data/associated_data.dart';
+import 'package:rits_client/models/projects/project.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/view_objects/view_objects.dart';
 
 class AssociatedDataItemsRepository
     extends ViewObjectsRepository<BusinessObject> {

@@ -3,8 +3,8 @@ import 'package:meta/meta.dart';
 
 import 'package:flutter_pdf_viewer/flutter_pdf_viewer.dart';
 
-import '../models/view_objects/view_objects.dart';
-import '../view_object/view_object.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/view_object/view_object.dart';
 import 'report.dart';
 
 class ReportScreen extends ViewObjectScreen {

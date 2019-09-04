@@ -1,6 +1,6 @@
-import '../settings.dart' as settings;
-import '../utils/errors.dart';
-import '../view_object/view_object.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/errors.dart';
+import 'package:rits_client/view_object/view_object.dart';
 import 'chart.dart';
 
 class ChartBloc extends ViewObjectBloc {

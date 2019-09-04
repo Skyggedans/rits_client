@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../models/projects/projects.dart';
-import '../models/view_objects/view_objects.dart';
-import '../view_object_parameters/view_object_parameters.dart';
+import 'package:rits_client/models/projects/projects.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/view_object_parameters/view_object_parameters.dart';
 import 'view_object.dart';
 
 abstract class ViewObjectScreen extends StatefulWidget {

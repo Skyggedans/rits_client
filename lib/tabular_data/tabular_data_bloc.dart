@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import '../models/view_objects/view_objects.dart';
-import '../settings.dart' as settings;
-import '../utils/utils.dart';
-import '../view_object/view_object.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/utils.dart';
+import 'package:rits_client/view_object/view_object.dart';
 import 'tabular_data.dart';
 
 class TabularDataBloc extends ViewObjectBloc {

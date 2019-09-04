@@ -5,8 +5,8 @@ import 'package:meta/meta.dart';
 import 'package:provider/provider.dart';
 import 'package:rw_help/rw_help.dart';
 
-import '../utils/utils.dart';
-import '../models/projects/projects.dart';
+import 'package:rits_client/utils/utils.dart';
+import 'package:rits_client/models/projects/projects.dart';
 import 'matching_items_search.dart';
 
 class MatchingItemsSearchScreen extends StatefulWidget {
@@ -23,7 +23,7 @@ class MatchingItemsSearchScreen extends StatefulWidget {
 
 class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
   final _matchingItemsSearchBloc =
-      MatchingItemsSearchBloc(restClient: RestClient());
+      MatchingItemsSearchBloc(restClient: RitsClient());
 
   String get _searchString => widget.searchString;
 

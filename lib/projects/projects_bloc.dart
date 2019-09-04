@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../utils/utils.dart';
+import 'package:rits_client/utils/utils.dart';
 import 'projects.dart';
 
 class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {

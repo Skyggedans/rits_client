@@ -4,13 +4,13 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../settings.dart' as settings;
-import '../utils/utils.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/utils.dart';
 import 'matching_items_search.dart';
 
 class MatchingItemsSearchBloc
     extends Bloc<MatchingItemsSearchEvent, MatchingItemsSearchState> {
-  final RestClient restClient;
+  final RitsClient restClient;
 
   MatchingItemsSearchBloc({@required this.restClient})
       : assert(restClient != null);

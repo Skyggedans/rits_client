@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
-import '../models/comments/comments.dart';
+import 'package:rits_client/models/comments/comments.dart';
 
 abstract class CommentsEvent extends Equatable {
   CommentsEvent([List props = const []]) : super(props);

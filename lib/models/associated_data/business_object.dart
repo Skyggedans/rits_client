@@ -1,4 +1,4 @@
-import '../../models/view_objects/view_object.dart';
+import 'package:rits_client/models/view_objects/view_object.dart';
 
 class BusinessObject extends ViewObject {
   final int id;

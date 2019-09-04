@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:provider/provider.dart';
 
-import '../models/projects/projects.dart';
-import '../utils/rest_client.dart';
+import 'package:rits_client/models/projects/projects.dart';
+import 'package:rits_client/utils/rest_client.dart';
 import 'luis.dart';
 
 class LuisScreen extends StatefulWidget {
@@ -16,7 +16,7 @@ class LuisScreen extends StatefulWidget {
 
 class _LuisScreenState extends State<LuisScreen> {
   final LuisBloc _luisBloc =
-      LuisBloc(restClient: RestClient(), luisClient: LuisClient());
+      LuisBloc(restClient: RitsClient(), luisClient: LuisClient());
 
   @override
   void didChangeDependencies() {

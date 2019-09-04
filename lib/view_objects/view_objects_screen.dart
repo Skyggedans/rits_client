@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../models/projects/projects.dart';
-import '../utils/utils.dart';
+import 'package:rits_client/models/projects/projects.dart';
+import 'package:rits_client/utils/utils.dart';
 import 'view_objects.dart';
 
 class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
@@ -38,7 +38,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
     return _ViewObjectsScreenState._(
       viewObjectsBloc: ViewObjectsBloc(
           viewObjectsRepository: viewObjectsRepository ??
-              ViewObjectsRepository(restClient: RestClient())),
+              ViewObjectsRepository(restClient: RitsClient())),
     );
   }
 

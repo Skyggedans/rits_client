@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 
-import '../models/projects/projects.dart';
+import 'package:rits_client/models/projects/projects.dart';
 
 @immutable
 abstract class ViewObjectsEvent extends Equatable {

@@ -5,13 +5,13 @@ import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:bloc/bloc.dart';
 
-import '../../settings.dart' as settings;
-import '../../utils/utils.dart';
-import '../../models/view_objects/view_objects.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/utils.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
 import 'selection.dart';
 
 class SingleSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
-  final RestClient restClient;
+  final RitsClient restClient;
 
   SingleSelectionBloc({@required this.restClient});
 

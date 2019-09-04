@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../models/view_objects/view_objects.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
 
 abstract class ViewObjectParametersState extends Equatable {
   ViewObjectParametersState([List props = const []]) : super(props);

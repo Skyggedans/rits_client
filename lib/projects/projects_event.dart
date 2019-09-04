@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../models/projects/projects.dart';
+import 'package:rits_client/models/projects/projects.dart';
 
 abstract class ProjectsEvent extends Equatable {
   ProjectsEvent([List props = const []]) : super(props);

@@ -1,27 +1,23 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 
+import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
+import 'package:rxdart/rxdart.dart';
+
 import 'package:rits_client/models/app_config.dart';
 import 'package:rits_client/models/projects/project_context.dart';
-import 'package:rxdart/rxdart.dart';
-import 'package:bloc/bloc.dart';
-
-import '../utils/rest_client.dart';
+import 'package:rits_client/utils/rest_client.dart';
 import 'view_object.dart';
 
 abstract class ViewObjectBloc extends Bloc<ViewObjectEvent, ViewObjectState> {
-  final AppConfig appConfig;
+  final AppConfig appConfig = GetIt.instance<AppConfig>();
+  final RestClient restClient = GetIt.instance<RestClient>();
   final ProjectContext projectContext;
-  final RestClient restClient;
 
-  ViewObjectBloc({
-    @required this.appConfig,
-    @required this.projectContext,
-    @required this.restClient,
-  })  : assert(appConfig != null),
-        assert(projectContext != null),
-        assert(restClient != null);
+  ViewObjectBloc({@required this.projectContext})
+      : assert(projectContext != null);
 
   @override
   get initialState => ViewObjectIdle();

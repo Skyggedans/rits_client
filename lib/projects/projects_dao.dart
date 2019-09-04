@@ -1,18 +1,12 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
+import 'package:rits_client/main.dart';
 import 'package:rits_client/models/models.dart';
 import 'package:rits_client/utils/rest_client.dart';
 
 class ProjectsDao {
-  final AbstractRestClient restClient;
-  final AppConfig appConfig;
-
-  ProjectsDao({
-    @required this.restClient,
-    @required this.appConfig,
-  })  : assert(restClient != null),
-        assert(appConfig != null);
+  final restClient = locator<RestClient>();
+  final appConfig = locator<AppConfig>();
 
   Future<List<Project>> getProjects() async {
     final url = '${appConfig.settings.backendUrl}/GetProjects';

@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../../utils/rest_client.dart';
-import '../../models/view_objects/view_objects.dart';
-import '../../models/projects/projects.dart';
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/models/projects/projects.dart';
 import 'selection.dart';
 
 class MultiSelection extends StatefulWidget {
@@ -24,7 +24,7 @@ class MultiSelection extends StatefulWidget {
 
 class _MultiSelectionState extends State<MultiSelection> {
   final MultiSelectionBloc _selectionBloc =
-      MultiSelectionBloc(restClient: RestClient());
+      MultiSelectionBloc(restClient: RitsClient());
 
   ViewObjectParameter get _param => widget.param;
 

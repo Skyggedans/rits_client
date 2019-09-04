@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import '../models/view_objects/view_objects.dart';
-import '../models/kpi/kpi.dart';
-import '../view_object/view_object.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/models/kpi/kpi.dart';
+import 'package:rits_client/view_object/view_object.dart';
 import 'kpi.dart';
 
 Card buildKpiCard(Kpi kpi) {

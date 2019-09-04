@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 
-import '../models/associated_data/associated_data.dart';
-import '../models/associated_data/business_object.dart';
-import '../models/associated_data/table.dart';
-import '../settings.dart' as settings;
-import '../utils/utils.dart';
-import '../view_object/view_object.dart';
+import 'package:rits_client/models/associated_data/associated_data.dart';
+import 'package:rits_client/models/associated_data/business_object.dart';
+import 'package:rits_client/models/associated_data/table.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/utils.dart';
+import 'package:rits_client/view_object/view_object.dart';
 import 'associated_data_item.dart';
 
 class AssociatedDataItemBloc extends ViewObjectBloc {

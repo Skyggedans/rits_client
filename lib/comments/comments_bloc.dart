@@ -4,14 +4,14 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../models/comments/comments.dart';
-import '../settings.dart' as settings;
-import '../utils/errors.dart';
-import '../utils/rest_client.dart';
+import 'package:rits_client/models/comments/comments.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/errors.dart';
+import 'package:rits_client/utils/rest_client.dart';
 import 'comments.dart';
 
 class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
-  final RestClient restClient;
+  final RitsClient restClient;
 
   CommentsBloc({@required this.restClient}) : assert(restClient != null);
 

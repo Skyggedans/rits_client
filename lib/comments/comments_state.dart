@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../models/comments/comments.dart';
+import 'package:rits_client/models/comments/comments.dart';
 
 abstract class CommentsState extends Equatable {
   CommentsState([List props = const []]) : super(props);

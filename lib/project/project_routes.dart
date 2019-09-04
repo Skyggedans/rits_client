@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../associated_data_item/associated_data_item.dart';
-import '../chart/chart.dart';
-import '../kpi/kpi.dart';
-import '../report/report.dart';
-import '../tabular_data/tabular_data.dart';
+import 'package:rits_client/associated_data_item/associated_data_item.dart';
+import 'package:rits_client/chart/chart.dart';
+import 'package:rits_client/kpi/kpi.dart';
+import 'package:rits_client/report/report.dart';
+import 'package:rits_client/tabular_data/tabular_data.dart';
 
 class ProjectRoutes {
   static final routes = <String, WidgetBuilder>{

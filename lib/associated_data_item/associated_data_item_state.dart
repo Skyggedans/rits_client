@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
-import '../models/associated_data/associated_data.dart';
-import '../view_object/view_object.dart';
+import 'package:rits_client/models/associated_data/associated_data.dart';
+import 'package:rits_client/view_object/view_object.dart';
 
 class AssociatedDataItemGenerated extends ViewObjectState {
   final List<ColumnDef> columnDefinitions;

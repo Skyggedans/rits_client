@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
-import '../authentication/authentication.dart';
-import '../settings.dart' as settings;
+import 'package:rits_client/authentication/authentication.dart';
+import 'package:rits_client/settings.dart' as settings;
 import 'utils.dart';
 
 typedef RequestFunc = Future<http.Response> Function(String url,
@@ -15,7 +16,7 @@ typedef RequestFunc = Future<http.Response> Function(String url,
 typedef BodiedRequestFunc = Future<http.Response> Function(String url,
     {Map<String, String> headers, dynamic body, Encoding encoding});
 
-abstract class AbstractRestClient {
+abstract class RestClient {
   Future<http.Response> get(String url,
       {Map<String, String> headers: const {}}) async {
     final allHeaders = <String, String>{}
@@ -76,25 +77,23 @@ abstract class AbstractRestClient {
     return _handleResponse(response);
   }
 
+  Future<http.StreamedResponse> uploadFile(
+    String url, {
+    Map<String, String> headers: const {},
+    String field,
+    String filePath,
+    String fileName,
+    Uint8List bytes,
+    MediaType contentType,
+  });
+
   Map<String, String> _getHeaders();
 
   http.BaseResponse _handleResponse(http.BaseResponse response);
 }
 
-class RestClient extends AbstractRestClient {
-  static RestClient _instance;
-  final AuthRepository authRepository;
-
-  RestClient._internal({this.authRepository});
-
-  factory RestClient({AuthRepository authRepository}) {
-    if (_instance == null) {
-      assert(authRepository != null);
-      _instance = RestClient._internal(authRepository: authRepository);
-    }
-
-    return _instance;
-  }
+class RitsClient extends RestClient {
+  final AuthRepository _authRepository = GetIt.instance<AuthRepository>();
 
   @override
   Future<http.Response> get(String url,
@@ -222,9 +221,9 @@ class RestClient extends AbstractRestClient {
 
   Future<void> _tryRefreshToken() async {
     final tokenResponse =
-        await _requestAccessTokenByRefreshToken(authRepository.refreshToken);
+        await _requestAccessTokenByRefreshToken(_authRepository.refreshToken);
 
-    return await authRepository.persistTokens(
+    return await _authRepository.persistTokens(
       tokenResponse['access_token'],
       tokenResponse['refresh_token'],
       DateTime.now().add(
@@ -234,7 +233,7 @@ class RestClient extends AbstractRestClient {
   }
 
   Map<String, String> _getHeaders() {
-    return {'Authorization': 'Bearer ${authRepository.accessToken}'};
+    return {'Authorization': 'Bearer ${_authRepository.accessToken}'};
   }
 
   http.BaseResponse _handleResponse(http.BaseResponse response) {
@@ -271,7 +270,7 @@ class RestClient extends AbstractRestClient {
   }
 }
 
-class LuisClient extends AbstractRestClient {
+class LuisClient extends RestClient {
   static LuisClient _instance;
 
   LuisClient._internal();
@@ -301,5 +300,16 @@ class LuisClient extends AbstractRestClient {
     }
 
     return response;
+  }
+
+  @override
+  Future<http.StreamedResponse> uploadFile(String url,
+      {Map<String, String> headers = const {},
+      String field,
+      String filePath,
+      String fileName,
+      Uint8List bytes,
+      MediaType contentType}) {
+    return null;
   }
 }

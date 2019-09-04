@@ -1,4 +1,4 @@
-import '../view_object/view_object.dart';
+import 'package:rits_client/view_object/view_object.dart';
 
 class TabularDataGenerated extends ViewObjectState {
   final List<dynamic> data;

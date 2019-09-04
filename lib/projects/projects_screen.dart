@@ -1,12 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:rits_client/project/project.dart';
 
-import '../utils/rest_client.dart';
-import '../project/project.dart';
 import 'projects.dart';
 
 class ProjectsScreen extends StatefulWidget {
@@ -46,11 +44,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 );
               } else if (state is ProjectsLoaded) {
                 return _ProjectButtons();
-              } else if (state is ProjectsError) {
-                return Center(
-                  child: Text('Failed to fetch projects'),
-                );
               }
+
+              return Center(
+                child: Text('Failed to fetch projects'),
+              );
             },
           )),
         );
@@ -76,7 +74,10 @@ class _ProjectButtons extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProjectScreen(project: project),
+                          builder: (context) => Provider<ProjectBloc>.value(
+                            value: ProjectBloc(),
+                            child: ProjectScreen(project: project),
+                          ),
                         ),
                       );
                     });

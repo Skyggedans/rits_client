@@ -1,20 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:bloc/bloc.dart';
 
-import '../settings.dart' as settings;
-import '../utils/utils.dart';
-import '../models/view_objects/view_objects.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/utils.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
 import 'view_object_parameters.dart';
 
 class ViewObjectParametersBloc
     extends Bloc<ViewObjectParametersEvent, ViewObjectParametersState> {
-  final RestClient restClient;
-
-  ViewObjectParametersBloc({@required this.restClient});
+  final RestClient _restClient = GetIt.instance<RestClient>();
 
   @override
   Stream<ViewObjectParametersEvent> transform(
@@ -63,7 +62,7 @@ class ViewObjectParametersBloc
       ViewObject viewObject, String userToken) async {
     final url =
         '${settings.backendUrl}/GetViewElementParameter/$userToken/${Uri.encodeFull(viewObject.name)}/${viewObject.itemType}';
-    final response = await restClient.get(url);
+    final response = await _restClient.get(url);
     final List body = json.decode(response.body);
 
     List<ViewObjectParameter> allParams = body.map((param) {
@@ -103,14 +102,14 @@ class ViewObjectParametersBloc
       final url =
           '${settings.backendUrl}/UpdateCategoryFilterData/$userToken/$name';
 
-      await restClient.post(url,
+      await _restClient.post(url,
           body: json.encode(paramJson['ParameterValue']));
     } else {
       final value = Uri.encodeFull(paramJson['ParameterValue']);
       final url =
           '${settings.backendUrl}/SetParameterValue/$userToken/$name/$value';
 
-      await restClient.get(url);
+      await _restClient.get(url);
     }
   }
 }

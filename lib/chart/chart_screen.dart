@@ -4,9 +4,9 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:meta/meta.dart';
 import 'package:provider/provider.dart';
 
-import '../authentication/authentication.dart';
-import '../models/view_objects/view_objects.dart';
-import '../view_object/view_object.dart';
+import 'package:rits_client/authentication/authentication.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/view_object/view_object.dart';
 import 'chart.dart';
 
 class ChartScreen extends ViewObjectScreen {

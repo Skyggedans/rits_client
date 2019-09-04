@@ -4,10 +4,10 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdf_viewer/flutter_pdf_viewer.dart';
 
-import '../models/view_objects/view_objects.dart';
-import '../settings.dart' as settings;
-import '../utils/utils.dart';
-import '../view_object/view_object.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/utils.dart';
+import 'package:rits_client/view_object/view_object.dart';
 
 class ReportBloc extends ViewObjectBloc {
   @override

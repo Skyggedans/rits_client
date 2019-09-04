@@ -1,5 +1,5 @@
-import '../models/view_objects/view_objects.dart';
-import '../view_object/view_object.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/view_object/view_object.dart';
 
 class ChartPresentation extends ViewObjectState {
   final ViewObject viewObject;

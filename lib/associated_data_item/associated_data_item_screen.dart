@@ -5,11 +5,11 @@ import 'package:meta/meta.dart';
 import 'package:provider/provider.dart';
 import 'package:rw_help/rw_help.dart';
 
-import '../models/associated_data/associated_data.dart';
-import '../models/view_objects/view_objects.dart';
-import '../row_editor/row_editor_screen.dart';
-import '../view_object/view_object.dart';
-import '../models/projects/projects.dart';
+import 'package:rits_client/models/associated_data/associated_data.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/row_editor/row_editor_screen.dart';
+import 'package:rits_client/view_object/view_object.dart';
+import 'package:rits_client/models/projects/projects.dart';
 import 'associated_data_item.dart';
 
 enum RecordAction {

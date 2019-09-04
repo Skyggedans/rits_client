@@ -4,22 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:rits_client/associated_data_item/associated_data_item.dart';
+import 'package:rits_client/associated_data_items/associated_data_items.dart';
+import 'package:rits_client/chart/chart.dart';
+import 'package:rits_client/comments/comments_screen.dart';
+import 'package:rits_client/kpi/kpi.dart';
+import 'package:rits_client/luis/luis.dart';
+import 'package:rits_client/matching_items_search/matching_items_search.dart';
+import 'package:rits_client/models/app_config.dart';
+import 'package:rits_client/models/projects/projects.dart';
+import 'package:rits_client/report/report.dart';
+import 'package:rits_client/tabular_data/tabular_data.dart';
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rits_client/view_objects/view_objects.dart';
 
-import '../associated_data_item/associated_data_item.dart';
-import '../associated_data_items/associated_data_items.dart';
-import '../authentication/authentication_provider.dart';
-import '../authentication/authentication_repository.dart';
-import '../chart/chart.dart';
-import '../comments/comments_screen.dart';
-import '../kpi/kpi.dart';
-import '../luis/luis.dart';
-import '../matching_items_search/matching_items_search.dart';
-import '../models/projects/projects.dart';
-import '../report/report.dart';
-import '../tabular_data/tabular_data.dart';
-import '../utils/rest_client.dart';
-import '../view_objects/view_objects.dart';
-import '../models/app_config.dart';
 import 'project.dart';
 
 class ProjectScreen extends StatefulWidget {
@@ -32,63 +30,60 @@ class ProjectScreen extends StatefulWidget {
 }
 
 class _ProjectScreenState extends State<ProjectScreen> {
-  final ProjectBloc _projectBloc = ProjectBloc(restClient: RestClient());
-
-  Project get _project => widget.project;
-
-  @override
-  void initState() {
-    super.initState();
-    _projectBloc.dispatch(LoadProject(_project));
-  }
+  //Project get _project => widget.project;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    final projectBloc = Provider.of<ProjectBloc>(context);
+
+    if (projectBloc.currentState != projectBloc.initialState) {
+      projectBloc
+          .dispatch(LoadProject(Provider.of<ProjectContext>(context).project));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder(
-      bloc: _projectBloc,
-      builder: (BuildContext context, ProjectState state) {
-        Widget bodyChild;
+    return Consumer2<ProjectBloc, ProjectContext>(
+      builder: (_, bloc, projectContext, __) {
+        return BlocBuilder(
+          bloc: bloc,
+          builder: (BuildContext context, ProjectState state) {
+            Widget bodyChild;
 
-        if (state is ProjectLoading) {
-          bodyChild = CircularProgressIndicator();
-        } else if (state is ProjectLoaded) {
-          return Provider<ProjectContext>.value(
-            value: ProjectContext(
-              project: _project,
-              userToken: state.userToken,
-              hierarchyLevel: state.hierarchyLevel,
-            ),
-            child: Navigator(
-              onGenerateRoute: _getRoutes,
-            ),
-          );
-        } else if (state is ProjectError) {
-          bodyChild = Text(state.message ?? '');
-        }
+            if (state is ProjectLoading) {
+              bodyChild = CircularProgressIndicator();
+            } else if (state is ProjectLoaded) {
+              return Provider<ProjectContext>.value(
+                value: ProjectContext(
+                  project: projectContext.project,
+                  userToken: state.userToken,
+                  hierarchyLevel: state.hierarchyLevel,
+                ),
+                child: Navigator(
+                  onGenerateRoute: _getRoutes,
+                ),
+              );
+            } else if (state is ProjectError) {
+              bodyChild = Text(state.message ?? '');
+            }
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(_project.name),
-          ),
-          body: Center(child: bodyChild),
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(projectContext.project.name),
+              ),
+              body: Center(child: bodyChild),
+            );
+          },
         );
       },
     );
   }
 
-  @override
-  void dispose() {
-    _projectBloc.dispose();
-    super.dispose();
-  }
-
   Route<BuildContext> _getRoutes(RouteSettings settings) {
-    var builder = ProjectRoutes.routes[settings.name];
+    final builder = ProjectRoutes.routes[settings.name];
 
     if (builder != null) {
       return new MaterialPageRoute(
@@ -115,10 +110,12 @@ class _ProjectScreenState extends State<ProjectScreen> {
   }
 
   Widget _buildPage(BuildContext context) {
-    final state = _projectBloc.currentState as ProjectLoaded;
+    final projectBloc = Provider.of<ProjectBloc>(context);
+    final projectContext = Provider.of<ProjectContext>(context);
+    final state = projectBloc.currentState as ProjectLoaded;
     final title = state.context != null
-        ? '${_project.name} - ${state.context}'
-        : _project.name;
+        ? '${projectContext.project.name} - ${state.context}'
+        : projectContext.project.name;
 
     return Scaffold(
       appBar: AppBar(
@@ -301,7 +298,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         title: 'Associated Data',
                         detailsScreenRoute: AssociatedDataItemScreen.route,
                         viewObjectsRepository: AssociatedDataItemsRepository(
-                            restClient: RestClient()),
+                            restClient: RitsClient()),
                       ),
                     ),
                   );

@@ -2,7 +2,7 @@ import 'package:device_info/device_info.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-import '../settings.dart';
+import 'package:rits_client/settings.dart';
 
 class AppConfig extends Equatable {
   final Settings settings;

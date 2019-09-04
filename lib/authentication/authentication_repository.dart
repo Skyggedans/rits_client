@@ -1,9 +1,9 @@
-import 'package:meta/meta.dart';
+import 'package:get_it/get_it.dart';
 
 import 'authentication.dart';
 
 class AuthRepository {
-  final AuthProvider authProvider;
+  final AuthProvider _authProvider = GetIt.instance<AuthProvider>();
 
   String _accessToken;
   String _refreshToken;
@@ -13,10 +13,12 @@ class AuthRepository {
   String get refreshToken => _refreshToken;
   DateTime get expiresAt => _expiresAt;
 
-  AuthRepository({@required this.authProvider}) : assert(authProvider != null);
+  // AuthRepository({@required authProvider})
+  //     : this.authProvider = authProvider ?? GetIt.instance<AuthProvider>(),
+  //       assert(authProvider != null);
 
   Future<void> _getTokens() async {
-    final auth = await authProvider.getAuth();
+    final auth = await _authProvider.getAuth();
 
     if (auth != null) {
       _accessToken = auth['access_token'];
@@ -31,7 +33,7 @@ class AuthRepository {
     _refreshToken = refreshToken;
     _expiresAt = expiresAt;
 
-    await authProvider.saveAuth({
+    await _authProvider.saveAuth({
       'access_token': accessToken,
       'refresh_token': refreshToken,
       'expires_at': expiresAt.millisecondsSinceEpoch,
@@ -43,7 +45,7 @@ class AuthRepository {
     _refreshToken = null;
     _expiresAt = null;
 
-    await authProvider.deleteAuth();
+    await _authProvider.deleteAuth();
   }
 
   Future<bool> hasAccessToken() async {
