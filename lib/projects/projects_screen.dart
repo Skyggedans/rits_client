@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:rits_client/models/models.dart';
 import 'package:rits_client/project/project.dart';
 
 import 'projects.dart';
@@ -74,9 +75,15 @@ class _ProjectButtons extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Provider<ProjectBloc>.value(
-                            value: ProjectBloc(),
-                            child: ProjectScreen(project: project),
+                          builder: (context) => MultiProvider(
+                            providers: [
+                              Provider<Project>.value(value: project),
+                              Provider<ProjectBloc>(
+                                builder: (_) => ProjectBloc(),
+                                dispose: (_, value) => value.dispose(),
+                              ),
+                            ],
+                            child: ProjectScreen(),
                           ),
                         ),
                       );

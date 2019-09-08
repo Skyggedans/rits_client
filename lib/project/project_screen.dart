@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,6 +8,7 @@ import 'package:rits_client/associated_data_items/associated_data_items.dart';
 import 'package:rits_client/chart/chart.dart';
 import 'package:rits_client/comments/comments_screen.dart';
 import 'package:rits_client/kpi/kpi.dart';
+import 'package:rits_client/locator.dart';
 import 'package:rits_client/luis/luis.dart';
 import 'package:rits_client/matching_items_search/matching_items_search.dart';
 import 'package:rits_client/models/app_config.dart';
@@ -21,62 +21,52 @@ import 'package:rits_client/view_objects/view_objects.dart';
 import 'project.dart';
 
 class ProjectScreen extends StatefulWidget {
-  final Project project;
-
-  ProjectScreen({Key key, @required this.project}) : super(key: key);
-
   @override
   State createState() => _ProjectScreenState();
 }
 
 class _ProjectScreenState extends State<ProjectScreen> {
-  //Project get _project => widget.project;
+  Project get _project => Provider.of<Project>(context);
+  ProjectBloc get _projectBloc => Provider.of<ProjectBloc>(context);
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final projectBloc = Provider.of<ProjectBloc>(context);
-
-    if (projectBloc.currentState != projectBloc.initialState) {
-      projectBloc
-          .dispatch(LoadProject(Provider.of<ProjectContext>(context).project));
+    if (_projectBloc.currentState == _projectBloc.initialState) {
+      _projectBloc.dispatch(LoadProject(_project));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<ProjectBloc, ProjectContext>(
-      builder: (_, bloc, projectContext, __) {
-        return BlocBuilder(
-          bloc: bloc,
-          builder: (BuildContext context, ProjectState state) {
-            Widget bodyChild;
+    return BlocBuilder(
+      bloc: _projectBloc,
+      builder: (BuildContext context, ProjectState state) {
+        Widget bodyChild;
 
-            if (state is ProjectLoading) {
-              bodyChild = CircularProgressIndicator();
-            } else if (state is ProjectLoaded) {
-              return Provider<ProjectContext>.value(
-                value: ProjectContext(
-                  project: projectContext.project,
-                  userToken: state.userToken,
-                  hierarchyLevel: state.hierarchyLevel,
-                ),
-                child: Navigator(
-                  onGenerateRoute: _getRoutes,
-                ),
-              );
-            } else if (state is ProjectError) {
-              bodyChild = Text(state.message ?? '');
-            }
+        if (state is ProjectLoading) {
+          bodyChild = CircularProgressIndicator();
+        } else if (state is ProjectLoaded) {
+          return Provider<ProjectContext>.value(
+            value: ProjectContext(
+              project: _project,
+              userToken: state.userToken,
+              hierarchyLevel: state.hierarchyLevel,
+            ),
+            child: Navigator(
+              onGenerateRoute: _getRoutes,
+            ),
+          );
+        } else if (state is ProjectError) {
+          bodyChild = Text(state.message ?? '');
+        }
 
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(projectContext.project.name),
-              ),
-              body: Center(child: bodyChild),
-            );
-          },
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(_project.name),
+          ),
+          body: Center(child: bodyChild),
         );
       },
     );
@@ -110,12 +100,10 @@ class _ProjectScreenState extends State<ProjectScreen> {
   }
 
   Widget _buildPage(BuildContext context) {
-    final projectBloc = Provider.of<ProjectBloc>(context);
-    final projectContext = Provider.of<ProjectContext>(context);
-    final state = projectBloc.currentState as ProjectLoaded;
+    final state = _projectBloc.currentState as ProjectLoaded;
     final title = state.context != null
-        ? '${projectContext.project.name} - ${state.context}'
-        : projectContext.project.name;
+        ? '${_project.name} - ${state.context}'
+        : _project.name;
 
     return Scaffold(
       appBar: AppBar(
@@ -127,7 +115,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
   }
 
   List<Widget> _buildActions(BuildContext context, ProjectLoaded state) {
-    final isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
+    final isRealWearDevice = locator<AppConfig>().isRealWearDevice;
 
     return <Widget>[
       Visibility(
@@ -188,7 +176,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
   }
 
   Widget _buildButtons(BuildContext context, ProjectLoaded state) {
-    final isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
+    final isRealWearDevice = locator<AppConfig>().isRealWearDevice;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

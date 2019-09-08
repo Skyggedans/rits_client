@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:rits_client/main.dart';
+import 'package:rits_client/locator.dart';
 import 'package:rits_client/models/models.dart';
 import 'package:rits_client/utils/rest_client.dart';
 
