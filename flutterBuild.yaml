@@ -1,0 +1,5 @@
+pool:
+  name: RITS
+steps:
+- task: aloisdeniel.flutter.flutter-install.FlutterInstall@0
+  displayName: 'Flutter Install'
