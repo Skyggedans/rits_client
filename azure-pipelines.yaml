@@ -1,5 +1,10 @@
-pool:
-  name: Hosted VS2017
-steps:
-- task: aloisdeniel.flutter.flutter-install.FlutterInstall@0
-  displayName: 'Flutter Install'
+- task: FlutterInstall@0
+  inputs:
+    channel: 'stable'
+    version: 'latest'
+- task: FlutterBuild@0
+  inputs:
+    target: 'apk'
+    projectDirectory: '.'
+    debugMode: true
+    apkTargetPlatform: 'android-arm64'
