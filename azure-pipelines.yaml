@@ -2,7 +2,8 @@ steps:
 - task: FlutterInstall@0
   inputs:
     channel: 'stable'
-    version: 'latest'
+    version: 'custom'
+    customVersion: '1.7.8+hotfix.4'
 - task: FlutterBuild@0
   inputs:
     target: 'apk'
