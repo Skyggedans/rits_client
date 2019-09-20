@@ -1,5 +1,5 @@
 pool:
-  name: RITS
+  name: Hosted VS2017
 steps:
 - task: aloisdeniel.flutter.flutter-install.FlutterInstall@0
   displayName: 'Flutter Install'
