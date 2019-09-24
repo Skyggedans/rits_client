@@ -1,13 +1,13 @@
 import 'package:equatable/equatable.dart';
 
-class Filter extends Equatable {
+class Option extends Equatable {
   final String title;
   final bool state;
 
-  Filter({this.title, this.state}) : super([title, state]);
+  Option({this.title, this.state}) : super([title, state]);
 
-  factory Filter.fromJson(Map<String, dynamic> json) {
-    return Filter(
+  factory Option.fromJson(Map<String, dynamic> json) {
+    return Option(
       title: json['FilterTitle'],
       state: json['State'],
     );
@@ -20,10 +20,10 @@ class Filter extends Equatable {
     };
   }
 
-  Filter copyWith({
+  Option copyWith({
     bool state,
   }) {
-    return Filter(
+    return Option(
       title: title,
       state: state ?? this.state,
     );

@@ -146,9 +146,9 @@ class _ReportParameters extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => SingleSelection(
-                                  param: param,
-                                  userToken: concreteState.userToken,
-                                ),
+                              param: param,
+                              userToken: concreteState.userToken,
+                            ),
                           ),
                         );
 
@@ -192,13 +192,13 @@ class _ReportParameters extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => MultiSelection(
-                                  param: param,
-                                  userToken: concreteState.userToken,
-                                ),
+                              param: param,
+                              userToken: concreteState.userToken,
+                            ),
                           ),
                         );
 
-                        if (selection is List<Filter>) {
+                        if (selection is List<Option>) {
                           _reportParametersBloc
                               .dispatch(SaveViewObjectParameter(
                             viewObject: concreteState.viewObject,

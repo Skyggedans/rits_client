@@ -96,12 +96,12 @@ class _SelectionOptions extends StatelessWidget {
     return BlocBuilder(
       bloc: _selectionBloc,
       builder: (BuildContext context, SelectionState state) {
-        if (state is SelectionOptionsLoaded<Filter>) {
+        if (state is SelectionOptionsLoaded<Option>) {
           return ListView.builder(
             padding: const EdgeInsets.all(10.0),
             itemCount: state.options.length,
             itemBuilder: (context, index) {
-              Filter option = state.options[index];
+              Option option = state.options[index];
 
               return CheckboxListTile(
                 title: Text(option.title),

@@ -34,9 +34,9 @@ class MultiSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
       } on ApiError {
         yield SelectionOptionsError();
       }
-    } else if (event is UpdateSelection<Filter>) {
-      final List<Filter> updatedOptions =
-          (currentState as SelectionOptionsLoaded<Filter>)
+    } else if (event is UpdateSelection<Option>) {
+      final List<Option> updatedOptions =
+          (currentState as SelectionOptionsLoaded<Option>)
               .options
               .map((option) {
         return option.title == event.option.title ? event.option : option;
@@ -46,7 +46,7 @@ class MultiSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
     }
   }
 
-  Future<List<Filter>> _fetchParamOptions(
+  Future<List<Option>> _fetchParamOptions(
       ViewObjectParameter param, String userToken) async {
     final url =
         '${settings.backendUrl}/GetCategoryFilterData/$userToken/${param.name}';
@@ -54,7 +54,7 @@ class MultiSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
     final List body = json.decode(response.body);
 
     return body.map((option) {
-      return Filter.fromJson(option);
+      return Option.fromJson(option);
     }).toList();
   }
 }

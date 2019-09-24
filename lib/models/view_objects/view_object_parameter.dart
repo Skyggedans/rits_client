@@ -102,7 +102,7 @@ class ViewObjectParameter extends Equatable {
       }
     } else {
       paramValue =
-          (value as List<Filter>).map((filter) => filter.toJson()).toList();
+          (value as List<Option>).map((filter) => filter.toJson()).toList();
     }
 
     return {

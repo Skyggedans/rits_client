@@ -100,7 +100,7 @@ class ViewObjectParametersBloc
     final paramJson = param.toJson();
     final name = Uri.encodeFull(paramJson['ParameterName']);
 
-    if (param.value is List<Filter>) {
+    if (param.value is List<Option>) {
       final url =
           '${settings.backendUrl}/UpdateCategoryFilterData/$userToken/$name';
 
