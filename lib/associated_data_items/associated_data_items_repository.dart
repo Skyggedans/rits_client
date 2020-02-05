@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:http/http.dart';
 import 'package:meta/meta.dart';
+import 'package:rits_client/utils/rest_client.dart';
 
 import '../models/associated_data/associated_data.dart';
 import '../models/projects/project.dart';
@@ -9,7 +11,7 @@ import '../view_objects/view_objects.dart';
 
 class AssociatedDataItemsRepository
     extends ViewObjectsRepository<BusinessObject> {
-  AssociatedDataItemsRepository({@required restClient})
+  AssociatedDataItemsRepository({@required RestClient restClient})
       : super(restClient: restClient);
 
   @override
@@ -20,10 +22,11 @@ class AssociatedDataItemsRepository
   ) async {
     final url = '${settings.backendUrl}/GetAssociatedDataItems/$userToken';
     final response = await restClient.get(url);
-    final List body = json.decode(response.body);
+    final body =
+        List<Map<String, dynamic>>.from(json.decode(response.body) as List);
 
-    return body.map((report) {
-      return BusinessObject.fromJson(report);
+    return body.map((reportJson) {
+      return BusinessObject.fromJson(reportJson);
     }).toList();
   }
 

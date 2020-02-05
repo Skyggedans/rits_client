@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -21,9 +22,8 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
   get initialState => LuisUninitialized();
 
   @override
-  Stream<LuisEvent> transform(Stream<LuisEvent> events) {
-    return (events as Observable<LuisEvent>)
-        .debounce(Duration(milliseconds: 500));
+  Stream<LuisState> transformStates(Stream<LuisState> states) {
+    return states.debounceTime(Duration(milliseconds: 50));
   }
 
   @override
@@ -48,7 +48,7 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
         );
 
         if (response.containsKey('url')) {
-          yield UtteranceExecutedWithUrl(url: response['url']);
+          yield UtteranceExecutedWithUrl(url: response['url'] as String);
         } else {
           yield UtteranceInput(
               luisProjectId: event.luisProjectId, userToken: event.userToken);
@@ -61,13 +61,14 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
 
   Future<String> _getLuisProjectId(Project project) async {
     final url = '${settings.luisConfig["host"]}/luis/api/v2.0/apps';
-    final response = await luisClient.get(url);
-    final List projects = json.decode(response.body);
+    final response = await luisClient.get(url) as Response;
+    final projects =
+        List<Map<String, dynamic>>.from(json.decode(response.body) as List);
 
     final luisProject = projects.firstWhere((p) => p['name'] == project.name,
         orElse: () => null);
 
-    return luisProject != null ? luisProject['id'] : null;
+    return luisProject != null ? luisProject['id'] as String : null;
   }
 
   Future<Map<String, dynamic>> _executeUtterance(
@@ -85,6 +86,6 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
       body: json.encode(requestBody),
     );
 
-    return json.decode(response.body);
+    return json.decode(response.body) as Map<String, dynamic>;
   }
 }

@@ -27,7 +27,6 @@ class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
   })  : assert(project != null),
         assert(userToken != null),
         assert(detailsScreenRoute != null),
-        assert(type != null),
         super(key: key);
 
   @override
@@ -56,7 +55,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
   @override
   void initState() {
     super.initState();
-    viewObjectsBloc.dispatch(FetchViewObjects(
+    viewObjectsBloc.add(FetchViewObjects(
       project: _project,
       type: _type,
       userToken: _userToken,
@@ -78,27 +77,22 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
             return CircularProgressIndicator();
           } else if (state is ViewObjectsLoaded) {
             return BlocProvider(
-              bloc: viewObjectsBloc,
+              create: (context) => viewObjectsBloc,
               child: _ViewObjectButtons(),
             );
-          } else if (state is ViewObjectsError) {
-            return const Text('Failed to fetch view objects');
           }
+
+          return const Text('Failed to fetch view objects');
         },
       )),
     );
-  }
-
-  @override
-  void dispose() {
-    viewObjectsBloc.dispose();
-    super.dispose();
   }
 }
 
 class _ViewObjectButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // ignore: close_sinks
     final _viewObjectsBloc = BlocProvider.of<ViewObjectsBloc>(context);
 
     return BlocBuilder(
@@ -109,7 +103,7 @@ class _ViewObjectButtons extends StatelessWidget {
           spacing: 10,
           children: (state as ViewObjectsLoaded).viewObjects.map((viewObject) {
             final ViewObjectsScreen screen =
-                context.ancestorWidgetOfExactType(ViewObjectsScreen);
+                context.findAncestorWidgetOfExactType<ViewObjectsScreen>();
 
             return RaisedButton(
                 child: Text(viewObject.title ?? viewObject.name),

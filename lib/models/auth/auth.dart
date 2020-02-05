@@ -10,9 +10,9 @@ class Auth extends Equatable {
 
   factory Auth.fromJson(Map<String, dynamic> json) {
     return Auth(
-      accessToken: json['access_token'],
-      refreshToken: json['refresh_token'],
-      expiresAt: json['expires_at'],
+      accessToken: json['access_token'] as String,
+      refreshToken: json['refresh_token'] as String,
+      expiresAt: DateTime.fromMillisecondsSinceEpoch(json['expires_at'] as int),
     );
   }
 

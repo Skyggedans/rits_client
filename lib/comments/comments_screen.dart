@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:rits_client/app_config.dart';
 import 'package:rw_help/rw_help.dart';
 
 import '../models/comments/comment.dart';
@@ -15,13 +17,13 @@ abstract class CommentAction {
 }
 
 class SaveAction extends CommentAction {
-  SaveAction({@required comment})
+  SaveAction({@required Comment comment})
       : assert(comment != null),
         super(comment);
 }
 
 class RemoveAction extends CommentAction {
-  RemoveAction({@required comment})
+  RemoveAction({@required Comment comment})
       : assert(comment != null),
         super(comment);
 }
@@ -50,7 +52,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
   @override
   void initState() {
     super.initState();
-    _commentsBloc.dispatch(FetchComments(userToken: _userToken));
+    _commentsBloc.add(FetchComments(userToken: _userToken));
   }
 
   @override
@@ -92,6 +94,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
             } else if (state is CommentsError) {
               return Text(state.message);
             }
+
+            return const Text('Unable to fetch comments');
           },
         ),
       ),
@@ -100,14 +104,18 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   Widget _buildComments(BuildContext context, CommentsLoaded state) {
     final comments = state.comments;
+    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
 
-    if (comments.length > 0) {
-      final commentsRange = comments.length == 1 ? '1' : '1-${comments.length}';
+    if (isRealWearDevice) {
+      if (comments.length > 0) {
+        final commentsRange =
+            comments.length == 1 ? '1' : '1-${comments.length}';
 
-      RwHelp.setCommands(
-          ['Say "Select comment ${commentsRange}" for comment actions']);
-    } else {
-      RwHelp.setCommands([]);
+        RwHelp.setCommands(
+            ['Say "Select comment $commentsRange" for comment actions']);
+      } else {
+        RwHelp.setCommands([]);
+      }
     }
 
     return ListView.builder(
@@ -153,7 +161,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
     final dialogResult = await _showCommentDialog(context, newComment);
 
     if (dialogResult is SaveAction) {
-      _commentsBloc.dispatch(AddComment(
+      _commentsBloc.add(AddComment(
         comment: dialogResult.comment,
         userToken: _userToken,
       ));
@@ -164,12 +172,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
     final dialogResult = await _showCommentDialog(context, comment);
 
     if (dialogResult is SaveAction) {
-      _commentsBloc.dispatch(UpdateComment(
+      _commentsBloc.add(UpdateComment(
         comment: dialogResult.comment,
         userToken: _userToken,
       ));
     } else if (dialogResult is RemoveAction) {
-      _commentsBloc.dispatch(RemoveComment(
+      _commentsBloc.add(RemoveComment(
         comment: dialogResult.comment,
         userToken: _userToken,
       ));
@@ -221,7 +229,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   @override
   void dispose() {
-    RwHelp.setCommands([]);
+    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+
+    if (isRealWearDevice) {
+      RwHelp.setCommands([]);
+    }
+
     super.dispose();
   }
 }

@@ -18,9 +18,9 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
 
   @override
   Stream<ViewObjectState> mapEventToState(ViewObjectEvent event) async* {
-    final prevState = currentState;
+    final prevState = state;
 
-    if (event is GenerateViewObject) {
+    if (event is GenerateViewObject<BusinessObject>) {
       yield ViewObjectGeneration();
 
       try {
@@ -119,12 +119,12 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
       }
 
       return value;
-    });
+    }) as Map<String, dynamic>;
 
     return AssociatedDataTable(
       container: AssociatedDataContainer.fromJson(body),
-      columns: body['columns'].cast<String>(),
-      rows: body['data'].cast<Map<String, dynamic>>(),
+      columns: List<String>.from(body['columns'] as List),
+      rows: List<Map<String, dynamic>>.from(body['data'] as List),
     );
   }
 
@@ -134,10 +134,11 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
         '${settings.backendUrl}/GetAssociatedDataValidation/$userToken/${viewObject.name}';
 
     final response = await restClient.get(url);
-    final body = json.decode(response.body);
+    final body =
+        List<Map<String, dynamic>>.from(json.decode(response.body) as List);
 
-    return body.map<ColumnDef>((colDef) {
-      return ColumnDef.fromJson(colDef);
+    return body.map((colDefJson) {
+      return ColumnDef.fromJson(colDefJson);
     }).toList();
   }
 
@@ -159,6 +160,8 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
 
           return format.format(object);
         }
+
+        return object.toString();
       }),
     );
   }

@@ -10,8 +10,8 @@ class Comment extends Equatable {
 
   factory Comment.fromJson(Map<String, dynamic> json) {
     return Comment(
-      id: json['CommentID'],
-      text: json['CommentText'],
+      id: json['CommentID'] as int,
+      text: json['CommentText'] as String,
     );
   }
 

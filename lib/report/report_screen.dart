@@ -26,7 +26,8 @@ class ReportScreen extends ViewObjectScreen {
 
 class _ReportScreenState
     extends ViewObjectScreenState<ReportBloc, ReportGenerated> {
-  ReportBloc viewObjectBloc = ReportBloc();
+  // ignore: close_sinks
+  final viewObjectBloc = ReportBloc();
 
   @override
   Widget buildOutputWidget(BuildContext context, ReportGenerated state) {

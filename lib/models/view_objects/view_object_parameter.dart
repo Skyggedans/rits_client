@@ -42,7 +42,8 @@ class ViewObjectParameter extends Equatable {
     switch (dataType) {
       case 'numeric':
         {
-          final numValue = value is num ? value : double.tryParse(value);
+          final numValue =
+              value is num ? value : double.tryParse(value as String);
           final truncatedValue = numValue.truncate();
 
           value = numValue == truncatedValue ? truncatedValue : numValue;
@@ -53,7 +54,7 @@ class ViewObjectParameter extends Equatable {
         {
           final DateFormat format = DateFormat('MM/dd/yyyy');
 
-          value = format.parse(value);
+          value = format.parse(value as String);
 
           break;
         }
@@ -61,17 +62,17 @@ class ViewObjectParameter extends Equatable {
         {
           final DateFormat format = DateFormat('MM/dd/yyyy hh:mm:ss a');
 
-          value = format.parse(value);
+          value = format.parse(value as String);
 
           break;
         }
     }
 
     return ViewObjectParameter(
-        name: json['ParameterName'],
-        title: json['Title'],
-        viewItem: json['ViewItemName'],
-        itemType: json['ItemTypeName'],
+        name: json['ParameterName'] as String,
+        title: json['Title'] as String,
+        viewItem: json['ViewItemName'] as String,
+        itemType: json['ItemTypeName'] as String,
         value: value,
         dataType: dataType,
         selectionMode: json['SelectionMode'].toString().toLowerCase(),
@@ -85,13 +86,14 @@ class ViewObjectParameter extends Equatable {
       switch (dataType) {
         case 'date':
           {
-            paramValue = DateFormat('yyyy-MM-dd').format(value);
+            paramValue = DateFormat('yyyy-MM-dd').format(value as DateTime);
 
             break;
           }
         case 'datetime':
           {
-            paramValue = DateFormat('yyyy-MM-dd hh:mm:ss a').format(value);
+            paramValue =
+                DateFormat('yyyy-MM-dd hh:mm:ss a').format(value as DateTime);
 
             break;
           }
@@ -101,8 +103,9 @@ class ViewObjectParameter extends Equatable {
           }
       }
     } else {
-      paramValue =
-          (value as List<Option>).map((filter) => filter.toJson()).toList();
+      paramValue = List<Option>.from(value as List)
+          .map((filter) => filter.toJson())
+          .toList();
     }
 
     return {

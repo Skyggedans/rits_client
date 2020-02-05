@@ -4,15 +4,18 @@ import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:logging/logging.dart';
 
 import '../authentication/authentication.dart';
 import '../settings.dart' as settings;
 
-typedef RequestFunc = Future<http.Response> Function(String url,
+typedef RequestFunc = Future<http.BaseResponse> Function(String url,
     {Map<String, String> headers});
 
-typedef BodiedRequestFunc = Future<http.Response> Function(String url,
+typedef BodiedRequestFunc = Future<http.BaseResponse> Function(String url,
     {Map<String, String> headers, dynamic body, Encoding encoding});
+
+final _logger = Logger('rest');
 
 class ApiError implements Exception {
   final String message;
@@ -24,8 +27,8 @@ class ApiError implements Exception {
 }
 
 abstract class AbstractRestClient {
-  Future<http.Response> get(String url,
-      {Map<String, String> headers: const {}}) async {
+  Future<http.BaseResponse> get(String url,
+      {Map<String, String> headers = const {}}) async {
     final allHeaders = <String, String>{}
       ..addAll(_getHeaders())
       ..addAll(headers);
@@ -38,8 +41,8 @@ abstract class AbstractRestClient {
     return _handleResponse(response);
   }
 
-  Future<http.Response> post(String url,
-      {Map<String, String> headers: const {}, body, encoding}) async {
+  Future<http.BaseResponse> post(String url,
+      {Map<String, String> headers = const {}, body, Encoding encoding}) async {
     final allHeaders = <String, String>{}
       ..addAll(_getHeaders())
       ..addAll(headers);
@@ -54,8 +57,8 @@ abstract class AbstractRestClient {
     return _handleResponse(response);
   }
 
-  Future<http.Response> delete(String url,
-      {Map<String, String> headers: const {}}) async {
+  Future<http.BaseResponse> delete(String url,
+      {Map<String, String> headers = const {}}) async {
     final allHeaders = <String, String>{}
       ..addAll(_getHeaders())
       ..addAll(headers);
@@ -68,8 +71,8 @@ abstract class AbstractRestClient {
     return _handleResponse(response);
   }
 
-  Future<http.Response> put(String url,
-      {Map<String, String> headers: const {}, body, encoding}) async {
+  Future<http.BaseResponse> put(String url,
+      {Map<String, String> headers = const {}, body, Encoding encoding}) async {
     final allHeaders = <String, String>{}
       ..addAll(_getHeaders())
       ..addAll(headers);
@@ -86,7 +89,26 @@ abstract class AbstractRestClient {
 
   Map<String, String> _getHeaders();
 
-  http.BaseResponse _handleResponse(http.BaseResponse response);
+  http.BaseResponse _handleResponse(http.BaseResponse response) {
+    final request = response.request;
+    final logFunc = response.statusCode < 200 || response.statusCode >= 300
+        ? _logger.severe
+        : _logger.info;
+
+    logFunc({
+      '"url"': '"${request.url}"',
+      '"method"': '"${request.method}"',
+      '"status"': response.statusCode,
+      '"reason"': '"${response.reasonPhrase}"',
+      '"headers"': request.headers.map(
+        (key, value) =>
+            MapEntry('"$key"', key == 'Authorization' ? '"***"' : '"$value"'),
+      ),
+      '"body"': response is http.Response ? response.body : '',
+    });
+
+    return response;
+  }
 }
 
 class RestClient extends AbstractRestClient {
@@ -106,34 +128,38 @@ class RestClient extends AbstractRestClient {
 
   @override
   Future<http.Response> get(String url,
-      {Map<String, String> headers: const {}}) async {
-    final RequestFunc func = _requestWrapper(super.get);
+      {Map<String, String> headers = const {}}) async {
+    final RequestFunc func = _requestWrapper(super.get) as RequestFunc;
 
-    return await func(url, headers: headers);
+    return await func(url, headers: headers) as http.Response;
   }
 
   @override
   Future<http.Response> post(String url,
-      {Map<String, String> headers: const {}, body, encoding}) async {
-    final BodiedRequestFunc func = _requestWrapper(super.post);
+      {Map<String, String> headers = const {}, body, encoding}) async {
+    final BodiedRequestFunc func =
+        _requestWrapper(super.post) as BodiedRequestFunc;
 
-    return await func(url, headers: headers, body: body, encoding: encoding);
+    return await func(url, headers: headers, body: body, encoding: encoding)
+        as http.Response;
   }
 
   @override
   Future<http.Response> delete(String url,
-      {Map<String, String> headers: const {}}) async {
-    final RequestFunc func = _requestWrapper(super.delete);
+      {Map<String, String> headers = const {}}) async {
+    final RequestFunc func = _requestWrapper(super.delete) as RequestFunc;
 
-    return await func(url, headers: headers);
+    return await func(url, headers: headers) as http.Response;
   }
 
   @override
   Future<http.Response> put(String url,
-      {Map<String, String> headers: const {}, body, encoding}) async {
-    final BodiedRequestFunc func = _requestWrapper(super.put);
+      {Map<String, String> headers = const {}, body, encoding}) async {
+    final BodiedRequestFunc func =
+        _requestWrapper(super.put) as BodiedRequestFunc;
 
-    return await func(url, headers: headers, body: body, encoding: encoding);
+    return await func(url, headers: headers, body: body, encoding: encoding)
+        as http.Response;
   }
 
   Future<http.StreamedResponse> uploadFile(
@@ -176,12 +202,12 @@ class RestClient extends AbstractRestClient {
     }
 
     try {
-      return _handleResponse(await request.send());
+      return _handleResponse(await request.send()) as http.StreamedResponse;
     } on AccessDeniedError {
       try {
         await _tryRefreshToken();
 
-        return _handleResponse(await request.send());
+        return _handleResponse(await request.send()) as http.StreamedResponse;
       } on TokenRevokedError {
         throw AccessDeniedError();
       }
@@ -233,10 +259,10 @@ class RestClient extends AbstractRestClient {
         await _requestAccessTokenByRefreshToken(authRepository.refreshToken);
 
     return await authRepository.persistTokens(
-      tokenResponse['access_token'],
-      tokenResponse['refresh_token'],
+      tokenResponse['access_token'] as String,
+      tokenResponse['refresh_token'] as String,
       DateTime.now().add(
-        Duration(seconds: tokenResponse['expires_in']),
+        Duration(seconds: tokenResponse['expires_in'] as int),
       ),
     );
   }
@@ -246,6 +272,8 @@ class RestClient extends AbstractRestClient {
   }
 
   http.BaseResponse _handleResponse(http.BaseResponse response) {
+    response = super._handleResponse(response);
+
     final int statusCode = response.statusCode;
 
     if (statusCode == 401) {
@@ -269,7 +297,7 @@ class RestClient extends AbstractRestClient {
       },
     );
 
-    final body = json.decode(response.body);
+    final body = json.decode(response.body) as Map<String, dynamic>;
 
     if (response.statusCode == 200) {
       return body;
@@ -302,6 +330,8 @@ class LuisClient extends AbstractRestClient {
 
   @override
   http.BaseResponse _handleResponse(http.BaseResponse response) {
+    response = super._handleResponse(response);
+
     final int statusCode = response.statusCode;
 
     if (statusCode < 200 || statusCode >= 300) {

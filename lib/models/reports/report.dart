@@ -17,11 +17,12 @@ class Report extends Equatable {
 
   factory Report.fromJson(Map<String, dynamic> json) {
     return Report(
-        name: json['Name'],
-        title: json['Title'],
-        itemType: json['ItemTypeName'],
-        contentType: json['ContentTypeName'],
-        inputForm: json['InputForm']);
+      name: json['Name'] as String,
+      title: json['Title'] as String,
+      itemType: json['ItemTypeName'] as String,
+      contentType: json['ContentTypeName'] as String,
+      inputForm: json['InputForm'] as String,
+    );
   }
 
   Map<String, dynamic> toJson() => {

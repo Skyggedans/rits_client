@@ -64,7 +64,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                       RaisedButton(
                         child: const Text('View'),
                         onPressed: () {
-                          viewObjectBloc.dispatch(GenerateViewObject(
+                          viewObjectBloc.add(GenerateViewObject(
                             viewObject,
                             userToken,
                           ));
@@ -79,18 +79,12 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
     );
   }
 
-  @override
-  void dispose() {
-    viewObjectBloc.dispose();
-    super.dispose();
-  }
-
   bool returnToMainScreen() =>
-      viewObjectBloc.currentState != viewObjectBloc.initialState;
+      viewObjectBloc.state != viewObjectBloc.initialState;
 
   Future<bool> _onBackPressed() async {
     if (returnToMainScreen()) {
-      viewObjectBloc.dispatch(ReturnToViewObjectMainScreen());
+      viewObjectBloc.add(ReturnToViewObjectMainScreen());
 
       return false;
     }

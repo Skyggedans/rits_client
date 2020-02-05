@@ -18,9 +18,8 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
   get initialState => CommentsInProgress();
 
   @override
-  Stream<CommentsEvent> transform(Stream<CommentsEvent> events) {
-    return (events as Observable<CommentsEvent>)
-        .debounce(Duration(milliseconds: 500));
+  Stream<CommentsState> transformStates(Stream<CommentsState> states) {
+    return states.debounceTime(Duration(milliseconds: 50));
   }
 
   @override
@@ -40,7 +39,7 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
 
       try {
         await _addComment(event.comment, event.userToken);
-        dispatch(FetchComments(userToken: event.userToken));
+        add(FetchComments(userToken: event.userToken));
       } on ApiError {
         yield CommentsError(message: 'Unable to add comment');
       }
@@ -49,7 +48,7 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
 
       try {
         await _updateComment(event.comment, event.userToken);
-        dispatch(FetchComments(userToken: event.userToken));
+        add(FetchComments(userToken: event.userToken));
       } on ApiError {
         yield CommentsError(message: 'Unable to update comment');
       }
@@ -58,7 +57,7 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
 
       try {
         await _removeComment(event.comment, event.userToken);
-        dispatch(FetchComments(userToken: event.userToken));
+        add(FetchComments(userToken: event.userToken));
       } on ApiError {
         yield CommentsError(message: 'Unable to remove comment');
       }
@@ -68,21 +67,15 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
   Future<List<Comment>> _fetchComments(String userToken) async {
     final url = '${settings.backendUrl}/GetVoiceToTextMemos/$userToken';
     final response = await restClient.get(url);
-    final body = json.decode(response.body);
+    final body =
+        List<Map<String, dynamic>>.from(json.decode(response.body) as List);
 
-    return body.map<Comment>((comment) {
+    return body.map((comment) {
       return Comment.fromJson(comment);
     }).toList();
-
-    // return Future.delayed(Duration(seconds: 3), () {
-    //   return [
-    //     Comment(id: 1, text: 'comment 1'),
-    //     Comment(id: 2, text: 'comment 2'),
-    //   ];
-    // });
   }
 
-  Future<Null> _addComment(Comment comment, String userToken) async {
+  Future<void> _addComment(Comment comment, String userToken) async {
     final url = '${settings.backendUrl}/AddVoiceToTextMemo/$userToken';
 
     final requestBody = {
@@ -96,7 +89,7 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
     );
   }
 
-  Future<Null> _updateComment(Comment comment, String userToken) async {
+  Future<void> _updateComment(Comment comment, String userToken) async {
     final url = '${settings.backendUrl}/UpdateVoiceToTextMemo/$userToken';
 
     final requestBody = {
@@ -111,5 +104,7 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
     );
   }
 
-  Future<Null> _removeComment(Comment comment, String userToken) {}
+  Future<void> _removeComment(Comment comment, String userToken) {
+    return null;
+  }
 }

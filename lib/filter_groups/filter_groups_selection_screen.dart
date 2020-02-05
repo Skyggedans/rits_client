@@ -22,13 +22,12 @@ class FilterGroupsSelectionScreenState
   FilterGroup _selectedFilterGroup;
 
   List<FilterGroup> get _filterGroups => widget.filterGroups;
-  String get _userToken => widget.userToken;
 
   @override
   void initState() {
     super.initState();
-    _selectedFilterGroup =
-        _filterGroups.singleWhere((filterGroup) => filterGroup.isActive);
+    // _selectedFilterGroup =
+    //     _filterGroups.singleWhere((filterGroup) => filterGroup.isActive);
   }
 
   @override
@@ -74,7 +73,7 @@ class FilterGroupsSelectionScreenState
                   title: Text(filterGroup.name),
                   value: filterGroup,
                   groupValue: _selectedFilterGroup,
-                  onChanged: (value) {
+                  onChanged: (FilterGroup value) {
                     setState(() {
                       _selectedFilterGroup = value;
                     });

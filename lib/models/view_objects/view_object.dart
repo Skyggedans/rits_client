@@ -21,12 +21,12 @@ class ViewObject extends Equatable {
 
   factory ViewObject.fromJson(Map<String, dynamic> json) {
     return ViewObject(
-      name: json['Name'],
-      title: json['Title'],
-      itemType: json['ItemTypeName'],
-      hierarchyLevel: json['HierachyLevel'],
-      contentType: json['ContentTypeName'],
-      inputForm: json['InputForm'],
+      name: json['Name'] as String,
+      title: json['Title'] as String,
+      itemType: json['ItemTypeName'] as String,
+      hierarchyLevel: json['HierachyLevel'] as String,
+      contentType: json['ContentTypeName'] as String,
+      inputForm: json['InputForm'] as String,
     );
   }
 

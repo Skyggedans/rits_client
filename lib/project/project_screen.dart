@@ -37,7 +37,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
   @override
   void initState() {
     super.initState();
-    _projectBloc.dispatch(LoadProject(_project));
+    _projectBloc.add(LoadProject(_project));
   }
 
   @override
@@ -77,43 +77,41 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 ),
                 //color: Colors.blue,
                 onPressed: () {
-                  _projectBloc
-                      .dispatch(ScanBarcode(userToken: state.userToken));
+                  _projectBloc.add(ScanBarcode(userToken: state.userToken));
                 },
               ),
             ),
             SizedBox(
               width: 200,
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  suffixIcon: const Icon(Icons.search),
-                  labelText: 'Search Item',
-                  helperText: 'Search Item',
-                  alignLabelWithHint: true,
-                  helperStyle: TextStyle(
-                    fontSize: 1,
-                    color: Color.fromARGB(0, 0, 0, 0),
+              child: Semantics(
+                //textField: true,
+                value: 'Search Item',
+                child: TextFormField(
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    suffixIcon: const Icon(Icons.search),
+                    labelText: 'Search Item',
+                    alignLabelWithHint: true,
                   ),
-                ),
-                onFieldSubmitted: (value) async {
-                  final selectedContext = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MatchingItemsSearchScreen(
-                        searchString: value,
-                        userToken: state.userToken,
+                  onFieldSubmitted: (value) async {
+                    final selectedContext = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MatchingItemsSearchScreen(
+                          searchString: value,
+                          userToken: state.userToken,
+                        ),
                       ),
-                    ),
-                  );
+                    ) as String;
 
-                  if (selectedContext != null) {
-                    _projectBloc.dispatch(SetContextFromSearch(
-                      context: selectedContext,
-                      userToken: state.userToken,
-                    ));
-                  }
-                },
+                    if (selectedContext != null) {
+                      _projectBloc.add(SetContextFromSearch(
+                        context: selectedContext,
+                        userToken: state.userToken,
+                      ));
+                    }
+                  },
+                ),
               ),
             ),
           ];
@@ -131,8 +129,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     child: RaisedButton(
                       child: const Text('Take Photo'),
                       onPressed: () async {
-                        _projectBloc
-                            .dispatch(TakePhoto(userToken: state.userToken));
+                        _projectBloc.add(TakePhoto(userToken: state.userToken));
                       },
                     ),
                   ),
@@ -143,7 +140,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       child: const Text('Record Video'),
                       onPressed: () async {
                         _projectBloc
-                            .dispatch(RecordVideo(userToken: state.userToken));
+                            .add(RecordVideo(userToken: state.userToken));
                       },
                     ),
                   ),
@@ -162,7 +159,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     },
                   ),
                   RaisedButton(
-                    child: Text('Show Reports'),
+                    child: const Text('Show Reports'),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -179,7 +176,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     },
                   ),
                   RaisedButton(
-                    child: Text('Show Charts'),
+                    child: const Text('Show Charts'),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -196,7 +193,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     },
                   ),
                   RaisedButton(
-                    child: Text('Show Tabular Data'),
+                    child: const Text('Show Tabular Data'),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -214,7 +211,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     },
                   ),
                   RaisedButton(
-                    child: Text('Show KPIs'),
+                    child: const Text('Show KPIs'),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -233,7 +230,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   Visibility(
                     visible: state.hierarchyLevel != null,
                     child: RaisedButton(
-                      child: Text('Show Associated Data'),
+                      child: const Text('Show Associated Data'),
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -256,7 +253,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   Visibility(
                     visible: state.hierarchyLevel != null,
                     child: RaisedButton(
-                      child: Text('Show Comments'),
+                      child: const Text('Show Comments'),
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -299,11 +296,5 @@ class _ProjectScreenState extends State<ProjectScreen> {
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    _projectBloc.dispose();
-    super.dispose();
   }
 }

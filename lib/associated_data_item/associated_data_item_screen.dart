@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
+import 'package:rits_client/app_config.dart';
 import 'package:rw_help/rw_help.dart';
 
 import '../models/associated_data/associated_data.dart';
@@ -40,11 +41,13 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
   @override
   void initState() {
     super.initState();
-    viewObjectBloc.dispatch(GenerateViewObject(viewObject, userToken));
+    viewObjectBloc.add(GenerateViewObject(viewObject, userToken));
   }
 
   @override
   Widget build(BuildContext context) {
+    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+
     return BlocBuilder(
       bloc: viewObjectBloc,
       builder: (BuildContext context, ViewObjectState state) {
@@ -56,16 +59,19 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
         } else if (state is AssociatedDataItemGenerated) {
           title += '.${state.table.container.name}';
 
-          final rowCount = state.table.rows.length;
+          if (isRealWearDevice) {
+            final rowCount = state.table.rows.length;
 
-          if (rowCount > 0) {
-            final rowRange = rowCount == 1 ? '1' : '1-$rowCount';
+            if (rowCount > 0) {
+              final rowRange = rowCount == 1 ? '1' : '1-$rowCount';
 
-            RwHelp.setCommands(
-                ['Say "Select record ${rowRange}" for record actions']);
-          } else {
-            RwHelp.setCommands([]);
+              RwHelp.setCommands(
+                  ['Say "Select record $rowRange" for record actions']);
+            } else {
+              RwHelp.setCommands([]);
+            }
           }
+
           bodyChild = buildOutputWidget(context, state);
         } else if (state is NoActiveContainerError) {
           bodyChild = const Text('There is no active container');
@@ -116,7 +122,7 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
                         ],
                       ),
                       onPressed: () {
-                        viewObjectBloc.dispatch(SaveRows(
+                        viewObjectBloc.add(SaveRows(
                           table: state.table,
                           viewObject: state.viewObject,
                           userToken: state.userToken,
@@ -196,9 +202,9 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
                                   ? value.toStringAsFixed(0)
                                   : value.toString();
                             } else if (colDef is DateTimeColumn) {
-                              final format = DateFormat.yMd('en_US');
+                              final dateFormat = DateFormat.yMd('en_US');
 
-                              text = format.format(value);
+                              text = dateFormat.format(value as DateTime);
                             }
 
                             return Expanded(
@@ -237,26 +243,31 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
 
   @override
   void dispose() {
-    RwHelp.setCommands([]);
+    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+
+    if (isRealWearDevice) {
+      RwHelp.setCommands([]);
+    }
+
     super.dispose();
   }
 
   void _onNewRecord(BuildContext context, List<ColumnDef> columnDefinitions,
       AssociatedDataTable table) async {
-    final newRow = await Navigator.push(
+    final Map<String, dynamic> newRow = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => RowEditorScreen(
           columnDefinitions: columnDefinitions,
           row: Map<String, dynamic>.fromIterable(columnDefinitions,
-              key: (colDef) => colDef.name,
+              key: (colDef) => colDef.name as String,
               value: (colDef) => colDef.defaultValue),
         ),
       ),
     );
 
     if (newRow != null) {
-      viewObjectBloc.dispatch(AddRow(table: table, row: newRow));
+      viewObjectBloc.add(AddRow(table: table, row: newRow));
     }
   }
 
@@ -276,18 +287,18 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
                 row: Map<String, dynamic>.from(row),
               ),
             ),
-          );
+          ) as Map<String, dynamic>;
 
           if (modifiedRow != null) {
-            viewObjectBloc.dispatch(
-                UpdateRow(table: table, row: modifiedRow, index: index));
+            viewObjectBloc
+                .add(UpdateRow(table: table, row: modifiedRow, index: index));
           }
 
           break;
         }
       case RecordAction.REMOVE:
         {
-          viewObjectBloc.dispatch(RemoveRow(table: table, index: index));
+          viewObjectBloc.add(RemoveRow(table: table, index: index));
 
           break;
         }

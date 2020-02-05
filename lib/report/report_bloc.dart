@@ -44,13 +44,13 @@ class ReportBloc extends ViewObjectBloc {
         '${settings.backendUrl}/GenerateReportInternal/$userToken/${Uri.encodeFull(viewObject.name)}/pdf';
     final response = await restClient.get(url);
 
-    return json.decode(response.body);
+    return json.decode(response.body) as Map<String, dynamic>;
   }
 
   Future<Uint8List> _getReportBytes(
       ViewObject viewObject, String userToken) async {
     final url = await _getReportUrl(viewObject, userToken);
-    final response = await restClient.get(url['URL']);
+    final response = await restClient.get(url['URL'] as String);
 
     return response.bodyBytes;
   }

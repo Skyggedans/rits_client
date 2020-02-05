@@ -31,10 +31,11 @@ class KpiBloc extends ViewObjectBloc {
     final url =
         '${settings.backendUrl}/fetch/$userToken/0/SystemKpi/${Uri.encodeFull(viewObject.name)}';
     final response = await restClient.get(url);
-    final List body = json.decode(response.body);
+    final body =
+        List<Map<String, dynamic>>.from(json.decode(response.body) as List);
 
-    return body.map((kpi) {
-      return Kpi.fromJson(kpi);
+    return body.map((kpiJson) {
+      return Kpi.fromJson(kpiJson);
     }).toList();
   }
 }

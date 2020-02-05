@@ -23,11 +23,12 @@ class FilterGroup extends Equatable {
 
   factory FilterGroup.fromJson(Map<String, dynamic> json) {
     return FilterGroup(
-      id: int.tryParse(json['FilterGroupID']),
-      name: json['GroupName'],
-      levelNumber: int.tryParse(json['LevelNumber']),
-      filters: json['Filter'].map<Filter>((filter) {
-        return Filter.fromJson(filter);
+      id: int.tryParse(json['FilterGroupID'] as String),
+      name: json['GroupName'] as String,
+      levelNumber: int.tryParse(json['LevelNumber'] as String),
+      filters: List<Map<String, dynamic>>.from(json['Filter'] as List)
+          .map((filterJson) {
+        return Filter.fromJson(filterJson);
       }).toList(),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rits_client/models/view_objects/view_object.dart';
 
 import 'associated_data_item/associated_data_item.dart';
 import 'authentication/authentication.dart';
@@ -18,8 +19,8 @@ class Routes {
         final dynamic args = ModalRoute.of(context).settings.arguments;
 
         return ReportScreen(
-          viewObject: args['viewObject'],
-          userToken: args['userToken'],
+          viewObject: args['viewObject'] as ViewObject,
+          userToken: args['userToken'] as String,
         );
       },
       ChartScreen.route: (BuildContext context) {
@@ -27,32 +28,32 @@ class Routes {
 
         return ChartScreen(
           authRepository: authRepository,
-          viewObject: args['viewObject'],
-          userToken: args['userToken'],
+          viewObject: args['viewObject'] as ViewObject,
+          userToken: args['userToken'] as String,
         );
       },
       TabularDataScreen.route: (BuildContext context) {
         final dynamic args = ModalRoute.of(context).settings.arguments;
 
         return TabularDataScreen(
-          viewObject: args['viewObject'],
-          userToken: args['userToken'],
+          viewObject: args['viewObject'] as ViewObject,
+          userToken: args['userToken'] as String,
         );
       },
       KpiScreen.route: (BuildContext context) {
         final dynamic args = ModalRoute.of(context).settings.arguments;
 
         return KpiScreen(
-          viewObject: args['viewObject'],
-          userToken: args['userToken'],
+          viewObject: args['viewObject'] as ViewObject,
+          userToken: args['userToken'] as String,
         );
       },
       AssociatedDataItemScreen.route: (BuildContext context) {
         final dynamic args = ModalRoute.of(context).settings.arguments;
 
         return AssociatedDataItemScreen(
-          viewObject: args['viewObject'],
-          userToken: args['userToken'],
+          viewObject: args['viewObject'] as ViewObject,
+          userToken: args['userToken'] as String,
         );
       },
     };

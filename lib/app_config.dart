@@ -1,5 +1,6 @@
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppConfig extends InheritedWidget {
   bool _isRealWearDevice = false;
@@ -13,16 +14,23 @@ class AppConfig extends InheritedWidget {
   }
 
   static AppConfig of(BuildContext context) {
-    return context.inheritFromWidgetOfExactType(AppConfig);
+    return context.dependOnInheritedWidgetOfExactType<AppConfig>();
   }
 
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) => false;
 
   static Future<bool> _checkDevice() async {
-    final deviceInfo = DeviceInfoPlugin();
-    final androidInfo = await deviceInfo.androidInfo;
+    WidgetsFlutterBinding.ensureInitialized();
 
-    return androidInfo?.brand == 'RealWear';
+    final deviceInfo = DeviceInfoPlugin();
+
+    try {
+      final androidInfo = await deviceInfo.androidInfo;
+
+      return androidInfo?.brand == 'RealWear';
+    } on MissingPluginException {
+      return false;
+    }
   }
 }

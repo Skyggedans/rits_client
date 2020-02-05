@@ -8,8 +8,8 @@ class Option extends Equatable {
 
   factory Option.fromJson(Map<String, dynamic> json) {
     return Option(
-      title: json['FilterTitle'],
-      state: json['State'],
+      title: json['FilterTitle'] as String,
+      state: json['State'] as bool,
     );
   }
 

@@ -12,7 +12,7 @@ abstract class ColumnDef<T> extends Equatable {
   ColumnDef(this.name, {this.min, this.max, this.options});
 
   factory ColumnDef.fromJson(Map<String, dynamic> json) {
-    switch (json['AttributeTypeName']) {
+    switch (json['AttributeTypeName'] as String) {
       case 'Numeric':
         {
           return NumericColumn.fromJson(json) as ColumnDef<T>;
@@ -46,10 +46,10 @@ class NumericColumn extends ColumnDef<num> {
 
   factory NumericColumn.fromJson(Map<String, dynamic> json) {
     return NumericColumn(
-      json['AttributeName'],
-      min: json['InclusionMin'],
-      max: json['InclusionMax'],
-      options: json['Items']?.cast<num>(),
+      json['AttributeName'] as String,
+      min: json['InclusionMin'] as num,
+      max: json['InclusionMax'] as num,
+      options: List<num>.from(json['Items'] as List),
     );
   }
 }
@@ -62,8 +62,8 @@ class StringColumn extends ColumnDef<String> {
 
   factory StringColumn.fromJson(Map<String, dynamic> json) {
     return StringColumn(
-      json['AttributeName'],
-      options: json['Items']?.cast<String>(),
+      json['AttributeName'] as String,
+      options: List<String>.from(json['Items'] as List),
     );
   }
 }
@@ -80,19 +80,19 @@ class DateTimeColumn extends ColumnDef<DateTime> {
     DateTime max;
 
     try {
-      min = format.parse(json['InclusionMin']);
+      min = format.parse(json['InclusionMin'] as String);
     } catch (_) {
       min = null;
     }
 
     try {
-      max = format.parse(json['InclusionMax']);
+      max = format.parse(json['InclusionMax'] as String);
     } catch (_) {
       max = null;
     }
 
     return DateTimeColumn(
-      json['AttributeName'],
+      json['AttributeName'] as String,
       min: min,
       max: max,
     );

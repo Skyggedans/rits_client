@@ -19,10 +19,9 @@ class MatchingItemsSearchBloc
   get initialState => MatchingItemsUninitialized();
 
   @override
-  Stream<MatchingItemsSearchEvent> transform(
-      Stream<MatchingItemsSearchEvent> events) {
-    return (events as Observable<MatchingItemsSearchEvent>)
-        .debounce(Duration(milliseconds: 500));
+  Stream<MatchingItemsSearchState> transformStates(
+      Stream<MatchingItemsSearchState> states) {
+    return states.debounceTime(Duration(milliseconds: 50));
   }
 
   @override
@@ -46,8 +45,8 @@ class MatchingItemsSearchBloc
     final url =
         '${settings.backendUrl}/MatchObservedItem/$userToken/${Uri.encodeFull(searchString)}';
     final response = await restClient.get(url);
-    final body = json.decode(response.body);
+    final body = json.decode(response.body) as Map<String, dynamic>;
 
-    return body['ResultData'].cast<String>();
+    return List<String>.from(body['ResultData'] as List);
   }
 }

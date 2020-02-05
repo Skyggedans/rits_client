@@ -26,12 +26,14 @@ class TabularDataBloc extends ViewObjectBloc {
     }
   }
 
-  Future<List<dynamic>> _getData(
+  Future<List<Map<String, dynamic>>> _getData(
       ViewObject viewObject, String userToken) async {
     final url =
         '${settings.backendUrl}/fetch/$userToken/3/${Uri.encodeFull(viewObject.name)}';
     final response = await restClient.get(url);
+    final body =
+        List<Map<String, dynamic>>.from(json.decode(response.body)[0] as List);
 
-    return json.decode(response.body)[0];
+    return body;
   }
 }

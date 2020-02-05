@@ -17,9 +17,8 @@ abstract class ViewObjectBloc extends Bloc<ViewObjectEvent, ViewObjectState> {
   get initialState => ViewObjectIdle();
 
   @override
-  Stream<ViewObjectEvent> transform(Stream<ViewObjectEvent> events) {
-    return (events as Observable<ViewObjectEvent>)
-        .debounce(Duration(milliseconds: 500));
+  Stream<ViewObjectState> transformStates(Stream<ViewObjectState> states) {
+    return states.debounceTime(Duration(milliseconds: 50));
   }
 
   @override

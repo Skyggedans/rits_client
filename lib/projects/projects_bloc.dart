@@ -17,9 +17,8 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
   ProjectsBloc({@required this.restClient});
 
   @override
-  Stream<ProjectsEvent> transform(Stream<ProjectsEvent> events) {
-    return (events as Observable<ProjectsEvent>)
-        .debounce(Duration(milliseconds: 500));
+  Stream<ProjectsState> transformStates(Stream<ProjectsState> states) {
+    return states.debounceTime(Duration(milliseconds: 50));
   }
 
   @override
@@ -29,7 +28,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
   Stream<ProjectsState> mapEventToState(ProjectsEvent event) async* {
     if (event is FetchProjects) {
       try {
-        if (currentState is ProjectsUninitialized) {
+        if (state is ProjectsUninitialized) {
           final projects = await _fetchProjects();
 
           yield ProjectsLoaded(projects: projects);
@@ -42,11 +41,12 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
 
   Future<List<Project>> _fetchProjects() async {
     const url = '${settings.backendUrl}/GetProjects';
-    dynamic response = await restClient.get(url);
-    final List body = json.decode(response.body);
+    final response = await restClient.get(url);
+    final body =
+        List<Map<String, dynamic>>.from(json.decode(response.body) as List);
 
-    return body.map((param) {
-      return Project.fromJson(param);
+    return body.map((paramJson) {
+      return Project.fromJson(paramJson);
     }).toList();
   }
 }

@@ -16,9 +16,8 @@ class MultiSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
   MultiSelectionBloc({@required this.restClient});
 
   @override
-  Stream<SelectionEvent> transform(Stream<SelectionEvent> events) {
-    return (events as Observable<SelectionEvent>)
-        .debounce(Duration(milliseconds: 500));
+  Stream<SelectionState> transformStates(Stream<SelectionState> states) {
+    return states.debounceTime(Duration(milliseconds: 50));
   }
 
   @override
@@ -36,9 +35,7 @@ class MultiSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
       }
     } else if (event is UpdateSelection<Option>) {
       final List<Option> updatedOptions =
-          (currentState as SelectionOptionsLoaded<Option>)
-              .options
-              .map((option) {
+          (state as SelectionOptionsLoaded<Option>).options.map((option) {
         return option.title == event.option.title ? event.option : option;
       }).toList();
 
@@ -51,10 +48,11 @@ class MultiSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
     final url =
         '${settings.backendUrl}/GetCategoryFilterData/$userToken/${param.name}';
     final response = await restClient.get(url);
-    final List body = json.decode(response.body);
+    final body =
+        List<Map<String, dynamic>>.from(json.decode(response.body) as List);
 
-    return body.map((option) {
-      return Option.fromJson(option);
+    return body.map((optionJson) {
+      return Option.fromJson(optionJson);
     }).toList();
   }
 }

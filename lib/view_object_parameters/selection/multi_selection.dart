@@ -29,7 +29,7 @@ class _MultiSelectionState extends State<MultiSelection> {
   @override
   void initState() {
     super.initState();
-    _selectionBloc.dispatch(FetchSelectionOptions(
+    _selectionBloc.add(FetchSelectionOptions(
       param: _param,
       userToken: _userToken,
     ));
@@ -46,7 +46,7 @@ class _MultiSelectionState extends State<MultiSelection> {
           bodyChild = CircularProgressIndicator();
         } else if (state is SelectionOptionsLoaded) {
           bodyChild = BlocProvider(
-            bloc: _selectionBloc,
+            create: (context) => _selectionBloc,
             child: _SelectionOptions(),
           );
         } else if (state is SelectionOptionsError) {
@@ -107,7 +107,7 @@ class _SelectionOptions extends StatelessWidget {
                 title: Text(option.title),
                 value: option.state,
                 onChanged: (bool value) {
-                  _selectionBloc.dispatch(
+                  _selectionBloc.add(
                       UpdateSelection(option: option.copyWith(state: value)));
                 },
               );

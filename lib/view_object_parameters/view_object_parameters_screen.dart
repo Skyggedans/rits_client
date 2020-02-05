@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 import '../utils/rest_client.dart';
 import '../models/view_objects/view_objects.dart';
@@ -24,7 +25,7 @@ class ViewObjectParametersScreen extends StatefulWidget {
 
 class _ViewObjectParametersScreenState
     extends State<ViewObjectParametersScreen> {
-  final ViewObjectParametersBloc _projectsBloc =
+  final ViewObjectParametersBloc _viewObjectParametersBloc =
       ViewObjectParametersBloc(restClient: RestClient());
 
   ViewObject get _viewObject => widget.viewObject;
@@ -34,7 +35,7 @@ class _ViewObjectParametersScreenState
   @override
   void initState() {
     super.initState();
-    _projectsBloc.dispatch(FetchViewObjectParameters(
+    _viewObjectParametersBloc.add(FetchViewObjectParameters(
       viewObject: _viewObject,
       userToken: _userToken,
     ));
@@ -48,42 +49,31 @@ class _ViewObjectParametersScreenState
       ),
       body: Center(
         child: BlocBuilder(
-          bloc: _projectsBloc,
+          bloc: _viewObjectParametersBloc,
           builder: (BuildContext context, ViewObjectParametersState state) {
             if (state is ViewObjectParametersInProgress) {
               return CircularProgressIndicator();
             } else if (state is ViewObjectParametersLoaded) {
-              return BlocProvider(
-                bloc: _projectsBloc,
+              return InheritedProvider<ViewObjectParametersBloc>.value(
+                value: _viewObjectParametersBloc,
                 child: _ReportParameters(),
               );
-            } else if (state is ViewObjectParametersError) {
-              return const Text(
-                  'Failed to fetch or save view object parameters');
             }
+
+            return const Text('Failed to fetch or save view object parameters');
           },
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _projectsBloc.dispose();
-    super.dispose();
   }
 }
 
 class _ReportParameters extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final _reportParametersBloc =
-        BlocProvider.of<ViewObjectParametersBloc>(context);
-
-    return BlocBuilder(
-      bloc: _reportParametersBloc,
-      builder: (BuildContext context, ViewObjectParametersState state) {
-        final concreteState = (state as ViewObjectParametersLoaded);
+    return Consumer<ViewObjectParametersBloc>(
+      builder: (BuildContext context, ViewObjectParametersBloc bloc, _) {
+        final concreteState = bloc.state as ViewObjectParametersLoaded;
 
         return Padding(
           padding: EdgeInsets.all(10.0),
@@ -96,44 +86,44 @@ class _ReportParameters extends StatelessWidget {
                 switch (param.dataType) {
                   case 'datetime':
                     {
-                      return DateTimePicker(
-                        labelText: param.title,
-                        helperText: param.title,
-                        selectedDate: param.value,
-                        selectDate: (value) {
-                          _reportParametersBloc
-                              .dispatch(SaveViewObjectParameter(
-                            viewObject: concreteState.viewObject,
-                            userToken: concreteState.userToken,
-                            parameter: param.copyWith(value: value),
-                          ));
-                        },
+                      return Semantics(
+                        textField: true,
+                        value: param.title,
+                        child: DateTimePicker(
+                          labelText: param.title,
+                          selectedDate: param.value as DateTime,
+                          selectDate: (value) {
+                            bloc.add(SaveViewObjectParameter(
+                              viewObject: concreteState.viewObject,
+                              userToken: concreteState.userToken,
+                              parameter: param.copyWith(value: value),
+                            ));
+                          },
+                        ),
                       );
                     }
                   default:
                     {
-                      final textField = TextFormField(
-                        initialValue: param.value.toString(),
-                        keyboardType: param.dataType == 'numeric'
-                            ? TextInputType.number
-                            : TextInputType.text,
-                        enabled: !param.readOnly,
-                        decoration: InputDecoration(
-                          labelText: param.title,
-                          helperText: param.title,
-                          helperStyle: TextStyle(
-                            fontSize: 1,
-                            color: Color.fromARGB(0, 0, 0, 0),
+                      final textField = Semantics(
+                        textField: true,
+                        value: param.title,
+                        child: TextFormField(
+                          initialValue: param.value.toString(),
+                          keyboardType: param.dataType == 'numeric'
+                              ? TextInputType.number
+                              : TextInputType.text,
+                          enabled: !param.readOnly,
+                          decoration: InputDecoration(
+                            labelText: param.title,
                           ),
+                          onFieldSubmitted: (text) {
+                            bloc.add(SaveViewObjectParameter(
+                              viewObject: concreteState.viewObject,
+                              userToken: concreteState.userToken,
+                              parameter: param.copyWith(value: text),
+                            ));
+                          },
                         ),
-                        onFieldSubmitted: (text) {
-                          _reportParametersBloc
-                              .dispatch(SaveViewObjectParameter(
-                            viewObject: concreteState.viewObject,
-                            userToken: concreteState.userToken,
-                            parameter: param.copyWith(value: text),
-                          ));
-                        },
                       );
 
                       return textField;
@@ -153,8 +143,7 @@ class _ReportParameters extends StatelessWidget {
                         );
 
                         if (selection != null) {
-                          _reportParametersBloc
-                              .dispatch(SaveViewObjectParameter(
+                          bloc.add(SaveViewObjectParameter(
                             viewObject: concreteState.viewObject,
                             userToken: concreteState.userToken,
                             parameter: param.copyWith(value: selection),
@@ -167,19 +156,6 @@ class _ReportParameters extends StatelessWidget {
                   button: true,
                   value: param.title,
                   onTap: handler,
-                  // child: TextFormField(
-                  //   initialValue: '${param.value}',
-                  //   textInputAction: TextInputAction.continueAction,
-                  //   //enabled: false,
-                  //   decoration: InputDecoration(
-                  //     labelText: '${param.title}',
-                  //     helperText: '${param.title}',
-                  //     helperStyle: TextStyle(
-                  //       fontSize: 1,
-                  //       color: Color.fromARGB(0, 0, 0, 0),
-                  //     ),
-                  //   ),
-                  // ),
                   child: RaisedButton(
                     child: Text('${param.title}: ${param.value}'),
                     onPressed: handler,
@@ -199,8 +175,7 @@ class _ReportParameters extends StatelessWidget {
                         );
 
                         if (selection is List<Option>) {
-                          _reportParametersBloc
-                              .dispatch(SaveViewObjectParameter(
+                          bloc.add(SaveViewObjectParameter(
                             viewObject: concreteState.viewObject,
                             userToken: concreteState.userToken,
                             parameter: param.copyWith(value: selection),

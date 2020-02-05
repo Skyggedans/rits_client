@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/semantics.dart';
 
 import '../models/associated_data/associated_data.dart';
 import '../widgets/widgets.dart';
@@ -74,54 +72,53 @@ class _RowEditorScreenState extends State<RowEditorScreen> {
             spacing: 10,
             children: _columnDefinitions.map((columnDef) {
               if (columnDef is NumericColumn) {
-                final numValue = _row[columnDef.name];
+                final numValue = _row[columnDef.name] as num;
 
                 return SizedBox(
                   width: 250,
-                  child: TextFormField(
-                    autovalidate: true,
-                    initialValue: numValue.truncateToDouble() == numValue
-                        ? numValue.toStringAsFixed(0)
-                        : numValue.toString(),
-                    keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
-                    decoration: InputDecoration(
-                      labelText: columnDef.name,
-                      helperText: columnDef.name,
-                      helperStyle: TextStyle(
-                        fontSize: 1,
-                        color: Color.fromARGB(0, 0, 0, 0),
+                  child: Semantics(
+                    textField: true,
+                    value: columnDef.name,
+                    child: TextFormField(
+                      autovalidate: true,
+                      initialValue: numValue.truncateToDouble() == numValue
+                          ? numValue.toStringAsFixed(0)
+                          : numValue.toString(),
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
+                      decoration: InputDecoration(
+                        labelText: columnDef.name,
                       ),
+                      onSaved: (value) {
+                        setState(() {
+                          _row[columnDef.name] = num.tryParse(value) ?? 0;
+                        });
+                      },
+                      validator: (value) {
+                        final numValue = num.tryParse(value) ?? 0;
+
+                        if (columnDef.min == 0 && columnDef.max == 0) {
+                          return null;
+                        }
+
+                        if (numValue >= columnDef.min &&
+                            numValue <= columnDef.max) {
+                          return null;
+                        } else {
+                          return 'Value is outside the allowed range (${columnDef.min} - ${columnDef.max})';
+                        }
+                      },
                     ),
-                    onSaved: (value) {
-                      setState(() {
-                        _row[columnDef.name] = num.tryParse(value) ?? 0;
-                      });
-                    },
-                    validator: (value) {
-                      final numValue = num.tryParse(value) ?? 0;
-
-                      if (columnDef.min == 0 && columnDef.max == 0) {
-                        return null;
-                      }
-
-                      if (numValue >= columnDef.min &&
-                          numValue <= columnDef.max) {
-                        return null;
-                      } else {
-                        return 'Value is outside the allowed range (${columnDef.min} - ${columnDef.max})';
-                      }
-                    },
                   ),
                 );
               } else if (columnDef is StringColumn) {
                 getField() {
                   if (columnDef?.options?.isNotEmpty ?? false) {
-                    final dropDownValue =
-                        (columnDef?.options.contains(_row[columnDef.name]) ??
-                                false)
-                            ? _row[columnDef.name]
-                            : null;
+                    final dropDownValue = (columnDef?.options
+                                ?.contains(_row[columnDef.name] as String) ??
+                            false)
+                        ? _row[columnDef.name] as String
+                        : null;
 
                     final dropDownKey = GlobalKey<State>();
 
@@ -129,7 +126,7 @@ class _RowEditorScreenState extends State<RowEditorScreen> {
                       button: true,
                       value: columnDef.name,
                       onTap: () {
-                        final RenderBox renderObject =
+                        final RenderObject renderObject =
                             dropDownKey.currentState.context.findRenderObject();
 
                         renderObject.visitChildrenForSemantics((element) {
@@ -201,7 +198,7 @@ class _RowEditorScreenState extends State<RowEditorScreen> {
                   child: DateTimePicker(
                     labelText: columnDef.name,
                     helperText: columnDef.name,
-                    selectedDate: _row[columnDef.name],
+                    selectedDate: _row[columnDef.name] as DateTime,
                     selectDate: (value) {
                       setState(() {
                         _row[columnDef.name] = value;

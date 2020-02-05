@@ -14,9 +14,8 @@ class ViewObjectsBloc extends Bloc<ViewObjectsEvent, ViewObjectsState> {
       : assert(viewObjectsRepository != null);
 
   @override
-  Stream<ViewObjectsEvent> transform(Stream<ViewObjectsEvent> events) {
-    return (events as Observable<ViewObjectsEvent>)
-        .debounce(Duration(milliseconds: 500));
+  Stream<ViewObjectsState> transformStates(Stream<ViewObjectsState> states) {
+    return states.debounceTime(Duration(milliseconds: 50));
   }
 
   @override
@@ -26,7 +25,7 @@ class ViewObjectsBloc extends Bloc<ViewObjectsEvent, ViewObjectsState> {
   Stream<ViewObjectsState> mapEventToState(ViewObjectsEvent event) async* {
     if (event is FetchViewObjects) {
       try {
-        if (currentState is ViewObjectsUninitialized) {
+        if (state is ViewObjectsUninitialized) {
           final viewObjects = event.hierarchyLevel?.isNotEmpty == true
               ? await viewObjectsRepository.fetchHierarchyViewObjects(
                   event.project,

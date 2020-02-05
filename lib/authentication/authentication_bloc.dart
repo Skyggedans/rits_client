@@ -38,7 +38,7 @@ class AuthenticationBloc
       await authRepository.deleteTokens();
       yield Unauthenticated();*/
     } else if (event is AccessTokenExpired) {
-      dispatch(Authenticate());
+      add(Authenticate());
     }
   }
 
@@ -67,7 +67,7 @@ class AuthenticationBloc
       //     dispatch(Authenticate());
       //   }
     } else {
-      dispatch(Authenticate());
+      add(Authenticate());
     }
   }
 
@@ -79,36 +79,36 @@ class AuthenticationBloc
           'Authentication backend will be waiting for user code for ${response['expires_in']} seconds');
 
       yield AuthenticationPending(
-        userCode: response['user_code'],
-        verificationUrl: response['verification_uri'],
-        expiresIn: Duration(seconds: response['expires_in']),
+        userCode: response['user_code'] as String,
+        verificationUrl: response['verification_uri'] as String,
+        expiresIn: Duration(seconds: response['expires_in'] as int),
       );
 
       final stopPollingAt = DateTime.now().add(
-        Duration(seconds: response['expires_in']),
+        Duration(seconds: response['expires_in'] as int),
       );
 
       Timer.periodic(
-        Duration(milliseconds: response['interval'] * 1000 + 100),
+        Duration(milliseconds: (response['interval'] as int) * 1000 + 100),
         (timer) async {
           try {
             print('Requesting access token');
 
             final tokenResponse =
-                await _requestAccessToken(response['device_code']);
+                await _requestAccessToken(response['device_code'] as String);
 
             timer.cancel();
             print('Access granted for ${tokenResponse['expires_in']} seconds');
 
             await authRepository.persistTokens(
-              tokenResponse['access_token'],
-              tokenResponse['refresh_token'],
+              tokenResponse['access_token'] as String,
+              tokenResponse['refresh_token'] as String,
               DateTime.now().add(
-                Duration(seconds: tokenResponse['expires_in']),
+                Duration(seconds: tokenResponse['expires_in'] as int),
               ),
             );
 
-            dispatch(AccessGranted());
+            add(AccessGranted());
           } on AuthorizationPendingError catch (e) {
             print(e);
           } on RateLimitExceededError catch (e) {
@@ -118,17 +118,17 @@ class AuthenticationBloc
             timer.cancel();
             print(e);
             //dispatch(Authenticate());
-            dispatch(AccessDenied(reason: e.toString()));
+            add(AccessDenied(reason: e.toString()));
           } on AuthorizationException catch (e) {
             timer.cancel();
             print(e);
-            dispatch(AccessDenied(reason: e.toString()));
+            add(AccessDenied(reason: e.toString()));
           }
 
           if (timer.isActive && DateTime.now().isAfter(stopPollingAt)) {
             timer.cancel();
             print('Token aquisition expired');
-            dispatch(Authenticate());
+            add(Authenticate());
           }
         },
       );
@@ -136,7 +136,7 @@ class AuthenticationBloc
       print(e);
 
       Future.delayed(const Duration(seconds: 1), () {
-        dispatch(Authenticate());
+        add(Authenticate());
       });
     }
   }
@@ -150,7 +150,7 @@ class AuthenticationBloc
       },
     );
 
-    final body = json.decode(response.body);
+    final body = json.decode(response.body) as Map<String, dynamic>;
 
     if (response.statusCode == 401 && body['error'] == 'access_denied') {
       throw AccessDeniedError();
@@ -174,7 +174,7 @@ class AuthenticationBloc
       },
     );
 
-    final body = json.decode(response.body);
+    final body = json.decode(response.body) as Map<String, dynamic>;
 
     if (response.statusCode == 400) {
       if (body['error'] == 'authorization_pending') {
@@ -211,7 +211,7 @@ class AuthenticationBloc
       },
     );
 
-    final body = json.decode(response.body);
+    final body = json.decode(response.body) as Map<String, dynamic>;
 
     if (response.statusCode == 200) {
       return body;

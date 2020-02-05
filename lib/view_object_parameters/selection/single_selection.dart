@@ -29,7 +29,7 @@ class _SingleSelectionState extends State<SingleSelection> {
   @override
   void initState() {
     super.initState();
-    _selectionBloc.dispatch(FetchSelectionOptions(
+    _selectionBloc.add(FetchSelectionOptions(
       param: _param,
       userToken: _userToken,
     ));
@@ -46,7 +46,7 @@ class _SingleSelectionState extends State<SingleSelection> {
           bodyChild = CircularProgressIndicator();
         } else if (state is SelectionOptionsLoaded) {
           bodyChild = BlocProvider(
-            bloc: _selectionBloc,
+            create: (context) => _selectionBloc,
             child: _SelectionOptions(),
           );
         } else if (state is SelectionOptionsError) {
@@ -91,6 +91,7 @@ class _SingleSelectionState extends State<SingleSelection> {
 class _SelectionOptions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // ignore: close_sinks
     final _selectionBloc = BlocProvider.of<SingleSelectionBloc>(context);
 
     return BlocBuilder(
@@ -104,11 +105,11 @@ class _SelectionOptions extends StatelessWidget {
               final option = state.options[index];
 
               return RadioListTile(
-                title: Text(option),
+                title: Text(option.toString()),
                 value: option,
                 groupValue: state.selection,
                 onChanged: (value) {
-                  _selectionBloc.dispatch(UpdateSelection(option: value));
+                  _selectionBloc.add(UpdateSelection(option: value));
                 },
               );
             },

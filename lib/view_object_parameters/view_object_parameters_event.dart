@@ -8,8 +8,9 @@ abstract class ViewObjectParametersEvent extends Equatable {
   ViewObjectParametersEvent([List props = const []]) : super(props);
 }
 
-class FetchViewObjectParameters extends ViewObjectParametersEvent {
-  final ViewObject viewObject;
+class FetchViewObjectParameters<T extends ViewObject>
+    extends ViewObjectParametersEvent {
+  final T viewObject;
   final String userToken;
 
   FetchViewObjectParameters(
@@ -20,8 +21,9 @@ class FetchViewObjectParameters extends ViewObjectParametersEvent {
   String toString() => 'FetchViewObjectParameters';
 }
 
-class SaveViewObjectParameter extends ViewObjectParametersEvent {
-  final ViewObject viewObject;
+class SaveViewObjectParameter<T extends ViewObject>
+    extends ViewObjectParametersEvent {
+  final T viewObject;
   final String userToken;
   final ViewObjectParameter parameter;
 

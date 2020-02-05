@@ -32,8 +32,10 @@ class _AuthenticationFailureScreenState
             RaisedButton(
               child: const Text('Try Again'),
               onPressed: () {
+                // ignore: close_sinks
                 final _authBloc = BlocProvider.of<AuthenticationBloc>(context);
-                _authBloc.dispatch(Authenticate());
+
+                _authBloc.add(Authenticate());
               },
             ),
           ],

@@ -13,8 +13,8 @@ class ReturnToViewObjectMainScreen extends ViewObjectEvent {
   String toString() => 'ReturnToViewObjectMainScreen';
 }
 
-class GenerateViewObject extends ViewObjectEvent {
-  final ViewObject viewObject;
+class GenerateViewObject<T extends ViewObject> extends ViewObjectEvent {
+  final T viewObject;
   final String userToken;
 
   GenerateViewObject(this.viewObject, this.userToken)

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:memoize/memoize.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../models/filter_groups/filter_groups.dart';
@@ -19,9 +18,8 @@ class FilterGroupsBloc extends Bloc<FilterGroupsEvent, FilterGroupsState> {
   get initialState => FilterGroupsInProgress();
 
   @override
-  Stream<FilterGroupsEvent> transform(Stream<FilterGroupsEvent> events) {
-    return (events as Observable<FilterGroupsEvent>)
-        .debounce(Duration(milliseconds: 500));
+  Stream<FilterGroupsState> transformStates(Stream<FilterGroupsState> states) {
+    return states.debounceTime(Duration(milliseconds: 50));
   }
 
   @override
@@ -54,32 +52,36 @@ class FilterGroupsBloc extends Bloc<FilterGroupsEvent, FilterGroupsState> {
   Future<List<FilterGroup>> _fetchFilterGroups(String userToken) async {
     final url = '${settings.backendUrl}/GroupFilter/$userToken';
     final response = await restClient.get(url);
-    final Iterable<dynamic> body = json.decode(response.body);
-    final getActiveFilterGroupsForLevelCached =
-        memo2(_getActiveFilterGroupsForLevel);
+    final body =
+        List<Map<String, dynamic>>.from(json.decode(response.body) as List);
+    // final getActiveFilterGroupsForLevelCached =
+    //     memo2(_getActiveFilterGroupsForLevel);
 
-    final futures = body.map((filterGroup) {
-      final group = FilterGroup.fromJson(filterGroup);
+    // final futures = body.map((filterGroup) {
+    //   final group = FilterGroup.fromJson(filterGroup);
 
-      return getActiveFilterGroupsForLevelCached(
-        group.levelNumber,
-        userToken,
-      ).then((filterGroupsForLevel) {
-        final isActive = filterGroupsForLevel.contains(group.name);
+    //   return getActiveFilterGroupsForLevelCached(
+    //     group.levelNumber,
+    //     userToken,
+    //   ).then((filterGroupsForLevel) {
+    //     final isActive = filterGroupsForLevel.contains(group.name);
 
-        return group.copyWith(isActive: isActive);
-      });
+    //     return group.copyWith(isActive: isActive);
+    //   });
 
-      //return Future.value(group.copyWith(isActive: group.name == 'alfred'));
-    });
+    //   //return Future.value(group.copyWith(isActive: group.name == 'alfred'));
+    // });
 
-    final filterGroups = await Future.wait(futures);
+    // final filterGroups = await Future.wait(futures);
 
-    filterGroups.sort((group1, group2) {
-      return group1.levelNumber < group2.levelNumber
-          ? -1
-          : (group1.levelNumber > group2.levelNumber ? 1 : 0);
-    });
+    final filterGroups =
+        body.map((filterGroup) => FilterGroup.fromJson(filterGroup)).toList();
+
+    // filterGroups.sort((group1, group2) {
+    //   return group1.levelNumber < group2.levelNumber
+    //       ? -1
+    //       : (group1.levelNumber > group2.levelNumber ? 1 : 0);
+    // });
 
     return filterGroups;
   }
@@ -90,7 +92,7 @@ class FilterGroupsBloc extends Bloc<FilterGroupsEvent, FilterGroupsState> {
         '${settings.backendUrl}/GetActiveGroupFilter/$userToken/$levelNumber';
     final String response = await restClient.get(url) as String;
 
-    return response?.split('|') ?? '';
+    return response?.split('|') ?? [];
   }
 
   Future<void> _saveSelectedFilterGroup(

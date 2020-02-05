@@ -11,10 +11,10 @@ class Project extends Equatable {
 
   factory Project.fromJson(Map<String, dynamic> json) {
     return Project(
-      name: json['Name'],
-      templateGuid: json['TemplateGUID'],
-      luisId: json['LuisID'],
-      templateName: json['TemplateName'],
+      name: json['Name'] as String,
+      templateGuid: json['TemplateGUID'] as String,
+      luisId: json['LuisID'] as String,
+      templateName: json['TemplateName'] as String,
     );
   }
 }

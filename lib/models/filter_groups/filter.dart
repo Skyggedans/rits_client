@@ -14,8 +14,8 @@ class Filter extends Equatable {
 
   factory Filter.fromJson(Map<String, dynamic> json) {
     return Filter(
-      title: json['Title'],
-      isSelected: json['IsSelected'],
+      title: json['Title'] as String,
+      isSelected: json['IsSelected'] as bool,
     );
   }
 

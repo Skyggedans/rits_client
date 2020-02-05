@@ -17,10 +17,9 @@ class ViewObjectParametersBloc
   ViewObjectParametersBloc({@required this.restClient});
 
   @override
-  Stream<ViewObjectParametersEvent> transform(
-      Stream<ViewObjectParametersEvent> events) {
-    return (events as Observable<ViewObjectParametersEvent>)
-        .debounce(Duration(milliseconds: 500));
+  Stream<ViewObjectParametersState> transformStates(
+      Stream<ViewObjectParametersState> states) {
+    return states.debounceTime(Duration(milliseconds: 50));
   }
 
   @override
@@ -50,10 +49,13 @@ class ViewObjectParametersBloc
       try {
         await _saveViewObjectParam(
             event.viewObject, event.parameter, event.userToken);
-        this.dispatch(FetchViewObjectParameters(
+
+        final e = FetchViewObjectParameters(
           viewObject: event.viewObject,
           userToken: event.userToken,
-        ));
+        );
+
+        this.add(e);
       } on ApiError {
         yield ViewObjectParametersError();
       }
@@ -65,9 +67,10 @@ class ViewObjectParametersBloc
     final url =
         '${settings.backendUrl}/GetViewElementParameter/$userToken/${Uri.encodeFull(viewObject.name)}/${viewObject.itemType}';
     final response = await restClient.get(url);
-    final List body = json.decode(response.body);
+    final body =
+        List<Map<String, dynamic>>.from(json.decode(response.body) as List);
 
-    List<ViewObjectParameter> allParams = body.map((param) {
+    var allParams = body.map((param) {
       return ViewObjectParameter.fromJson(param);
     }).toList();
 
@@ -98,7 +101,7 @@ class ViewObjectParametersBloc
   Future<void> _saveViewObjectParam(ViewObject viewObject,
       ViewObjectParameter param, String userToken) async {
     final paramJson = param.toJson();
-    final name = Uri.encodeFull(paramJson['ParameterName']);
+    final name = Uri.encodeFull(paramJson['ParameterName'] as String);
 
     if (param.value is List<Option>) {
       final url =
@@ -107,7 +110,7 @@ class ViewObjectParametersBloc
       await restClient.post(url,
           body: json.encode(paramJson['ParameterValue']));
     } else {
-      final value = Uri.encodeFull(paramJson['ParameterValue']);
+      final value = Uri.encodeFull(paramJson['ParameterValue'] as String);
       final url =
           '${settings.backendUrl}/SetParameterValue/$userToken/$name/$value';
 

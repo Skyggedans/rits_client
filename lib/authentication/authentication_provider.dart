@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -23,21 +24,29 @@ class AuthProvider {
 
   AuthProvider._internal();
 
-  initDb() async {
-    final documentsDirectory = await getApplicationDocumentsDirectory();
-    final path = join(documentsDirectory.path, _dbFile);
+  Future<Database> initDb() async {
+    try {
+      final documentsDirectory = await getApplicationDocumentsDirectory();
+      final path = join(documentsDirectory.path, _dbFile);
 
-    return await openDatabase(path, version: 1, onCreate: _onCreate);
+      return await openDatabase(path, version: 1, onCreate: _onCreate);
+    } on MissingPluginException {
+      return null;
+    }
   }
 
   Future<String> deleteDb() async {
-    final documentsDirectory = await getApplicationDocumentsDirectory();
-    final path = join(documentsDirectory.path, _dbFile);
+    try {
+      final documentsDirectory = await getApplicationDocumentsDirectory();
+      final path = join(documentsDirectory.path, _dbFile);
 
-    await deleteDatabase(path);
-    _db = null;
+      await deleteDatabase(path);
+      _db = null;
 
-    return path;
+      return path;
+    } on MissingPluginException {
+      return null;
+    }
   }
 
   void _onCreate(Database db, int version) async {
@@ -49,22 +58,22 @@ class AuthProvider {
 
   Future<Map<String, dynamic>> getAuth() async {
     final dbClient = await db;
-    final result = await dbClient.query('Auth', limit: 1);
+    final result = await dbClient?.query('Auth', limit: 1);
 
-    return result.isEmpty ? null : result.first;
+    return result != null && result.isEmpty ? result.first : null;
   }
 
   Future<int> saveAuth(Map<String, dynamic> auth) async {
     final dbClient = await db;
 
-    await dbClient.delete('Auth');
+    await dbClient?.delete('Auth');
 
-    return await dbClient.insert('Auth', auth);
+    return await dbClient?.insert('Auth', auth);
   }
 
   Future<void> deleteAuth() async {
     final dbClient = await db;
 
-    await dbClient.delete('Auth');
+    await dbClient?.delete('Auth');
   }
 }

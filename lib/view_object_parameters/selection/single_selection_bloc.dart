@@ -16,9 +16,8 @@ class SingleSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
   SingleSelectionBloc({@required this.restClient});
 
   @override
-  Stream<SelectionEvent> transform(Stream<SelectionEvent> events) {
-    return (events as Observable<SelectionEvent>)
-        .debounce(Duration(milliseconds: 500));
+  Stream<SelectionState> transformStates(Stream<SelectionState> states) {
+    return states.debounceTime(Duration(milliseconds: 50));
   }
 
   @override
@@ -39,7 +38,7 @@ class SingleSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
       }
     } else if (event is UpdateSelection) {
       yield SelectionOptionsLoaded(
-        options: (currentState as SelectionOptionsLoaded<dynamic>).options,
+        options: (state as SelectionOptionsLoaded<dynamic>).options,
         selection: event.option,
       );
     }
@@ -52,11 +51,11 @@ class SingleSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
 
     final response = await restClient.get(url);
 
-    final List body = json.decode(response.body);
+    final body = json.decode(response.body) as List;
 
     if (param.dataType == 'number') {
       return body.map((option) {
-        return double.tryParse(option);
+        return double.tryParse(option as String);
       }).toList();
     } else {
       return body.map((option) {

@@ -30,7 +30,8 @@ class ChartScreen extends ViewObjectScreen {
 
 class _ChartScreenState
     extends ViewObjectScreenState<ChartBloc, ChartPresentation> {
-  ChartBloc viewObjectBloc = ChartBloc();
+  // ignore: close_sinks
+  final viewObjectBloc = ChartBloc();
 
   AuthRepository get _authRepository => (widget as ChartScreen).authRepository;
 

@@ -26,12 +26,6 @@ class _InputDropdown extends StatelessWidget {
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: labelText,
-          helperText: helperText,
-
-          helperStyle: TextStyle(
-            fontSize: 1,
-            color: Color.fromARGB(0, 0, 0, 0),
-          )
         ),
         baseStyle: valueStyle,
         child: Row(
@@ -39,8 +33,11 @@ class _InputDropdown extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(valueText, style: valueStyle),
-            Icon(Icons.arrow_drop_down,
-              color: Theme.of(context).brightness == Brightness.light ? Colors.grey.shade700 : Colors.white70,
+            Icon(
+              Icons.arrow_drop_down,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Colors.grey.shade700
+                  : Colors.white70,
             ),
           ],
         ),
@@ -84,8 +81,7 @@ class DateTimePicker extends StatelessWidget {
       context: context,
       initialTime: selectedTime,
     );
-    if (picked != null && picked != selectedTime)
-      selectTime(picked);
+    if (picked != null && picked != selectedTime) selectTime(picked);
   }
 
   @override
@@ -96,19 +92,15 @@ class DateTimePicker extends StatelessWidget {
 //      children: <Widget>[
 //        Expanded(
 //          flex: 4,
-          return Semantics(
-            label: labelText,
-            hint: helperText,
-            textField: true,
 
-            child: _InputDropdown(
-              labelText: labelText,
-              helperText: helperText,
-              valueText: DateFormat.yMd().format(selectedDate),
-              valueStyle: valueStyle,
-              onPressed: () { _selectDate(context); },
-            )
-          );
+    return _InputDropdown(
+      labelText: labelText,
+      valueText: DateFormat.yMd().format(selectedDate),
+      valueStyle: valueStyle,
+      onPressed: () {
+        _selectDate(context);
+      },
+    );
 //        ),
 //        const SizedBox(width: 12.0),
 //        Expanded(

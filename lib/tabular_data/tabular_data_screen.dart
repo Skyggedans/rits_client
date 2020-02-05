@@ -30,13 +30,14 @@ class TabularDataScreen extends ViewObjectScreen {
 
 class _TabularDataScreenState
     extends ViewObjectScreenState<TabularDataBloc, TabularDataGenerated> {
-  TabularDataBloc viewObjectBloc = TabularDataBloc();
+  // ignore: close_sinks
+  final viewObjectBloc = TabularDataBloc();
 
   @override
   Widget buildOutputWidget(BuildContext context, TabularDataGenerated state) {
-    final rows = state.data;
+    final rows = List<Map<String, dynamic>>.from(state.data);
 
-    if (rows.length > 0) {
+    if (rows.isNotEmpty) {
       final List<String> columns = rows[0].keys.toList();
 
       return Column(
@@ -63,7 +64,7 @@ class _TabularDataScreenState
                 );
               },
               itemBuilder: (context, index) {
-                final Map<String, dynamic> row = rows[index];
+                final row = rows[index];
 
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.center,

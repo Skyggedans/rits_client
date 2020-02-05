@@ -19,9 +19,10 @@ class AuthRepository {
     final auth = await authProvider.getAuth();
 
     if (auth != null) {
-      _accessToken = auth['access_token'];
-      _refreshToken = auth['refresh_token'];
-      _expiresAt = DateTime.fromMillisecondsSinceEpoch(auth['expires_at']);
+      _accessToken = auth['access_token'] as String;
+      _refreshToken = auth['refresh_token'] as String;
+      _expiresAt =
+          DateTime.fromMillisecondsSinceEpoch(auth['expires_at'] as int);
     }
   }
 

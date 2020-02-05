@@ -29,7 +29,7 @@ class _LuisScreenState extends State<LuisScreen> {
   @override
   void initState() {
     super.initState();
-    _luisBloc.dispatch(LoadLuisProject(_project, _userToken));
+    _luisBloc.add(LoadLuisProject(_project, _userToken));
   }
 
   @override
@@ -57,7 +57,7 @@ class _LuisScreenState extends State<LuisScreen> {
                   ),
                 ),
                 onFieldSubmitted: (text) {
-                  _luisBloc.dispatch(ExecuteUtterance(
+                  _luisBloc.add(ExecuteUtterance(
                     utteranceText: text,
                     luisProjectId: state.luisProjectId,
                     userToken: state.userToken,
@@ -75,17 +75,11 @@ class _LuisScreenState extends State<LuisScreen> {
                 child: Text(state.url),
               );
             }
-          } else if (state is LuisError) {
-            return const Text('Failed to start LUIS');
           }
+
+          return const Text('Failed to start LUIS');
         },
       )),
     );
-  }
-
-  @override
-  void dispose() {
-    _luisBloc.dispose();
-    super.dispose();
   }
 }

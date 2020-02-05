@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:rits_client/app_config.dart';
 import 'package:rw_help/rw_help.dart';
 
 import '../utils/utils.dart';
@@ -32,7 +33,7 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
   @override
   void initState() {
     super.initState();
-    _matchingItemsSearchBloc.dispatch(SearchMatchingItems(
+    _matchingItemsSearchBloc.add(SearchMatchingItems(
       searchString: _searchString,
       userToken: _userToken,
     ));
@@ -42,7 +43,7 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Searching for \'${_searchString}\''),
+        title: Text('Searching for \'$_searchString\''),
       ),
       body: Center(
         child: BlocBuilder(
@@ -55,6 +56,8 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
             } else if (state is MatchingItemsError) {
               return Text(state.message);
             }
+
+            return const Text('Unable to fetch results');
           },
         ),
       ),
@@ -63,13 +66,16 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
 
   Widget _buildItems(BuildContext context, MatchingItemsLoaded state) {
     final items = state.items;
+    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
 
-    if (items.length > 0) {
-      final itemRange = items.length == 1 ? '1' : '1-${items.length}';
+    if (isRealWearDevice) {
+      if (items.length > 0) {
+        final itemRange = items.length == 1 ? '1' : '1-${items.length}';
 
-      RwHelp.setCommands(['Say "Select Result ${itemRange}"']);
-    } else {
-      RwHelp.setCommands([]);
+        RwHelp.setCommands(['Say "Select Result $itemRange"']);
+      } else {
+        RwHelp.setCommands([]);
+      }
     }
 
     return ListView.builder(
@@ -100,7 +106,12 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
 
   @override
   void dispose() {
-    RwHelp.setCommands([]);
+    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+
+    if (isRealWearDevice) {
+      RwHelp.setCommands([]);
+    }
+
     super.dispose();
   }
 }

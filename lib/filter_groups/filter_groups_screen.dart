@@ -27,7 +27,7 @@ class _FilterGroupsScreenState extends State<FilterGroupsScreen> {
   @override
   void initState() {
     super.initState();
-    _filterGroupsBloc.dispatch(FetchFilterGroups(userToken: _userToken));
+    _filterGroupsBloc.add(FetchFilterGroups(userToken: _userToken));
   }
 
   @override
@@ -47,6 +47,8 @@ class _FilterGroupsScreenState extends State<FilterGroupsScreen> {
             } else if (state is FilterGroupsError) {
               return Text(state.message);
             }
+
+            return const Text('Unable to fetch filter groups');
           },
         ),
       ),
@@ -84,7 +86,7 @@ class _FilterGroupsScreenState extends State<FilterGroupsScreen> {
               child: ListTile(
                 title: Text(levelTitle),
                 subtitle: Text(levelGroups
-                    .where((filterGroup) => filterGroup.isActive)
+                    //.where((filterGroup) => filterGroup.isActive)
                     .map((filterGroup) => filterGroup.name)
                     .join(', ')),
               ),
@@ -106,19 +108,13 @@ class _FilterGroupsScreenState extends State<FilterGroupsScreen> {
           filterGroups: levelGroups,
         ),
       ),
-    );
+    ) as FilterGroup;
 
     if (selectedFilterGroup != null) {
-      _filterGroupsBloc.dispatch(SaveSelectedFilterGroup(
+      _filterGroupsBloc.add(SaveSelectedFilterGroup(
         filterGroup: selectedFilterGroup,
         userToken: _userToken,
       ));
     }
-  }
-
-  @override
-  void dispose() {
-    _filterGroupsBloc.dispose();
-    super.dispose();
   }
 }

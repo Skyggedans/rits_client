@@ -13,8 +13,8 @@ class AssociatedDataContainer extends Equatable {
 
   factory AssociatedDataContainer.fromJson(Map<String, dynamic> json) {
     return AssociatedDataContainer(
-      id: json['AssociatedHeaderID'],
-      name: json['AssociatedHeaderName'],
+      id: json['AssociatedHeaderID'] as int,
+      name: json['AssociatedHeaderName'] as String,
     );
   }
 

@@ -21,7 +21,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   @override
   void initState() {
     super.initState();
-    _projectsBloc.dispatch(FetchProjects());
+    _projectsBloc.add(FetchProjects());
   }
 
   @override
@@ -32,39 +32,32 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       ),
       body: Center(
           child: BlocBuilder(
-            bloc: _projectsBloc,
-            builder: (BuildContext context, ProjectsState state) {
-              if (state is ProjectsUninitialized) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              else if (state is ProjectsLoaded) {
-                return BlocProvider(
-                  bloc: _projectsBloc,
-                  child: _ProjectButtons(),
-                );
-              }
-              else if (state is ProjectsError) {
-                return Center(
-                  child: Text('Failed to fetch projects'),
-                );
-              }
-            },
-          )),
-    );
-  }
+        bloc: _projectsBloc,
+        builder: (BuildContext context, ProjectsState state) {
+          if (state is ProjectsUninitialized) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (state is ProjectsLoaded) {
+            return BlocProvider(
+              create: (context) => _projectsBloc,
+              child: _ProjectButtons(),
+            );
+          }
 
-  @override
-  void dispose() {
-    _projectsBloc.dispose();
-    super.dispose();
+          return const Center(
+            child: const Text('Failed to fetch projects'),
+          );
+        },
+      )),
+    );
   }
 }
 
 class _ProjectButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // ignore: close_sinks
     final _projectsBloc = BlocProvider.of<ProjectsBloc>(context);
 
     return BlocBuilder(

@@ -8,8 +8,8 @@ class BusinessObject extends ViewObject {
 
   factory BusinessObject.fromJson(Map<String, dynamic> json) {
     return BusinessObject(
-      id: json['BusinessObjectID'],
-      name: json['BoName'],
+      id: json['BusinessObjectID'] as int,
+      name: json['BoName'] as String,
     );
   }
 

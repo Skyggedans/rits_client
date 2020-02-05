@@ -3,10 +3,10 @@ import 'package:equatable/equatable.dart';
 class Kpi extends Equatable {
   final String group;
   final String name;
-  final dynamic value;
-  final dynamic previousValue;
-  final dynamic targetValue;
-  final dynamic valueChange;
+  final num value;
+  final num previousValue;
+  final num targetValue;
+  final num valueChange;
   final String chartName;
   final String image;
   final int indicator;
@@ -47,19 +47,19 @@ class Kpi extends Equatable {
 
   factory Kpi.fromJson(Map<String, dynamic> json) {
     return Kpi(
-      group: json['KpiGroup'],
-      name: json['KpiName'],
-      value: json['Value'],
-      previousValue: json['PreviousValue'],
-      targetValue: json['TargetValue'],
-      valueChange: json['ValueChange'],
-      chartName: json['ChartName'],
-      image: json['KPIImage'],
-      indicator: json['KPIIndicator'],
+      group: json['KpiGroup'] as String,
+      name: json['KpiName'] as String,
+      value: json['Value'] as num,
+      previousValue: json['PreviousValue'] as num,
+      targetValue: json['TargetValue'] as num,
+      valueChange: json['ValueChange'] as num,
+      chartName: json['ChartName'] as String,
+      image: json['KPIImage'] as String,
+      indicator: json['KPIIndicator'] as int,
       extraData1: json['ColumnKPIExtraData1'],
       extraData2: json['ColumnKPIExtraData2'],
-      userText1: json['ColumnKPIUserText1'],
-      userText2: json['ColumnKPIUserText2'],
+      userText1: json['ColumnKPIUserText1'] as String,
+      userText2: json['ColumnKPIUserText2'] as String,
     );
   }
 }

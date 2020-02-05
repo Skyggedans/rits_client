@@ -1,16 +1,22 @@
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rits_client/app_config.dart';
+import 'package:logging/logging.dart';
+import 'package:logging_appenders/logging_appenders.dart';
+import 'package:path/path.dart' as path;
 
 import 'authentication/authentication.dart';
 import 'projects/projects.dart';
 import 'routes.dart';
 import 'splash/splash.dart';
 import 'utils/rest_client.dart';
+
+final _logger = Logger('main');
 
 class _HttpOverrides extends HttpOverrides {
   @override
@@ -23,14 +29,23 @@ class _HttpOverrides extends HttpOverrides {
 }
 
 main() {
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
+  }
+
   final authRepository = AuthRepository(authProvider: AuthProvider());
 
   HttpOverrides.global = _HttpOverrides();
   RestClient(authRepository: authRepository);
 
-  // RwSpeechRecognizer.setCommands(<String>['Test'], (command) {
-  //   command;
-  // });
+  Logger.root.level = Level.ALL;
+  PrintAppender()..attachToLogger(Logger.root);
+
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    RotatingFileAppender(
+        baseFilePath: path.join(Directory.current.path, 'logs', 'rits.log'))
+      ..attachToLogger(Logger.root);
+  }
 
   runApp(
     AppConfig(
@@ -52,7 +67,7 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
   AuthenticationBloc _authenticationBloc;
 
   _RitsAppState() {
-    BlocSupervisor().delegate = this;
+    BlocSupervisor.delegate = this;
   }
 
   AuthRepository get _authRepository => widget.authRepository;
@@ -62,26 +77,20 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
     _authenticationBloc = AuthenticationBloc(authRepository: _authRepository);
 
     Future.delayed(Duration(seconds: 3), () {
-      _authenticationBloc.dispatch(AppStarted());
+      _authenticationBloc.add(AppStarted());
     });
 
     super.initState();
   }
 
   @override
-  void dispose() {
-    _authenticationBloc.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return BlocProvider<AuthenticationBloc>(
-      bloc: _authenticationBloc,
+      create: (context) => _authenticationBloc,
       child: MaterialApp(
         //showSemanticsDebugger: true,
         routes: Routes.get(authRepository: _authRepository),
-        home: BlocBuilder<AuthenticationEvent, AuthenticationState>(
+        home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           bloc: _authenticationBloc,
           builder: (BuildContext context, AuthenticationState state) {
             if (state is AuthenticationUninitialized) {
@@ -119,16 +128,20 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
   }
 
   @override
-  void onTransition(Transition transition) {
-    print(transition);
+  void onEvent(Bloc bloc, Object event) {
+    super.onEvent(bloc, event);
+    _logger.info(event);
   }
 
   @override
-  void onError(Object error, StackTrace stacktrace) {
-    print(error);
+  void onTransition(Bloc bloc, Transition transition) {
+    super.onTransition(bloc, transition);
+    _logger.info(transition);
+  }
 
-    if (error is AccessDeniedError) {
-      _authenticationBloc.dispatch(AccessTokenExpired());
-    }
+  @override
+  void onError(Bloc bloc, Object error, StackTrace stacktrace) {
+    super.onError(bloc, error, stacktrace);
+    _logger.severe('$error, $stacktrace');
   }
 }
