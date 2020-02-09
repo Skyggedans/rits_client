@@ -10,8 +10,15 @@ Card buildKpiCard(Kpi kpi) {
   var color = 'green';
   var direction = 'up';
 
-  if (kpi.previousValue != null) {
-    if (kpi.previousValue > kpi.value) {
+  if (kpi.previousValue != null &&
+      kpi.previousValue is Comparable &&
+      kpi.value is Comparable) {
+    if ((kpi.previousValue as Comparable).compareTo(kpi.value as Comparable) >
+        0) {
+      direction = 'down';
+    } else if ((kpi.previousValue as Comparable)
+            .compareTo(kpi.value as Comparable) <
+        0) {
       direction = 'down';
     } else if (kpi.previousValue == kpi.value) {
       direction = 'neutral';
@@ -28,9 +35,8 @@ Card buildKpiCard(Kpi kpi) {
     }
   }
 
-  final targetText = kpi.targetValue != null && kpi.targetValue > 0
-      ? ', Target: ${kpi.targetValue}'
-      : null;
+  final targetText =
+      kpi.targetValue != null ? ', Target: ${kpi.targetValue}' : null;
 
   final userText1 =
       kpi.userText1 != null ? '\n${kpi.userText1}: ${kpi.extraData1}' : null;
@@ -46,10 +52,12 @@ Card buildKpiCard(Kpi kpi) {
         height: 90,
       ),
       title: Text(kpi.name),
-      subtitle: Text('Value: ${kpi.value}' +
-          (targetText != null ? targetText : '') +
-          (userText1 != null ? userText1 : '') +
-          (userText2 != null ? userText2 : '')),
+      subtitle: kpi.value != null && kpi.value != ''
+          ? Text('Value: ${kpi.value}' +
+              (targetText != null ? targetText : '') +
+              (userText1 != null ? userText1 : '') +
+              (userText2 != null ? userText2 : ''))
+          : null,
     ),
   );
 }
@@ -72,14 +80,13 @@ class KpiScreen extends ViewObjectScreen {
 }
 
 class _KpiScreenState extends ViewObjectScreenState<KpiBloc, KpiGenerated> {
-  // ignore: close_sinks
   final viewObjectBloc = KpiBloc();
 
   @override
   Widget buildOutputWidget(BuildContext context, KpiGenerated state) {
     final kpis = state.kpis;
 
-    if (kpis.length > 0) {
+    if (kpis.isNotEmpty) {
       return ListView.builder(
         padding: const EdgeInsets.all(10.0),
         itemCount: kpis.length,

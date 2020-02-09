@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
+import 'package:rits_client/models/kpi/kpi.dart';
 
 @immutable
 abstract class LuisState extends Equatable {
@@ -34,7 +35,16 @@ class UtteranceExecutedWithUrl extends LuisState {
   UtteranceExecutedWithUrl({@required this.url}) : super([url]);
 
   @override
-  String toString() => 'UtteranceExecuted { info: $url }';
+  String toString() => 'UtteranceExecutedWithUrl { info: $url }';
+}
+
+class UtteranceExecutedWithKpis extends LuisState {
+  final List<Kpi> kpis;
+
+  UtteranceExecutedWithKpis({@required this.kpis}) : super([kpis]);
+
+  @override
+  String toString() => 'UtteranceExecutedWithKpis { KPIs: $kpis.length }';
 }
 
 class LuisError extends LuisState {

@@ -26,7 +26,6 @@ class ReportScreen extends ViewObjectScreen {
 
 class _ReportScreenState
     extends ViewObjectScreenState<ReportBloc, ReportGenerated> {
-  // ignore: close_sinks
   final viewObjectBloc = ReportBloc();
 
   @override

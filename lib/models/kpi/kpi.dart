@@ -3,10 +3,10 @@ import 'package:equatable/equatable.dart';
 class Kpi extends Equatable {
   final String group;
   final String name;
-  final num value;
-  final num previousValue;
-  final num targetValue;
-  final num valueChange;
+  final dynamic value;
+  final dynamic previousValue;
+  final dynamic targetValue;
+  final dynamic valueChange;
   final String chartName;
   final String image;
   final int indicator;
@@ -46,13 +46,45 @@ class Kpi extends Equatable {
         ]);
 
   factory Kpi.fromJson(Map<String, dynamic> json) {
+    dynamic value = json['Value'] is num
+        ? json['Value']
+        : num.tryParse(json['Value'] as String ?? '');
+
+    if (value == null) {
+      value = DateTime.tryParse(json['Value'] as String ?? '');
+    }
+
+    dynamic previousValue = json['PreviousValue'] is num
+        ? json['PreviousValue']
+        : num.tryParse(json['PreviousValue'] as String ?? '');
+
+    if (previousValue == null) {
+      previousValue = DateTime.tryParse(json['PreviousValue'] as String ?? '');
+    }
+
+    dynamic targetValue = json['TargetValue'] is num
+        ? json['TargetValue']
+        : num.tryParse(json['TargetValue'] as String ?? '');
+
+    if (targetValue == null) {
+      targetValue = DateTime.tryParse(json['TargetValue'] as String ?? '');
+    }
+
+    dynamic valueChange = json['ValueChange'] is num
+        ? json['ValueChange']
+        : num.tryParse(json['ValueChange'] as String ?? '');
+
+    if (valueChange == null) {
+      valueChange = DateTime.tryParse(json['ValueChange'] as String ?? '');
+    }
+
     return Kpi(
       group: json['KpiGroup'] as String,
       name: json['KpiName'] as String,
-      value: json['Value'] as num,
-      previousValue: json['PreviousValue'] as num,
-      targetValue: json['TargetValue'] as num,
-      valueChange: json['ValueChange'] as num,
+      value: value ?? json['Value'],
+      previousValue: previousValue ?? json['PreviousValue'],
+      targetValue: targetValue ?? json['TargetValue'],
+      valueChange: valueChange ?? json['ValueChange'],
       chartName: json['ChartName'] as String,
       image: json['KPIImage'] as String,
       indicator: json['KPIIndicator'] as int,

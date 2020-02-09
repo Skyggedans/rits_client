@@ -13,6 +13,7 @@ class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
   final String type;
   final String userToken;
   final String hierarchyLevel;
+  final bool favorite;
   final ViewObjectsRepository viewObjectsRepository;
 
   ViewObjectsScreen({
@@ -24,6 +25,7 @@ class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
     this.type,
     this.viewObjectsRepository,
     this.hierarchyLevel,
+    this.favorite = false,
   })  : assert(project != null),
         assert(userToken != null),
         assert(detailsScreenRoute != null),
@@ -41,6 +43,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
   String get _type => widget.type;
   String get _userToken => widget.userToken;
   String get _hierarchyLevel => widget.hierarchyLevel;
+  bool get _favorite => widget.favorite;
 
   _ViewObjectsScreenState._({this.viewObjectsBloc});
 
@@ -60,6 +63,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
       type: _type,
       userToken: _userToken,
       hierarchyLevel: _hierarchyLevel,
+      favorite: _favorite,
     ));
   }
 
@@ -108,7 +112,7 @@ class _ViewObjectButtons extends StatelessWidget {
             return RaisedButton(
                 child: Text(viewObject.title ?? viewObject.name),
                 onPressed: () async {
-                  Navigator.pushNamed(
+                  await Navigator.pushNamed(
                     context,
                     screen.detailsScreenRoute,
                     arguments: {

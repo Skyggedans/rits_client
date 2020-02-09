@@ -6,9 +6,12 @@ import 'package:bloc/bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:oauth2/oauth2.dart';
+import 'package:logging/logging.dart';
 
 import '../settings.dart' as settings;
 import 'authentication.dart';
+
+final _logger = Logger('auth');
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
@@ -75,8 +78,8 @@ class AuthenticationBloc
     try {
       final response = await _requestUserAndDeviceCodes();
 
-      print(
-          'Authentication backend will be waiting for user code for ${response['expires_in']} seconds');
+      _logger.info(
+          'Authentication will await for user code for ${response['expires_in']} seconds');
 
       yield AuthenticationPending(
         userCode: response['user_code'] as String,
@@ -92,13 +95,14 @@ class AuthenticationBloc
         Duration(milliseconds: (response['interval'] as int) * 1000 + 100),
         (timer) async {
           try {
-            print('Requesting access token');
+            _logger.info('Requesting access token');
 
             final tokenResponse =
                 await _requestAccessToken(response['device_code'] as String);
 
             timer.cancel();
-            print('Access granted for ${tokenResponse['expires_in']} seconds');
+            _logger.info(
+                'Access granted for ${tokenResponse['expires_in']} seconds');
 
             await authRepository.persistTokens(
               tokenResponse['access_token'] as String,
@@ -110,30 +114,30 @@ class AuthenticationBloc
 
             add(AccessGranted());
           } on AuthorizationPendingError catch (e) {
-            print(e);
+            _logger.info(e);
           } on RateLimitExceededError catch (e) {
-            print(e);
+            _logger.info(e);
             // sleep(const Duration(seconds: 1));
           } on TokenExpiredError catch (e) {
             timer.cancel();
-            print(e);
+            _logger.info(e);
             //dispatch(Authenticate());
             add(AccessDenied(reason: e.toString()));
           } on AuthorizationException catch (e) {
             timer.cancel();
-            print(e);
+            _logger.info(e);
             add(AccessDenied(reason: e.toString()));
           }
 
           if (timer.isActive && DateTime.now().isAfter(stopPollingAt)) {
             timer.cancel();
-            print('Token aquisition expired');
+            _logger.info('Token aquisition expired');
             add(Authenticate());
           }
         },
       );
     } on RateLimitExceededError catch (e) {
-      print(e);
+      _logger.info(e);
 
       Future.delayed(const Duration(seconds: 1), () {
         add(Authenticate());

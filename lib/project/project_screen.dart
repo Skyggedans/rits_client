@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rits_client/filter_groups/filter_groups_screen.dart';
+import 'package:rits_client/my_favorites/my_favorites_screen.dart';
 
 import '../app_config.dart';
 import '../associated_data_item/associated_data_item.dart';
@@ -31,8 +32,15 @@ class ProjectScreen extends StatefulWidget {
 
 class _ProjectScreenState extends State<ProjectScreen> {
   final ProjectBloc _projectBloc = ProjectBloc(restClient: RestClient());
+  bool isRealWearDevice;
 
   Project get _project => widget.project;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+  }
 
   @override
   void initState() {
@@ -42,8 +50,6 @@ class _ProjectScreenState extends State<ProjectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
-
     return BlocBuilder(
       bloc: _projectBloc,
       builder: (BuildContext context, ProjectState state) {
@@ -279,6 +285,20 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       );
                     },
                   ),
+                  RaisedButton(
+                    child: Text('Show My Favorites'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MyFavoritesScreen(
+                            userToken: state.userToken,
+                            project: _project,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ],
@@ -292,7 +312,10 @@ class _ProjectScreenState extends State<ProjectScreen> {
             title: Text(title),
             actions: actions,
           ),
-          body: Center(child: bodyChild),
+          body: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Center(child: bodyChild),
+          ),
         );
       },
     );

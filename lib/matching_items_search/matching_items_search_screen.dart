@@ -29,6 +29,13 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
 
   String get _searchString => widget.searchString;
   String get _userToken => widget.userToken;
+  bool isRealWearDevice;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+  }
 
   @override
   void initState() {
@@ -66,10 +73,9 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
 
   Widget _buildItems(BuildContext context, MatchingItemsLoaded state) {
     final items = state.items;
-    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
 
     if (isRealWearDevice) {
-      if (items.length > 0) {
+      if (items.isNotEmpty) {
         final itemRange = items.length == 1 ? '1' : '1-${items.length}';
 
         RwHelp.setCommands(['Say "Select Result $itemRange"']);
@@ -106,8 +112,6 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
 
   @override
   void dispose() {
-    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
-
     if (isRealWearDevice) {
       RwHelp.setCommands([]);
     }

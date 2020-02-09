@@ -13,13 +13,15 @@ class FetchViewObjects extends ViewObjectsEvent {
   final String type;
   final String userToken;
   final String hierarchyLevel;
+  final bool favorite;
 
   FetchViewObjects({
     @required this.project,
     @required this.type,
     @required this.userToken,
     this.hierarchyLevel,
-  }) : super([project, type, userToken, hierarchyLevel]);
+    this.favorite,
+  }) : super([project, type, userToken, hierarchyLevel, favorite]);
 
   @override
   String toString() => 'FetchViewObjects';

@@ -37,6 +37,13 @@ class AssociatedDataItemScreen extends ViewObjectScreen {
 class _AssociatedDataItemScreenState extends ViewObjectScreenState<
     AssociatedDataItemBloc, AssociatedDataItemGenerated> {
   AssociatedDataItemBloc viewObjectBloc = AssociatedDataItemBloc();
+  bool isRealWearDevice;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+  }
 
   @override
   void initState() {
@@ -46,8 +53,6 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
 
   @override
   Widget build(BuildContext context) {
-    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
-
     return BlocBuilder(
       bloc: viewObjectBloc,
       builder: (BuildContext context, ViewObjectState state) {
@@ -243,8 +248,6 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
 
   @override
   void dispose() {
-    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
-
     if (isRealWearDevice) {
       RwHelp.setCommands([]);
     }

@@ -268,7 +268,10 @@ class RestClient extends AbstractRestClient {
   }
 
   Map<String, String> _getHeaders() {
-    return {'Authorization': 'Bearer ${authRepository.accessToken}'};
+    return {
+      'Authorization': 'Bearer ${authRepository.accessToken}',
+      'Content-Type': 'application/json',
+    };
   }
 
   http.BaseResponse _handleResponse(http.BaseResponse response) {

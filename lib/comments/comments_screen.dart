@@ -46,8 +46,15 @@ class CommentsScreen extends StatefulWidget {
 
 class _CommentsScreenState extends State<CommentsScreen> {
   final _commentsBloc = CommentsBloc(restClient: RestClient());
+  bool isRealWearDevice;
 
   String get _userToken => widget.userToken;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+  }
 
   @override
   void initState() {
@@ -104,10 +111,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   Widget _buildComments(BuildContext context, CommentsLoaded state) {
     final comments = state.comments;
-    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
 
     if (isRealWearDevice) {
-      if (comments.length > 0) {
+      if (comments.isNotEmpty) {
         final commentsRange =
             comments.length == 1 ? '1' : '1-${comments.length}';
 
@@ -229,8 +235,6 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   @override
   void dispose() {
-    final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
-
     if (isRealWearDevice) {
       RwHelp.setCommands([]);
     }

@@ -6,7 +6,16 @@ abstract class ViewObjectState extends Equatable {
   ViewObjectState([List props = const []]) : super(props);
 }
 
+class ViewObjectUninitialized extends ViewObjectState {
+  @override
+  String toString() => 'ViewObjectUninitialized';
+}
+
 class ViewObjectIdle extends ViewObjectState {
+  final int favoriteId;
+
+  ViewObjectIdle({this.favoriteId}) : super([favoriteId]);
+
   @override
   String toString() => 'ViewObjectIdle';
 }
@@ -17,11 +26,6 @@ class ViewObjectGeneration extends ViewObjectState {
 }
 
 class ViewObjectGenerated extends ViewObjectState {
-  // final Uint8List bytes;
-  // final dynamic data;
-
-  // ViewObjectGenerated({this.bytes, this.data}) : super([bytes, data]);
-
   @override
   String toString() => 'ViewObjectGenerated';
 }
