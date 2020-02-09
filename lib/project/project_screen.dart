@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rits_client/filter_groups/filter_groups_screen.dart';
+import 'package:rits_client/my_favorites/my_favorites_screen.dart';
 
 import '../app_config.dart';
 import '../associated_data_item/associated_data_item.dart';
@@ -274,6 +275,20 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         MaterialPageRoute(
                           builder: (context) => FilterGroupsScreen(
                             userToken: state.userToken,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text('Show My Favorites'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MyFavoritesScreen(
+                            userToken: state.userToken,
+                            project: _project,
                           ),
                         ),
                       );

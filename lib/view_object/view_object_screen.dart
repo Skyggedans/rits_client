@@ -39,14 +39,12 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
           child: BlocBuilder(
             bloc: viewObjectBloc,
             builder: (BuildContext context, ViewObjectState state) {
-              if (state is ViewObjectGeneration) {
-                return CircularProgressIndicator();
-              } else if (state is S) {
-                return buildOutputWidget(context, state);
-              } else if (state is ViewObjectError) {
-                return const Text('Failed to generate view object');
-              } else {
-                return new Column(
+              if (state is ViewObjectUninitialized) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is ViewObjectIdle) {
+                return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       RaisedButton(
@@ -70,7 +68,29 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                           ));
                         },
                       ),
+                      RaisedButton(
+                        child: Text(state.favoriteId > 0
+                            ? 'Remove Favorite'
+                            : 'Add Favorite'),
+                        onPressed: () {
+                          state.favoriteId > 0
+                              ? viewObjectBloc.add(RemoveFavorite(
+                                  state.favoriteId,
+                                  userToken,
+                                ))
+                              : viewObjectBloc.add(AddFavorite(
+                                  viewObject,
+                                  userToken,
+                                ));
+                        },
+                      ),
                     ]);
+              } else if (state is ViewObjectGeneration) {
+                return CircularProgressIndicator();
+              } else if (state is S) {
+                return buildOutputWidget(context, state);
+              } else if (state is ViewObjectError) {
+                return const Text('Failed to generate view object');
               }
             },
           ),
@@ -79,12 +99,17 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
     );
   }
 
-  bool returnToMainScreen() =>
-      viewObjectBloc.state != viewObjectBloc.initialState;
+  bool returnToMainScreen() => !(viewObjectBloc.state is ViewObjectIdle);
+
+  @override
+  void initState() {
+    super.initState();
+    viewObjectBloc.add(GetFavoriteId(viewObject, userToken));
+  }
 
   Future<bool> _onBackPressed() async {
     if (returnToMainScreen()) {
-      viewObjectBloc.add(ReturnToViewObjectMainScreen());
+      viewObjectBloc.add(ReturnToViewObjectMainScreen(viewObject, userToken));
 
       return false;
     }

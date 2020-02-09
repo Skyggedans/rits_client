@@ -4,7 +4,7 @@ class Comment extends Equatable {
   final int id;
   final String text;
 
-  Comment({this.id, this.text: ''})
+  Comment({this.id, this.text = ''})
       : assert(text != null),
         super([id, text]);
 

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:rits_client/kpi/kpi.dart';
 
 import '../models/projects/projects.dart';
 import '../utils/rest_client.dart';
@@ -71,9 +72,19 @@ class _LuisScreenState extends State<LuisScreen> {
                 url: state.url,
               );
             } else {
-              return new Center(
-                child: Text(state.url),
+              return Text(state.url);
+            }
+          } else if (state is UtteranceExecutedWithKpis) {
+            if (state.kpis.isNotEmpty) {
+              return ListView.builder(
+                padding: const EdgeInsets.all(10.0),
+                itemCount: state.kpis.length,
+                itemBuilder: (context, index) {
+                  return buildKpiCard(state.kpis[index]);
+                },
               );
+            } else {
+              return const Text('No data');
             }
           }
 

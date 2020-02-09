@@ -69,7 +69,7 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
     final isRealWearDevice = AppConfig.of(context).isRealWearDevice;
 
     if (isRealWearDevice) {
-      if (items.length > 0) {
+      if (items.isNotEmpty) {
         final itemRange = items.length == 1 ? '1' : '1-${items.length}';
 
         RwHelp.setCommands(['Say "Select Result $itemRange"']);

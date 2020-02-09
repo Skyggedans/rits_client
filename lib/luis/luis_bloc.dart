@@ -3,8 +3,8 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart';
 import 'package:meta/meta.dart';
+import 'package:rits_client/models/kpi/kpi.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../models/projects/projects.dart';
@@ -49,6 +49,16 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
 
         if (response.containsKey('url')) {
           yield UtteranceExecutedWithUrl(url: response['url'] as String);
+        } else if (response.containsKey('ViewType') &&
+            response['ViewType']?.toString()?.toLowerCase() == 'kpis' &&
+            response.containsKey('ViewItemDetails')) {
+          final kpis = List<Map<String, dynamic>>.from(
+                  response['ViewItemDetails'] as List)
+              .map((kpiJson) {
+            return Kpi.fromJson(kpiJson);
+          }).toList();
+
+          yield UtteranceExecutedWithKpis(kpis: kpis);
         } else {
           yield UtteranceInput(
               luisProjectId: event.luisProjectId, userToken: event.userToken);
@@ -60,8 +70,15 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
   }
 
   Future<String> _getLuisProjectId(Project project) async {
-    final url = '${settings.luisConfig["host"]}/luis/api/v2.0/apps';
-    final response = await luisClient.get(url) as Response;
+    final luisKey = await _getLuisKey();
+    final url =
+        '${settings.luisConfig["host"]}/${settings.luisConfig["path"]}/apps';
+
+    final response = await restClient.get(url, headers: {
+      'Content-Type': 'application/json',
+      'Ocp-Apim-Subscription-Key': luisKey
+    });
+
     final projects =
         List<Map<String, dynamic>>.from(json.decode(response.body) as List);
 
@@ -69,6 +86,14 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
         orElse: () => null);
 
     return luisProject != null ? luisProject['id'] as String : null;
+  }
+
+  Future<String> _getLuisKey() async {
+    final url = '${settings.luisUrl}/GetLuisKey';
+    final response = await restClient.get(url);
+    final body = Map<String, dynamic>.from(json.decode(response.body) as Map);
+
+    return body['key'] as String;
   }
 
   Future<Map<String, dynamic>> _executeUtterance(

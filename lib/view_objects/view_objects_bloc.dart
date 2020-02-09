@@ -26,14 +26,20 @@ class ViewObjectsBloc extends Bloc<ViewObjectsEvent, ViewObjectsState> {
     if (event is FetchViewObjects) {
       try {
         if (state is ViewObjectsUninitialized) {
-          final viewObjects = event.hierarchyLevel?.isNotEmpty == true
-              ? await viewObjectsRepository.fetchHierarchyViewObjects(
-                  event.project,
-                  event.type,
-                  event.hierarchyLevel,
-                  event.userToken,
-                )
-              : await viewObjectsRepository.fetchViewObjects(
+          final viewObjects = !event.favorite
+              ? (event.hierarchyLevel?.isNotEmpty == true
+                  ? await viewObjectsRepository.fetchHierarchyViewObjects(
+                      event.project,
+                      event.type,
+                      event.hierarchyLevel,
+                      event.userToken,
+                    )
+                  : await viewObjectsRepository.fetchViewObjects(
+                      event.project,
+                      event.type,
+                      event.userToken,
+                    ))
+              : await viewObjectsRepository.fetchFavoriteViewObjects(
                   event.project,
                   event.type,
                   event.userToken,
