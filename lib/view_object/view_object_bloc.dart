@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:meta/meta.dart';
+import 'package:rits_client/app_context.dart';
 import 'package:rits_client/models/view_objects/view_object.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:bloc/bloc.dart';
@@ -12,8 +13,12 @@ import 'view_object.dart';
 
 abstract class ViewObjectBloc extends Bloc<ViewObjectEvent, ViewObjectState> {
   final RestClient restClient;
+  final AppContext appContext;
 
-  ViewObjectBloc({@required this.restClient}) : assert(restClient != null);
+  ViewObjectBloc({@required this.restClient, @required this.appContext})
+      : assert(restClient != null),
+        //assert(appContext != null),
+        super();
 
   @override
   get initialState => ViewObjectUninitialized();
@@ -67,7 +72,7 @@ abstract class ViewObjectBloc extends Bloc<ViewObjectEvent, ViewObjectState> {
 
   Future<bool> _addFavorite(String userToken, ViewObject viewObject) async {
     final url =
-        '${settings.backendUrl}/AddFavoriteReportItem/$userToken/${Uri.encodeFull(viewObject.name)}/${Uri.encodeFull(viewObject.itemType)}/${Uri.encodeFull(viewObject.hierarchyLevel)}';
+        '${settings.backendUrl}/AddFavoriteReportItem/$userToken/${Uri.encodeFull(viewObject.name)}/${Uri.encodeFull(viewObject.itemType)}/0';
     final response = await restClient.get(url);
 
     return (response.body ?? '') == 'true';

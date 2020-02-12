@@ -5,10 +5,12 @@ import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:rits_client/app_config.dart';
 import 'package:logging/logging.dart';
 import 'package:logging_appenders/logging_appenders.dart';
 import 'package:path/path.dart' as path;
+import 'package:rits_client/app_context.dart';
 
 import 'authentication/authentication.dart';
 import 'projects/projects.dart';
@@ -33,10 +35,8 @@ main() {
     debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
   }
 
-  final authRepository = AuthRepository(authProvider: AuthProvider());
-
+  Provider.debugCheckInvalidValueType = null;
   HttpOverrides.global = _HttpOverrides();
-  RestClient(authRepository: authRepository);
 
   Logger.root.level = Level.ALL;
   PrintAppender()..attachToLogger(Logger.root);
@@ -48,100 +48,127 @@ main() {
   }
 
   runApp(
-    AppConfig(
-      child: RitsApp(authRepository: authRepository),
+    MultiProvider(
+      providers: [
+        Provider<AppConfig>(
+          create: (_) => AppConfig(),
+        ),
+        InheritedProvider<AppContext>(
+          create: (_) => AppContext(),
+        ),
+        Provider<AuthProvider>(
+          create: (_) => AuthProvider(),
+        ),
+        ProxyProvider<AuthProvider, AuthRepository>(
+          update: (_, authProvider, __) =>
+              AuthRepository(authProvider: authProvider),
+        ),
+        ProxyProvider<AuthRepository, RestClient>(
+          update: (_, authRepository, __) =>
+              RestClient(authRepository: authRepository),
+        ),
+        ProxyProvider<AuthRepository, AuthenticationBloc>(
+          update: (_, authRepository, __) =>
+              AuthenticationBloc(authRepository: authRepository),
+          dispose: (_, bloc) => bloc.close(),
+        ),
+      ],
+      child: RitsApp(),
     ),
   );
 }
 
 class RitsApp extends StatefulWidget {
-  final AuthRepository authRepository;
-
-  RitsApp({Key key, @required this.authRepository}) : super(key: key);
+  RitsApp({Key key}) : super(key: key);
 
   @override
   State<RitsApp> createState() => _RitsAppState();
 }
 
 class _RitsAppState extends State<RitsApp> with BlocDelegate {
-  AuthenticationBloc _authenticationBloc;
-
   _RitsAppState() {
     BlocSupervisor.delegate = this;
   }
 
-  AuthRepository get _authRepository => widget.authRepository;
-
   @override
-  void initState() {
-    _authenticationBloc = AuthenticationBloc(authRepository: _authRepository);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final authenticationBloc = Provider.of<AuthenticationBloc>(context);
 
     Future.delayed(Duration(seconds: 3), () {
-      _authenticationBloc.add(AppStarted());
+      authenticationBloc.add(AppStarted());
     });
-
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<AuthenticationBloc>(
-      create: (context) => _authenticationBloc,
-      child: MaterialApp(
-        //showSemanticsDebugger: true,
-        routes: Routes.get(authRepository: _authRepository),
-        home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-          bloc: _authenticationBloc,
-          builder: (BuildContext context, AuthenticationState state) {
-            if (state is AuthenticationUninitialized) {
-              return SplashScreen();
-            } else if (state is AuthenticationPending) {
-              return AuthenticationUserCodeScreen(
-                verificationUrl: state.verificationUrl,
-                userCode: state.userCode,
-                expiresIn: state.expiresIn,
-              );
-            } else if (state is Authenticated) {
-              return ProjectsScreen();
-            } else if (state is AuthenticationFailed) {
-              return AuthenticationFailureScreen();
-            }
-          },
-        ),
-        theme: ThemeData(
-          brightness: Brightness.dark,
-          accentColor: Color(0xff1fe086),
-          buttonColor: Color(0xff1fe086),
-          textTheme: TextTheme(
-            body1: TextStyle(fontSize: 18.0),
-            body2: TextStyle(fontSize: 18.0),
-            subhead: TextStyle(fontSize: 18.0),
-            button: TextStyle(fontSize: 18.0),
-            caption: TextStyle(fontSize: 18.0),
+    return Consumer2<AuthRepository, AuthenticationBloc>(
+      builder: (context, authRepository, authenticationBloc, _) {
+        return MaterialApp(
+          //showSemanticsDebugger: true,
+          routes: Routes.get(authRepository: authRepository),
+          home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+            bloc: authenticationBloc,
+            builder: (BuildContext context, AuthenticationState state) {
+              if (state is AuthenticationUninitialized) {
+                return SplashScreen();
+              } else if (state is AuthenticationPending) {
+                return AuthenticationUserCodeScreen(
+                  verificationUrl: state.verificationUrl,
+                  userCode: state.userCode,
+                  expiresIn: state.expiresIn,
+                );
+              } else if (state is Authenticated) {
+                return ProxyProvider<RestClient, ProjectsBloc>(
+                  update: (_, restClient, __) =>
+                      ProjectsBloc(restClient: restClient),
+                  //..add(FetchProjects()),
+                  dispose: (_, bloc) => bloc.close(),
+                  child: ProjectsScreen(),
+                );
+              } else if (state is AuthenticationFailed) {
+                return AuthenticationFailureScreen();
+              }
+
+              return null;
+            },
           ),
-        ),
-        darkTheme: ThemeData(
-          brightness: Brightness.dark,
-        ),
-      ),
+          theme: ThemeData(
+            brightness: Brightness.dark,
+            accentColor: Color(0xff1fe086),
+            buttonColor: Color(0xff1fe086),
+            textTheme: TextTheme(
+              body1: TextStyle(fontSize: 18.0),
+              body2: TextStyle(fontSize: 18.0),
+              subhead: TextStyle(fontSize: 18.0),
+              button: TextStyle(fontSize: 18.0),
+              caption: TextStyle(fontSize: 18.0),
+            ),
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+          ),
+        );
+      },
     );
   }
 
   @override
   void onEvent(Bloc bloc, Object event) {
     super.onEvent(bloc, event);
-    _logger.info(event);
+    _logger.info('${bloc.runtimeType}: $event');
   }
 
   @override
   void onTransition(Bloc bloc, Transition transition) {
     super.onTransition(bloc, transition);
-    _logger.info(transition);
+    _logger.info('${bloc.runtimeType}: $transition');
   }
 
   @override
   void onError(Bloc bloc, Object error, StackTrace stacktrace) {
     super.onError(bloc, error, stacktrace);
-    _logger.severe('$error, $stacktrace');
+    _logger.severe('${bloc.runtimeType}: $error, $stacktrace');
   }
 }

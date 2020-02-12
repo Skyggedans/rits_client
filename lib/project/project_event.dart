@@ -18,56 +18,38 @@ class LoadProject extends ProjectEvent {
 }
 
 class ScanBarcode extends ProjectEvent {
-  final String userToken;
-
-  ScanBarcode({@required this.userToken})
-      : assert(userToken != null),
-        super([userToken]);
-
   @override
   String toString() => 'ScanBarcode';
 }
 
 class SetContextFromBarCode extends ProjectEvent {
-  final String context;
-  final String userToken;
+  final String sessionContext;
 
-  SetContextFromBarCode({@required this.context, @required this.userToken})
-      : assert(context != null),
-        assert(userToken != null),
-        super([context, userToken]);
+  SetContextFromBarCode({@required this.sessionContext})
+      : assert(sessionContext != null),
+        super([sessionContext]);
 
   @override
-  String toString() => 'SetContextFromString { context: $context }';
+  String toString() => 'SetContextFromString { context: $sessionContext }';
 }
 
 class SetContextFromSearch extends ProjectEvent {
-  final String context;
-  final String userToken;
+  final String sessionContext;
 
-  SetContextFromSearch({@required this.context, @required this.userToken})
-      : assert(context != null),
-        assert(userToken != null),
-        super([context, userToken]);
+  SetContextFromSearch({@required this.sessionContext})
+      : assert(sessionContext != null),
+        super([sessionContext]);
 
   @override
-  String toString() => 'SetContextFromSearch { context: $context }';
+  String toString() => 'SetContextFromSearch { context: $sessionContext }';
 }
 
 class TakePhoto extends ProjectEvent {
-  final String userToken;
-
-  TakePhoto({@required this.userToken}) : super([userToken]);
-
   @override
   String toString() => 'TakePhoto';
 }
 
 class RecordVideo extends ProjectEvent {
-  final String userToken;
-
-  RecordVideo({@required this.userToken}) : super([userToken]);
-
   @override
   String toString() => 'RecordVideo';
 }

@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:rits_client/app_context.dart';
 import 'package:rits_client/filter_groups/filter_groups_screen.dart';
 import 'package:rits_client/my_favorites/my_favorites_screen.dart';
 
@@ -14,7 +16,6 @@ import '../comments/comments_screen.dart';
 import '../kpi/kpi.dart';
 import '../luis/luis.dart';
 import '../matching_items_search/matching_items_search.dart';
-import '../models/projects/projects.dart';
 import '../report/report.dart';
 import '../tabular_data/tabular_data.dart';
 import '../utils/rest_client.dart';
@@ -22,47 +23,43 @@ import '../view_objects/view_objects.dart';
 import 'project.dart';
 
 class ProjectScreen extends StatefulWidget {
-  final Project project;
-
-  ProjectScreen({Key key, @required this.project}) : super(key: key);
+  ProjectScreen({Key key}) : super(key: key);
 
   @override
   State createState() => _ProjectScreenState();
 }
 
 class _ProjectScreenState extends State<ProjectScreen> {
-  final ProjectBloc _projectBloc = ProjectBloc(restClient: RestClient());
   bool isRealWearDevice;
-
-  Project get _project => widget.project;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    isRealWearDevice = AppConfig.of(context).isRealWearDevice;
-  }
+    isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
 
-  @override
-  void initState() {
-    super.initState();
-    _projectBloc.add(LoadProject(_project));
+    final appContext = Provider.of<AppContext>(context, listen: false);
+
+    Provider.of<ProjectBloc>(context).add(LoadProject(appContext.project));
   }
 
   @override
   Widget build(BuildContext context) {
+    final bloc = Provider.of<ProjectBloc>(context);
+
     return BlocBuilder(
-      bloc: _projectBloc,
+      bloc: bloc,
       builder: (BuildContext context, ProjectState state) {
-        String title = _project.name;
+        final appContext = Provider.of<AppContext>(context, listen: false);
+        String title = appContext.project.name;
         Widget bodyChild;
         List<Widget> actions;
 
         if (state is ProjectLoading) {
           bodyChild = CircularProgressIndicator();
         } else if (state is ProjectLoaded) {
-          title = state.context != null
-              ? '${_project.name} - ${state.context}'
-              : _project.name;
+          title = appContext.sessionContextName != null
+              ? '${appContext.project.name} - ${appContext.sessionContextName}'
+              : appContext.project.name;
 
           actions = <Widget>[
             Visibility(
@@ -83,7 +80,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 ),
                 //color: Colors.blue,
                 onPressed: () {
-                  _projectBloc.add(ScanBarcode(userToken: state.userToken));
+                  bloc.add(ScanBarcode());
                 },
               ),
             ),
@@ -105,15 +102,14 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       MaterialPageRoute(
                         builder: (context) => MatchingItemsSearchScreen(
                           searchString: value,
-                          userToken: state.userToken,
+                          userToken: appContext.userToken,
                         ),
                       ),
                     ) as String;
 
                     if (selectedContext != null) {
-                      _projectBloc.add(SetContextFromSearch(
-                        context: selectedContext,
-                        userToken: state.userToken,
+                      bloc.add(SetContextFromSearch(
+                        sessionContext: selectedContext,
                       ));
                     }
                   },
@@ -130,23 +126,24 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 spacing: 10,
                 children: <Widget>[
                   Visibility(
-                    visible: isRealWearDevice && state.hierarchyLevel != null,
+                    visible: isRealWearDevice &&
+                        appContext.sessionContextName != null,
                     maintainSize: false,
                     child: RaisedButton(
                       child: const Text('Take Photo'),
                       onPressed: () async {
-                        _projectBloc.add(TakePhoto(userToken: state.userToken));
+                        bloc.add(TakePhoto());
                       },
                     ),
                   ),
                   Visibility(
-                    visible: isRealWearDevice && state.hierarchyLevel != null,
+                    visible: isRealWearDevice &&
+                        appContext.sessionContextName != null,
                     maintainSize: false,
                     child: RaisedButton(
                       child: const Text('Record Video'),
                       onPressed: () async {
-                        _projectBloc
-                            .add(RecordVideo(userToken: state.userToken));
+                        bloc.add(RecordVideo());
                       },
                     ),
                   ),
@@ -157,8 +154,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => LuisScreen(
-                            project: _project,
-                            userToken: state.userToken,
+                            project: appContext.project,
+                            userToken: appContext.userToken,
                           ),
                         ),
                       );
@@ -171,11 +168,11 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ViewObjectsScreen(
-                            project: _project,
+                            project: appContext.project,
                             type: 'Reports',
                             detailsScreenRoute: ReportScreen.route,
-                            hierarchyLevel: state.hierarchyLevel,
-                            userToken: state.userToken,
+                            hierarchyLevel: appContext.sessionContextName,
+                            userToken: appContext.userToken,
                           ),
                         ),
                       );
@@ -188,11 +185,11 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ViewObjectsScreen(
-                            project: _project,
+                            project: appContext.project,
                             type: 'Charts',
                             detailsScreenRoute: ChartScreen.route,
-                            hierarchyLevel: state.hierarchyLevel,
-                            userToken: state.userToken,
+                            hierarchyLevel: appContext.sessionContextName,
+                            userToken: appContext.userToken,
                           ),
                         ),
                       );
@@ -205,12 +202,12 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ViewObjectsScreen(
-                            project: _project,
+                            project: appContext.project,
                             title: 'Tabular Data',
                             type: 'DataObjects',
                             detailsScreenRoute: TabularDataScreen.route,
-                            hierarchyLevel: state.hierarchyLevel,
-                            userToken: state.userToken,
+                            hierarchyLevel: appContext.sessionContextName,
+                            userToken: appContext.userToken,
                           ),
                         ),
                       );
@@ -223,18 +220,18 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ViewObjectsScreen(
-                            project: _project,
+                            project: appContext.project,
                             type: 'KPIs',
                             detailsScreenRoute: KpiScreen.route,
-                            hierarchyLevel: state.hierarchyLevel,
-                            userToken: state.userToken,
+                            hierarchyLevel: appContext.sessionContextName,
+                            userToken: appContext.userToken,
                           ),
                         ),
                       );
                     },
                   ),
                   Visibility(
-                    visible: state.hierarchyLevel != null,
+                    visible: appContext.sessionContextName != null,
                     child: RaisedButton(
                       child: const Text('Show Associated Data'),
                       onPressed: () {
@@ -242,14 +239,14 @@ class _ProjectScreenState extends State<ProjectScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ViewObjectsScreen(
-                              project: _project,
+                              project: appContext.project,
                               title: 'Associated Data',
                               detailsScreenRoute:
                                   AssociatedDataItemScreen.route,
                               viewObjectsRepository:
                                   AssociatedDataItemsRepository(
                                       restClient: RestClient()),
-                              userToken: state.userToken,
+                              userToken: appContext.userToken,
                             ),
                           ),
                         );
@@ -257,7 +254,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     ),
                   ),
                   Visibility(
-                    visible: state.hierarchyLevel != null,
+                    visible: appContext.sessionContextName != null,
                     child: RaisedButton(
                       child: const Text('Show Comments'),
                       onPressed: () {
@@ -265,7 +262,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => CommentsScreen(
-                              userToken: state.userToken,
+                              userToken: appContext.userToken,
                             ),
                           ),
                         );
@@ -279,7 +276,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => FilterGroupsScreen(
-                            userToken: state.userToken,
+                            userToken: appContext.userToken,
                           ),
                         ),
                       );
@@ -292,8 +289,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => MyFavoritesScreen(
-                            userToken: state.userToken,
-                            project: _project,
+                            userToken: appContext.userToken,
+                            project: appContext.project,
                           ),
                         ),
                       );

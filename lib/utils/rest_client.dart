@@ -164,7 +164,7 @@ class RestClient extends AbstractRestClient {
 
   Future<http.StreamedResponse> uploadFile(
     String url, {
-    Map<String, String> headers: const {},
+    Map<String, String> headers = const {},
     String field,
     String filePath,
     String fileName,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rits_client/app_context.dart';
 import 'package:rits_client/models/view_objects/view_object.dart';
 
 import 'associated_data_item/associated_data_item.dart';
@@ -60,4 +62,19 @@ class Routes {
 
     return routes;
   }
+
+  // Function(BuildContext) _generateRoute(ViewObjectScreen viewObjectScreen) {
+  //       final func = (BuildContext context) {
+  //         final dynamic args = ModalRoute.of(context).settings.arguments;
+
+  //         return (
+  //           authRepository: authRepository,
+  //           viewObject: args['viewObject'] as ViewObject,
+  //           userToken: args['userToken'] as String,
+  //         );
+
+  //       };
+
+  //       return func;
+  //     }
 }

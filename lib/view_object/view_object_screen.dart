@@ -17,7 +17,7 @@ abstract class ViewObjectScreen extends StatefulWidget {
     Key key,
     @required this.viewObject,
     @required this.userToken,
-    this.canBeFavorite = false,
+    this.canBeFavorite = true,
   }) : super(key: key);
 }
 

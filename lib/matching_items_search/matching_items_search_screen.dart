@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:provider/provider.dart';
 import 'package:rits_client/app_config.dart';
 import 'package:rw_help/rw_help.dart';
 
@@ -34,7 +35,7 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+    isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
   }
 
   @override

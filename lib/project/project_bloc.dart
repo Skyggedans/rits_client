@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:meta/meta.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:rits_client/app_context.dart';
 import 'package:rw_barcode_reader/rw_barcode_reader.dart';
 import 'package:rw_camera/rw_camera.dart';
 import 'package:rxdart/rxdart.dart';
@@ -16,8 +17,12 @@ import 'project.dart';
 
 class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   final RestClient restClient;
+  final AppContext appContext;
 
-  ProjectBloc({@required this.restClient});
+  ProjectBloc({@required this.restClient, @required this.appContext})
+      : assert(restClient != null),
+        assert(appContext != null),
+        super();
 
   @override
   get initialState => ProjectLoading();
@@ -33,9 +38,10 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 
     if (event is LoadProject) {
       try {
-        final userToken = await _getUserTokenForProject(event.project);
+        appContext.userToken =
+            await _getUserTokenForProject(appContext.project);
 
-        yield ProjectLoaded(userToken: userToken);
+        yield ProjectLoaded();
       } on ApiError {
         yield ProjectError();
       }
@@ -48,14 +54,14 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         try {
           dynamic decodedResult = json.decode(result);
           final levelName = await _setContextFromBarCode(
-              decodedResult['ritsData']['itemId'] as String, event.userToken);
+              decodedResult['ritsData']['itemId'] as String);
 
           if (levelName != null) {
-            yield ProjectLoaded(
-              hierarchyLevel: levelName,
-              context: decodedResult['ritsData']['itemId'] as String,
-              userToken: event.userToken,
-            );
+            appContext.sessionContext =
+                decodedResult['ritsData']['itemId'] as String;
+            appContext.sessionContextName = levelName;
+
+            yield ProjectLoaded();
           } else {
             yield ProjectError(message: 'Unable to set context');
           }
@@ -67,39 +73,37 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       yield ProjectLoading();
 
       try {
-        final levelName =
-            await _setContextFromBarCode(event.context, event.userToken);
+        final levelName = await _setContextFromBarCode(event.sessionContext);
 
         if (levelName != null) {
-          yield ProjectLoaded(
-            hierarchyLevel: levelName,
-            context: event.context,
-            userToken: event.userToken,
-          );
+          appContext.sessionContext = event.sessionContext;
+          appContext.sessionContextName = levelName;
+
+          yield ProjectLoaded();
         } else {
           yield ProjectError(message: 'Unable to set context');
         }
       } on ApiError {
-        yield ProjectError(message: 'Unrecognized context: ${event.context}');
+        yield ProjectError(
+            message: 'Unrecognized context: ${event.sessionContext}');
       }
     } else if (event is SetContextFromSearch) {
       yield ProjectLoading();
 
       try {
-        final levelName =
-            await _setContextFromSearch(event.context, event.userToken);
+        final levelName = await _setContextFromSearch(event.sessionContext);
 
         if (levelName != null) {
-          yield ProjectLoaded(
-            hierarchyLevel: levelName,
-            context: event.context,
-            userToken: event.userToken,
-          );
+          appContext.sessionContext = event.sessionContext;
+          appContext.sessionContextName = levelName;
+
+          yield ProjectLoaded();
         } else {
           yield ProjectError(message: 'Unable to set context');
         }
       } on ApiError {
-        yield ProjectError(message: 'Unrecognized context: ${event.context}');
+        yield ProjectError(
+            message: 'Unrecognized context: ${event.sessionContext}');
       }
     } else if (event is TakePhoto) {
       // final bytes = await RwCamera.takePhotoToBytes();
@@ -108,12 +112,13 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       //   yield ProjectLoading();
 
       //   try {
-      //     await _postPhoto(bytes, event.userToken);
+      //     await _postPhoto(bytes);
       //     yield prevState;
       //   } on ApiError {
       //     yield ProjectError(message: 'Unable to save photo');
       //   }
       // }
+
       PermissionStatus permission = await PermissionHandler()
           .checkPermissionStatus(PermissionGroup.storage);
 
@@ -132,7 +137,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         yield ProjectLoading();
 
         try {
-          await _postPhoto(filePath, event.userToken);
+          await _postPhoto(filePath);
           yield prevState;
         } on ApiError {
           yield ProjectError(message: 'Unable to save photo');
@@ -157,7 +162,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         yield ProjectLoading();
 
         try {
-          await _postVideo(filePath, event.userToken);
+          await _postVideo(filePath);
           yield prevState;
         } on ApiError {
           yield ProjectError(message: 'Unable to save video');
@@ -167,27 +172,24 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   }
 
   Future<String> _getUserTokenForProject(Project project) async {
-    const userId = 'default-user';
-    const skypeId = 'User';
     final url =
-        '${settings.backendUrl}/StartSkypeSession/$skypeId/$userId/${Uri.encodeFull(project.name)}';
+        '${settings.backendUrl}/StartWearableSession/${Uri.encodeFull(project.name)}';
     final response = await restClient.get(url);
 
     return json.decode(response.body) as String;
   }
 
-  Future<String> _setContextFromBarCode(
-      String contextId, String userToken) async {
+  Future<String> _setContextFromBarCode(String contextId) async {
     final url =
-        '${settings.backendUrl}/SetContextFromBarCode/$userToken/${Uri.encodeFull(contextId)}';
+        '${settings.backendUrl}/SetContextFromBarCode/${appContext.userToken}/${Uri.encodeFull(contextId)}';
     final response = await restClient.get(url);
 
     return json.decode(response.body) as String;
   }
 
-  Future<String> _setContextFromSearch(String context, String userToken) async {
+  Future<String> _setContextFromSearch(String context) async {
     final url =
-        '${settings.backendUrl}/SetObservedItemContext/$userToken/${Uri.encodeFull(context)}';
+        '${settings.backendUrl}/SetObservedItemContext/${appContext.userToken}/${Uri.encodeFull(context)}';
     final response = await restClient.get(url);
     final body = json.decode(response.body);
 
@@ -213,8 +215,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   //   );
   // }
 
-  Future<void> _postPhoto(String filePath, String userToken) async {
-    final url = '${settings.backendUrl}/uploadFile/$userToken';
+  Future<void> _postPhoto(String filePath) async {
+    final url = '${settings.backendUrl}/uploadFile/${appContext.userToken}';
 
     await restClient.uploadFile(
       url,
@@ -224,8 +226,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     );
   }
 
-  Future<void> _postVideo(String filePath, String userToken) async {
-    final url = '${settings.backendUrl}/uploadFile/$userToken';
+  Future<void> _postVideo(String filePath) async {
+    final url = '${settings.backendUrl}/uploadFile/${appContext.userToken}';
 
     await restClient.uploadFile(
       url,

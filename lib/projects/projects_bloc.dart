@@ -1,20 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/material.dart';
 
+import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:bloc/bloc.dart';
 
+import '../models/projects/projects.dart';
 import '../settings.dart' as settings;
 import '../utils/rest_client.dart';
-import '../models/projects/projects.dart';
 import 'projects.dart';
 
 class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
   final RestClient restClient;
 
-  ProjectsBloc({@required this.restClient});
+  ProjectsBloc({@required this.restClient})
+      : assert(restClient != null),
+        super();
 
   @override
   Stream<ProjectsState> transformStates(Stream<ProjectsState> states) {

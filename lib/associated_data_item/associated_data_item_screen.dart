@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
+import 'package:provider/provider.dart';
 import 'package:rits_client/app_config.dart';
 import 'package:rw_help/rw_help.dart';
 
@@ -42,7 +43,7 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    isRealWearDevice = AppConfig.of(context).isRealWearDevice;
+    isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
   }
 
   @override
@@ -151,7 +152,7 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
     final columns = state.columnDefinitions; //state.table.columns;
     final rows = state.table.rows;
 
-    if (rows.length > 0) {
+    if (rows.isNotEmpty) {
       return Column(
         children: <Widget>[
           Row(
@@ -179,7 +180,7 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
             child: ListView.separated(
               padding: const EdgeInsets.all(10.0),
               itemCount: rows.length,
-              separatorBuilder: (context, int) {
+              separatorBuilder: (context, index) {
                 return Divider(
                   color: Colors.black,
                 );

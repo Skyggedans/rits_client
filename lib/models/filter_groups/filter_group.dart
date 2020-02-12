@@ -12,7 +12,7 @@ class FilterGroup extends Equatable {
     this.id,
     this.name,
     this.levelNumber,
-    this.isActive: false,
+    this.isActive = false,
     this.filters,
   })  : assert(id != null),
         assert(name != null),

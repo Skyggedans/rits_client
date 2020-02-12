@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 import 'package:rits_client/utils/rest_client.dart';
 

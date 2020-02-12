@@ -58,7 +58,7 @@ class _TabularDataScreenState
             child: ListView.separated(
               padding: const EdgeInsets.all(10.0),
               itemCount: rows.length,
-              separatorBuilder: (context, int) {
+              separatorBuilder: (context, index) {
                 return Divider(
                   color: Colors.black,
                 );
