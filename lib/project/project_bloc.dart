@@ -6,13 +6,13 @@ import 'package:http_parser/http_parser.dart';
 import 'package:meta/meta.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/projects/projects.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/rest_client.dart';
 import 'package:rw_barcode_reader/rw_barcode_reader.dart';
 import 'package:rw_camera/rw_camera.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../models/projects/projects.dart';
-import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
 import 'project.dart';
 
 class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {

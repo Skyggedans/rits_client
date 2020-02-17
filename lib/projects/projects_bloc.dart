@@ -4,11 +4,11 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:rits_client/models/projects/projects.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/rest_client.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../models/projects/projects.dart';
-import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
 import 'projects.dart';
 
 class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {

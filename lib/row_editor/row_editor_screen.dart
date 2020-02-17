@@ -2,17 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
-import '../models/associated_data/associated_data.dart';
-import '../widgets/widgets.dart';
+import 'package:rits_client/models/associated_data/associated_data.dart';
+import 'package:rits_client/widgets/widgets.dart';
 
 class RowEditorScreen extends StatefulWidget {
   final List<ColumnDef> columnDefinitions;
   final Map<String, dynamic> row;
 
-  RowEditorScreen(
-      {Key key, @required this.columnDefinitions, @required this.row})
-      : assert(columnDefinitions != null),
+  RowEditorScreen({
+    Key key,
+    @required this.columnDefinitions,
+    @required this.row,
+  })  : assert(columnDefinitions != null),
         assert(row != null),
         super(key: key);
 

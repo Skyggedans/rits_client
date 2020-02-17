@@ -1,7 +1,6 @@
 import 'package:meta/meta.dart';
-
-import '../models/associated_data/associated_data.dart';
-import '../view_object/view_object.dart';
+import 'package:rits_client/models/associated_data/associated_data.dart';
+import 'package:rits_client/view_object/view_object.dart';
 
 class AddRow extends ViewObjectEvent {
   final AssociatedDataTable table;
@@ -47,16 +46,13 @@ class RemoveRow extends ViewObjectEvent {
 class SaveRows extends ViewObjectEvent {
   final AssociatedDataTable table;
   final BusinessObject viewObject;
-  final String userToken;
 
   SaveRows({
     @required this.table,
     @required this.viewObject,
-    @required this.userToken,
   })  : assert(table != null),
         assert(viewObject != null),
-        assert(userToken != null),
-        super([table, viewObject, userToken]);
+        super([table, viewObject]);
 
   @override
   String toString() => 'SaveRows';

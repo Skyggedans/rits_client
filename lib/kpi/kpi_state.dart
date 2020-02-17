@@ -1,5 +1,5 @@
-import '../models/kpi/kpi.dart';
-import '../view_object/view_object.dart';
+import 'package:rits_client/models/kpi/kpi.dart';
+import 'package:rits_client/view_object/view_object.dart';
 
 class KpiGenerated extends ViewObjectState {
   final List<Kpi> kpis;

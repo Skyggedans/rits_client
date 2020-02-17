@@ -2,17 +2,22 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/comments/comments.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/rest_client.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../models/comments/comments.dart';
-import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
 import 'comments.dart';
 
 class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
   final RestClient restClient;
+  final AppContext appContext;
 
-  CommentsBloc({@required this.restClient}) : assert(restClient != null);
+  CommentsBloc({@required this.restClient, @required this.appContext})
+      : assert(restClient != null),
+        assert(appContext != null),
+        super();
 
   @override
   get initialState => CommentsInProgress();
@@ -28,7 +33,7 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
       yield CommentsInProgress();
 
       try {
-        final comments = await _fetchComments(event.userToken);
+        final comments = await _fetchComments();
 
         yield CommentsLoaded(comments: comments);
       } on ApiError {
@@ -38,8 +43,8 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
       yield CommentsInProgress();
 
       try {
-        await _addComment(event.comment, event.userToken);
-        add(FetchComments(userToken: event.userToken));
+        await _addComment(event.comment);
+        add(FetchComments());
       } on ApiError {
         yield CommentsError(message: 'Unable to add comment');
       }
@@ -47,8 +52,8 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
       yield CommentsInProgress();
 
       try {
-        await _updateComment(event.comment, event.userToken);
-        add(FetchComments(userToken: event.userToken));
+        await _updateComment(event.comment);
+        add(FetchComments());
       } on ApiError {
         yield CommentsError(message: 'Unable to update comment');
       }
@@ -56,16 +61,17 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
       yield CommentsInProgress();
 
       try {
-        await _removeComment(event.comment, event.userToken);
-        add(FetchComments(userToken: event.userToken));
+        await _removeComment(event.comment);
+        add(FetchComments());
       } on ApiError {
         yield CommentsError(message: 'Unable to remove comment');
       }
     }
   }
 
-  Future<List<Comment>> _fetchComments(String userToken) async {
-    final url = '${settings.backendUrl}/GetVoiceToTextMemos/$userToken';
+  Future<List<Comment>> _fetchComments() async {
+    final url =
+        '${settings.backendUrl}/GetVoiceToTextMemos/${appContext.userToken}';
     final response = await restClient.get(url);
     final body =
         List<Map<String, dynamic>>.from(json.decode(response.body) as List);
@@ -75,8 +81,9 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
     }).toList();
   }
 
-  Future<void> _addComment(Comment comment, String userToken) async {
-    final url = '${settings.backendUrl}/AddVoiceToTextMemo/$userToken';
+  Future<void> _addComment(Comment comment) async {
+    final url =
+        '${settings.backendUrl}/AddVoiceToTextMemo/${appContext.userToken}';
 
     final requestBody = {
       'Comment': comment.text,
@@ -89,8 +96,9 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
     );
   }
 
-  Future<void> _updateComment(Comment comment, String userToken) async {
-    final url = '${settings.backendUrl}/UpdateVoiceToTextMemo/$userToken';
+  Future<void> _updateComment(Comment comment) async {
+    final url =
+        '${settings.backendUrl}/UpdateVoiceToTextMemo/${appContext.userToken}';
 
     final requestBody = {
       'CommentID': comment.id,
@@ -104,7 +112,7 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
     );
   }
 
-  Future<void> _removeComment(Comment comment, String userToken) {
+  Future<void> _removeComment(Comment comment) {
     return null;
   }
 }

@@ -1,7 +1,5 @@
-import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
-
-import '../models/projects/projects.dart';
+import 'package:meta/meta.dart';
 
 @immutable
 abstract class LuisEvent extends Equatable {
@@ -9,27 +7,20 @@ abstract class LuisEvent extends Equatable {
 }
 
 class LoadLuisProject extends LuisEvent {
-  final Project project;
-  final String userToken;
-
-  LoadLuisProject(this.project, this.userToken) : super([project, userToken]);
-
   @override
-  String toString() => 'LoadLuisProject { project: ${project.name} }';
+  String toString() => 'LoadLuisProject';
 }
 
 class ExecuteUtterance extends LuisEvent {
   final String utteranceText;
-  final String luisProjectId;
-  final String userToken;
+  final String luisAppId;
 
   ExecuteUtterance({
     @required this.utteranceText,
-    @required this.luisProjectId,
-    @required this.userToken,
-  }) : super([utteranceText, luisProjectId, userToken]);
+    @required this.luisAppId,
+  }) : super([utteranceText, luisAppId]);
 
   @override
   String toString() =>
-      'ExecuteUtterance { text: $utteranceText, luisProjectId: $luisProjectId }';
+      'ExecuteUtterance { text: $utteranceText, luisProjectId: $luisAppId }';
 }

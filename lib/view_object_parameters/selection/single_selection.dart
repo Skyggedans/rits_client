@@ -1,52 +1,59 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/utils/rest_client.dart';
 
-import '../../utils/rest_client.dart';
-import '../../models/view_objects/view_objects.dart';
 import 'selection.dart';
 
 class SingleSelection extends StatefulWidget {
   final ViewObjectParameter param;
-  final String userToken;
 
-  SingleSelection({Key key, @required this.param, @required this.userToken})
-      : super(key: key);
+  SingleSelection({Key key, @required this.param})
+      : assert(param != null),
+        super(key: key);
 
   @override
   State createState() => _SingleSelectionState();
 }
 
 class _SingleSelectionState extends State<SingleSelection> {
-  final SingleSelectionBloc _selectionBloc =
-      SingleSelectionBloc(restClient: RestClient());
+  SingleSelectionBloc _bloc;
 
   ViewObjectParameter get _param => widget.param;
 
-  String get _userToken => widget.userToken;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_bloc == null) {
+      _bloc = SingleSelectionBloc(
+        restClient: Provider.of<RestClient>(context),
+        appContext: Provider.of<AppContext>(context),
+      )..add(FetchSelectionOptions(param: _param));
+    }
+  }
 
   @override
-  void initState() {
-    super.initState();
-    _selectionBloc.add(FetchSelectionOptions(
-      param: _param,
-      userToken: _userToken,
-    ));
+  void dispose() {
+    _bloc.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder(
-      bloc: _selectionBloc,
+      bloc: _bloc,
       builder: (BuildContext context, SelectionState state) {
         Widget bodyChild;
 
         if (state is SelectionOptionsUninitialized) {
           bodyChild = CircularProgressIndicator();
         } else if (state is SelectionOptionsLoaded) {
-          bodyChild = BlocProvider(
-            create: (context) => _selectionBloc,
+          bodyChild = Provider<SingleSelectionBloc>.value(
+            value: _bloc,
             child: _SelectionOptions(),
           );
         } else if (state is SelectionOptionsError) {
@@ -91,11 +98,10 @@ class _SingleSelectionState extends State<SingleSelection> {
 class _SelectionOptions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // ignore: close_sinks
-    final _selectionBloc = BlocProvider.of<SingleSelectionBloc>(context);
+    final _bloc = Provider.of<SingleSelectionBloc>(context);
 
     return BlocBuilder(
-      bloc: _selectionBloc,
+      bloc: _bloc,
       builder: (BuildContext context, SelectionState state) {
         if (state is SelectionOptionsLoaded) {
           return ListView.builder(
@@ -109,12 +115,14 @@ class _SelectionOptions extends StatelessWidget {
                 value: option,
                 groupValue: state.selection,
                 onChanged: (value) {
-                  _selectionBloc.add(UpdateSelection(option: value));
+                  _bloc.add(UpdateSelection(option: value));
                 },
               );
             },
           );
         }
+
+        return null;
       },
     );
   }

@@ -5,19 +5,28 @@ import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
-import 'package:rits_client/app_config.dart';
 import 'package:logging/logging.dart';
 import 'package:logging_appenders/logging_appenders.dart';
 import 'package:path/path.dart' as path;
+import 'package:provider/provider.dart';
+import 'package:rits_client/app_config.dart';
 import 'package:rits_client/app_context.dart';
+import 'package:rits_client/view_objects/view_objects.dart';
 
-import 'authentication/authentication.dart';
+import 'auth/auth.dart';
 import 'projects/projects.dart';
 import 'routes.dart';
 import 'splash/splash.dart';
 import 'utils/rest_client.dart';
 
+final _appConfig = AppConfig();
+final _appContext = AppContext();
+final _authProvider = AuthProvider();
+final _authRepository = AuthRepository(authProvider: _authProvider);
+final _restClient = RestClient(authRepository: _authRepository);
+final _authBloc = AuthBloc(authRepository: _authRepository);
+final _viewObjectsRepository =
+    ViewObjectsRepository(restClient: _restClient, appContext: _appContext);
 final _logger = Logger('main');
 
 class _HttpOverrides extends HttpOverrides {
@@ -50,27 +59,26 @@ main() {
   runApp(
     MultiProvider(
       providers: [
-        Provider<AppConfig>(
-          create: (_) => AppConfig(),
+        Provider<AppConfig>.value(
+          value: _appConfig,
         ),
-        InheritedProvider<AppContext>(
-          create: (_) => AppContext(),
+        Provider<AppContext>.value(
+          value: _appContext,
         ),
-        Provider<AuthProvider>(
-          create: (_) => AuthProvider(),
+        Provider<AuthProvider>.value(
+          value: _authProvider,
         ),
-        ProxyProvider<AuthProvider, AuthRepository>(
-          update: (_, authProvider, __) =>
-              AuthRepository(authProvider: authProvider),
+        Provider<AuthRepository>.value(
+          value: _authRepository,
         ),
-        ProxyProvider<AuthRepository, RestClient>(
-          update: (_, authRepository, __) =>
-              RestClient(authRepository: authRepository),
+        Provider<RestClient>.value(
+          value: _restClient,
         ),
-        ProxyProvider<AuthRepository, AuthenticationBloc>(
-          update: (_, authRepository, __) =>
-              AuthenticationBloc(authRepository: authRepository),
-          dispose: (_, bloc) => bloc.close(),
+        Provider<AuthBloc>.value(
+          value: _authBloc,
+        ),
+        Provider<ViewObjectsRepository>.value(
+          value: _viewObjectsRepository,
         ),
       ],
       child: RitsApp(),
@@ -94,41 +102,43 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final authenticationBloc = Provider.of<AuthenticationBloc>(context);
+    final authBloc = Provider.of<AuthBloc>(context);
 
-    Future.delayed(Duration(seconds: 3), () {
-      authenticationBloc.add(AppStarted());
-    });
+    if (authBloc.state is AuthUninitialized) {
+      Future.delayed(Duration(seconds: 3), () {
+        authBloc.add(AppStarted());
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _authBloc.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<AuthRepository, AuthenticationBloc>(
+    return Consumer2<AuthRepository, AuthBloc>(
       builder: (context, authRepository, authenticationBloc, _) {
         return MaterialApp(
           //showSemanticsDebugger: true,
           routes: Routes.get(authRepository: authRepository),
-          home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+          home: BlocBuilder<AuthBloc, AuthState>(
             bloc: authenticationBloc,
-            builder: (BuildContext context, AuthenticationState state) {
-              if (state is AuthenticationUninitialized) {
+            builder: (BuildContext context, AuthState state) {
+              if (state is AuthUninitialized) {
                 return SplashScreen();
-              } else if (state is AuthenticationPending) {
-                return AuthenticationUserCodeScreen(
+              } else if (state is AuthPending) {
+                return AuthUserCodeScreen(
                   verificationUrl: state.verificationUrl,
                   userCode: state.userCode,
                   expiresIn: state.expiresIn,
                 );
               } else if (state is Authenticated) {
-                return ProxyProvider<RestClient, ProjectsBloc>(
-                  update: (_, restClient, __) =>
-                      ProjectsBloc(restClient: restClient),
-                  //..add(FetchProjects()),
-                  dispose: (_, bloc) => bloc.close(),
-                  child: ProjectsScreen(),
-                );
-              } else if (state is AuthenticationFailed) {
-                return AuthenticationFailureScreen();
+                return ProjectsScreen();
+              } else if (state is AuthFailed) {
+                return AuthFailureScreen();
               }
 
               return null;

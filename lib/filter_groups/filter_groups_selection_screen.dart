@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-
-import '../models/filter_groups/filter_groups.dart';
+import 'package:rits_client/models/filter_groups/filter_groups.dart';
 
 class FilterGroupsSelectionScreen extends StatefulWidget {
   final List<FilterGroup> filterGroups;
-  final String userToken;
 
   FilterGroupsSelectionScreen({
     Key key,
     @required this.filterGroups,
-    @required this.userToken,
-  })  : assert(filterGroups != null),
-        assert(userToken != null);
+  }) : assert(filterGroups != null);
 
   @override
   State createState() => FilterGroupsSelectionScreenState();

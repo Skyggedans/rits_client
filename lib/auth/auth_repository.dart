@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 
-import 'authentication.dart';
+import 'auth.dart';
 
 class AuthRepository {
   final AuthProvider authProvider;

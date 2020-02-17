@@ -37,7 +37,6 @@ class ProjectsLoaded extends ProjectsState {
 
 class ProjectSelected extends ProjectsState {
   final Project project;
-  final String userToken;
 
-  ProjectSelected({this.project, this.userToken}) : super([project, userToken]);
+  ProjectSelected({this.project}) : super([project]);
 }

@@ -1,36 +1,38 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:provider/provider.dart';
+import 'package:rits_client/app_context.dart';
 import 'package:rits_client/kpi/kpi.dart';
+import 'package:rits_client/utils/rest_client.dart';
 
-import '../models/projects/projects.dart';
-import '../utils/rest_client.dart';
 import 'luis.dart';
 
 class LuisScreen extends StatefulWidget {
-  final Project project;
-  final String userToken;
-
-  LuisScreen({Key key, @required this.project, @required this.userToken})
-      : super(key: key);
-
   @override
   State createState() => _LuisScreenState();
 }
 
 class _LuisScreenState extends State<LuisScreen> {
-  final LuisBloc _luisBloc =
-      LuisBloc(restClient: RestClient(), luisClient: LuisClient());
-
-  Project get _project => widget.project;
-  String get _userToken => widget.userToken;
+  LuisBloc _bloc;
 
   @override
-  void initState() {
-    super.initState();
-    _luisBloc.add(LoadLuisProject(_project, _userToken));
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_bloc == null) {
+      _bloc = LuisBloc(
+        restClient: Provider.of<RestClient>(context),
+        appContext: Provider.of<AppContext>(context),
+      )..add(LoadLuisProject());
+    }
+  }
+
+  @override
+  void dispose() {
+    _bloc.close();
+    super.dispose();
   }
 
   @override
@@ -41,7 +43,7 @@ class _LuisScreenState extends State<LuisScreen> {
       ),
       body: Center(
           child: BlocBuilder(
-        bloc: _luisBloc,
+        bloc: _bloc,
         builder: (BuildContext context, LuisState state) {
           if (state is LuisUninitialized || state is UtteranceExecution) {
             return CircularProgressIndicator();
@@ -58,10 +60,9 @@ class _LuisScreenState extends State<LuisScreen> {
                   ),
                 ),
                 onFieldSubmitted: (text) {
-                  _luisBloc.add(ExecuteUtterance(
+                  _bloc.add(ExecuteUtterance(
                     utteranceText: text,
-                    luisProjectId: state.luisProjectId,
-                    userToken: state.userToken,
+                    luisAppId: state.luisAppId,
                   ));
                 },
               ),

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
-
 import 'package:flutter_pdf_viewer/flutter_pdf_viewer.dart';
+import 'package:meta/meta.dart';
+import 'package:provider/provider.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rits_client/view_object/view_object.dart';
 
-import '../models/view_objects/view_objects.dart';
-import '../view_object/view_object.dart';
 import 'report.dart';
 
 class ReportScreen extends ViewObjectScreen {
@@ -13,12 +15,7 @@ class ReportScreen extends ViewObjectScreen {
   ReportScreen({
     Key key,
     @required ViewObject viewObject,
-    @required String userToken,
-  }) : super(
-          key: key,
-          viewObject: viewObject,
-          userToken: userToken,
-        );
+  }) : super(key: key, viewObject: viewObject);
 
   @override
   State createState() => _ReportScreenState();
@@ -26,7 +23,13 @@ class ReportScreen extends ViewObjectScreen {
 
 class _ReportScreenState
     extends ViewObjectScreenState<ReportBloc, ReportGenerated> {
-  final viewObjectBloc = ReportBloc();
+  @override
+  ReportBloc createBloc() {
+    return ReportBloc(
+      restClient: Provider.of<RestClient>(context),
+      appContext: Provider.of<AppContext>(context),
+    );
+  }
 
   @override
   Widget buildOutputWidget(BuildContext context, ReportGenerated state) {

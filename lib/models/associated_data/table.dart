@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-
-import '../../models/associated_data/associated_data.dart';
+import 'package:rits_client/models/associated_data/associated_data.dart';
 
 class AssociatedDataTable extends Equatable {
   final AssociatedDataContainer container;

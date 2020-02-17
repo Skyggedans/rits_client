@@ -1,23 +1,24 @@
 import 'dart:convert';
 
 import 'package:meta/meta.dart';
-import 'package:rits_client/models/projects/projects.dart';
+import 'package:rits_client/app_context.dart';
 import 'package:rits_client/models/view_objects/view_objects.dart';
 import 'package:rits_client/settings.dart' as settings;
 import 'package:rits_client/utils/utils.dart';
 
 class ViewObjectsRepository<T extends ViewObject> {
   final RestClient restClient;
+  final AppContext appContext;
 
-  const ViewObjectsRepository({@required this.restClient})
-      : assert(restClient != null);
+  const ViewObjectsRepository({
+    @required this.restClient,
+    @required this.appContext,
+  })  : assert(restClient != null),
+        assert(appContext != null);
 
-  Future<List<T>> fetchViewObjects(
-    Project project,
-    String type,
-    String userToken,
-  ) async {
-    final url = '${settings.backendUrl}/ViewObjects/$userToken/$type';
+  Future<List<T>> fetchViewObjects(String type) async {
+    final url =
+        '${settings.backendUrl}/ViewObjects/${appContext.userToken}/$type';
     final response = await restClient.get(url);
 
     final body =
@@ -29,14 +30,9 @@ class ViewObjectsRepository<T extends ViewObject> {
         .toList();
   }
 
-  Future<List<T>> fetchHierarchyViewObjects(
-    Project project,
-    String type,
-    String hierarchyLevel,
-    String userToken,
-  ) async {
+  Future<List<T>> fetchHierarchyViewObjects(String type) async {
     final url =
-        '${settings.backendUrl}/Hierarchy/$userToken/$hierarchyLevel/$type';
+        '${settings.backendUrl}/Hierarchy/${appContext.userToken}/${appContext.sessionContextName}/$type';
 
     final response = await restClient.get(url);
 
@@ -46,12 +42,9 @@ class ViewObjectsRepository<T extends ViewObject> {
     return body.map((report) => ViewObject.fromJson(report)).cast<T>().toList();
   }
 
-  Future<List<T>> fetchFavoriteViewObjects(
-    Project project,
-    String type,
-    String userToken,
-  ) async {
-    final url = '${settings.backendUrl}/GetUserReportsForType/$userToken/$type';
+  Future<List<T>> fetchFavoriteViewObjects(String type) async {
+    final url =
+        '${settings.backendUrl}/GetUserReportsForType/${appContext.userToken}/$type';
     final response = await restClient.get(url);
 
     final body =

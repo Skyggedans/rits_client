@@ -4,47 +4,54 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:provider/provider.dart';
 import 'package:rits_client/app_config.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/utils/utils.dart';
 import 'package:rw_help/rw_help.dart';
 
-import '../utils/utils.dart';
 import 'matching_items_search.dart';
 
 class MatchingItemsSearchScreen extends StatefulWidget {
   final String searchString;
-  final String userToken;
 
   MatchingItemsSearchScreen({
     Key key,
     @required this.searchString,
-    @required this.userToken,
   })  : assert(searchString != null),
-        assert(userToken != null);
+        super(key: key);
 
   @override
   State createState() => _MatchingItemsSearchScreenState();
 }
 
 class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
-  final _matchingItemsSearchBloc =
-      MatchingItemsSearchBloc(restClient: RestClient());
+  MatchingItemsSearchBloc _bloc;
 
   String get _searchString => widget.searchString;
-  String get _userToken => widget.userToken;
   bool isRealWearDevice;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
+
+    if (_bloc == null) {
+      _bloc = MatchingItemsSearchBloc(
+        restClient: Provider.of<RestClient>(context),
+        appContext: Provider.of<AppContext>(context),
+      )..add(SearchMatchingItems(searchString: _searchString));
+      ;
+
+      isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
+    }
   }
 
   @override
-  void initState() {
-    super.initState();
-    _matchingItemsSearchBloc.add(SearchMatchingItems(
-      searchString: _searchString,
-      userToken: _userToken,
-    ));
+  void dispose() {
+    if (isRealWearDevice) {
+      RwHelp.setCommands([]);
+    }
+
+    _bloc.close();
+    super.dispose();
   }
 
   @override
@@ -55,7 +62,7 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
       ),
       body: Center(
         child: BlocBuilder(
-          bloc: _matchingItemsSearchBloc,
+          bloc: _bloc,
           builder: (BuildContext context, MatchingItemsSearchState state) {
             if (state is MatchingItemsUninitialized) {
               return CircularProgressIndicator();
@@ -109,14 +116,5 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    if (isRealWearDevice) {
-      RwHelp.setCommands([]);
-    }
-
-    super.dispose();
   }
 }

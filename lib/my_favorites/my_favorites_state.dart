@@ -12,12 +12,11 @@ class ProjectLoading extends MyFavoritesState {
 }
 
 class ProjectLoaded extends MyFavoritesState {
-  final String userToken;
-  final String hierarchyLevel;
   final String context;
 
-  ProjectLoaded({@required this.userToken, this.hierarchyLevel, this.context})
-      : super([userToken, hierarchyLevel, context]);
+  ProjectLoaded({@required this.context})
+      : assert(context != null),
+        super([context]);
 
   @override
   String toString() => 'ProjectLoaded';

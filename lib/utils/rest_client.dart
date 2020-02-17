@@ -5,9 +5,8 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:logging/logging.dart';
-
-import '../authentication/authentication.dart';
-import '../settings.dart' as settings;
+import 'package:rits_client/auth/auth.dart';
+import 'package:rits_client/settings.dart' as settings;
 
 typedef RequestFunc = Future<http.BaseResponse> Function(String url,
     {Map<String, String> headers});

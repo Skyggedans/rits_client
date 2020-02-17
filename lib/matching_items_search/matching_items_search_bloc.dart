@@ -2,18 +2,24 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/rest_client.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
 import 'matching_items_search.dart';
 
 class MatchingItemsSearchBloc
     extends Bloc<MatchingItemsSearchEvent, MatchingItemsSearchState> {
   final RestClient restClient;
+  final AppContext appContext;
 
-  MatchingItemsSearchBloc({@required this.restClient})
-      : assert(restClient != null);
+  MatchingItemsSearchBloc({
+    @required this.restClient,
+    @required this.appContext,
+  })  : assert(restClient != null),
+        assert(appContext != null),
+        super();
 
   @override
   get initialState => MatchingItemsUninitialized();
@@ -31,7 +37,7 @@ class MatchingItemsSearchBloc
       yield MatchingItemsUninitialized();
 
       try {
-        final items = await _searchItems(event.searchString, event.userToken);
+        final items = await _searchItems(event.searchString);
 
         yield MatchingItemsLoaded(items: items);
       } on ApiError {
@@ -40,10 +46,9 @@ class MatchingItemsSearchBloc
     }
   }
 
-  Future<List<String>> _searchItems(
-      String searchString, String userToken) async {
+  Future<List<String>> _searchItems(String searchString) async {
     final url =
-        '${settings.backendUrl}/MatchObservedItem/$userToken/${Uri.encodeFull(searchString)}';
+        '${settings.backendUrl}/MatchObservedItem/${appContext.userToken}/${Uri.encodeFull(searchString)}';
     final response = await restClient.get(url);
     final body = json.decode(response.body) as Map<String, dynamic>;
 

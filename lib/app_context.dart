@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:rits_client/models/projects/project.dart';
 
-class AppContext /*extends ChangeNotifier*/ {
+class AppContext extends ChangeNotifier {
   Project _project;
   String _userToken;
   String _sessionContext;
@@ -14,21 +14,21 @@ class AppContext /*extends ChangeNotifier*/ {
 
   set project(Project value) {
     _project = value;
-    //notifyListeners();
+    notifyListeners();
   }
 
   set userToken(String value) {
     _userToken = value;
-    //notifyListeners();
+    notifyListeners();
   }
 
   set sessionContext(String value) {
     _sessionContext = value;
-    //notifyListeners();
+    notifyListeners();
   }
 
   set sessionContextName(String value) {
     _sessionContextName = value;
-    //notifyListeners();
+    notifyListeners();
   }
 }

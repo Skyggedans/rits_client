@@ -1,14 +1,18 @@
 import 'dart:convert';
 
-import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
-import '../models/view_objects/view_objects.dart';
-import '../models/kpi/kpi.dart';
-import '../view_object/view_object.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/kpi/kpi.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rits_client/view_object/view_object.dart';
+
 import 'kpi.dart';
 
 class KpiBloc extends ViewObjectBloc {
-  KpiBloc() : super(restClient: RestClient());
+  KpiBloc({@required RestClient restClient, @required AppContext appContext})
+      : super(restClient: restClient, appContext: appContext);
 
   @override
   Stream<ViewObjectState> mapEventToState(ViewObjectEvent event) async* {
@@ -16,7 +20,7 @@ class KpiBloc extends ViewObjectBloc {
       yield ViewObjectGeneration();
 
       try {
-        final kpis = await _getKpis(event.viewObject, event.userToken);
+        final kpis = await _getKpis(event.viewObject);
 
         yield KpiGenerated(kpis: kpis);
       } on ApiError {
@@ -27,9 +31,9 @@ class KpiBloc extends ViewObjectBloc {
     }
   }
 
-  Future<List<Kpi>> _getKpis(ViewObject viewObject, String userToken) async {
+  Future<List<Kpi>> _getKpis(ViewObject viewObject) async {
     final url =
-        '${settings.backendUrl}/fetch/$userToken/0/SystemKpi/${Uri.encodeFull(viewObject.name)}';
+        '${settings.backendUrl}/fetch/${appContext.userToken}/0/SystemKpi/${Uri.encodeFull(viewObject.name)}';
     final response = await restClient.get(url);
     final body =
         List<Map<String, dynamic>>.from(json.decode(response.body) as List);

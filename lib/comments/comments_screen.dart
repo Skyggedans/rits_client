@@ -5,10 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:provider/provider.dart';
 import 'package:rits_client/app_config.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/comments/comment.dart';
+import 'package:rits_client/utils/utils.dart';
 import 'package:rw_help/rw_help.dart';
 
-import '../models/comments/comment.dart';
-import '../utils/utils.dart';
 import 'comments.dart';
 
 abstract class CommentAction {
@@ -34,33 +35,36 @@ class CancelAction extends CommentAction {
 }
 
 class CommentsScreen extends StatefulWidget {
-  final String userToken;
-
-  CommentsScreen({
-    Key key,
-    @required this.userToken,
-  }) : assert(userToken != null);
-
   @override
   State createState() => _CommentsScreenState();
 }
 
 class _CommentsScreenState extends State<CommentsScreen> {
-  final _commentsBloc = CommentsBloc(restClient: RestClient());
+  CommentsBloc _bloc;
   bool isRealWearDevice;
-
-  String get _userToken => widget.userToken;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
+
+    if (_bloc == null) {
+      isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
+
+      _bloc = CommentsBloc(
+        restClient: Provider.of<RestClient>(context),
+        appContext: Provider.of<AppContext>(context),
+      )..add(FetchComments());
+    }
   }
 
   @override
-  void initState() {
-    super.initState();
-    _commentsBloc.add(FetchComments(userToken: _userToken));
+  void dispose() {
+    if (isRealWearDevice) {
+      RwHelp.setCommands([]);
+    }
+
+    _bloc.close();
+    super.dispose();
   }
 
   @override
@@ -93,7 +97,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
       ),
       body: Center(
         child: BlocBuilder(
-          bloc: _commentsBloc,
+          bloc: _bloc,
           builder: (BuildContext context, CommentsState state) {
             if (state is CommentsInProgress) {
               return CircularProgressIndicator();
@@ -168,10 +172,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
     final dialogResult = await _showCommentDialog(context, newComment);
 
     if (dialogResult is SaveAction) {
-      _commentsBloc.add(AddComment(
-        comment: dialogResult.comment,
-        userToken: _userToken,
-      ));
+      _bloc.add(AddComment(comment: dialogResult.comment));
     }
   }
 
@@ -179,15 +180,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
     final dialogResult = await _showCommentDialog(context, comment);
 
     if (dialogResult is SaveAction) {
-      _commentsBloc.add(UpdateComment(
-        comment: dialogResult.comment,
-        userToken: _userToken,
-      ));
+      _bloc.add(UpdateComment(comment: dialogResult.comment));
     } else if (dialogResult is RemoveAction) {
-      _commentsBloc.add(RemoveComment(
-        comment: dialogResult.comment,
-        userToken: _userToken,
-      ));
+      _bloc.add(RemoveComment(comment: dialogResult.comment));
     }
   }
 
@@ -232,14 +227,5 @@ class _CommentsScreenState extends State<CommentsScreen> {
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    if (isRealWearDevice) {
-      RwHelp.setCommands([]);
-    }
-
-    super.dispose();
   }
 }

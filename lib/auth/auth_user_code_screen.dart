@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-class AuthenticationUserCodeScreen extends StatefulWidget {
+class AuthUserCodeScreen extends StatefulWidget {
   final String userCode;
   final String verificationUrl;
   final Duration expiresIn;
 
-  AuthenticationUserCodeScreen({
+  AuthUserCodeScreen({
     Key key,
     @required this.userCode,
     @required this.verificationUrl,
@@ -14,11 +14,11 @@ class AuthenticationUserCodeScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _AuthenticationUserCodeScreenState();
+  State<StatefulWidget> createState() => _AuthUserCodeScreenState();
 }
 
-class _AuthenticationUserCodeScreenState
-    extends State<AuthenticationUserCodeScreen> with TickerProviderStateMixin {
+class _AuthUserCodeScreenState extends State<AuthUserCodeScreen>
+    with TickerProviderStateMixin {
   AnimationController _animationController;
 
   String get verificationUrl => widget.verificationUrl;

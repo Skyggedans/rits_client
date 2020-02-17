@@ -4,19 +4,22 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
+import 'package:rits_client/app_context.dart';
 import 'package:rits_client/models/kpi/kpi.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/rest_client.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../models/projects/projects.dart';
-import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
 import 'luis.dart';
 
 class LuisBloc extends Bloc<LuisEvent, LuisState> {
   final RestClient restClient;
-  final LuisClient luisClient;
+  final AppContext appContext;
 
-  LuisBloc({@required this.restClient, @required this.luisClient});
+  LuisBloc({@required this.restClient, @required this.appContext})
+      : assert(restClient != null),
+        assert(appContext != null),
+        super();
 
   @override
   get initialState => LuisUninitialized();
@@ -30,10 +33,9 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
   Stream<LuisState> mapEventToState(LuisEvent event) async* {
     if (event is LoadLuisProject) {
       try {
-        final luisProjectId = await _getLuisProjectId(event.project);
+        final luisAppId = await _getLuisProjectId();
 
-        yield UtteranceInput(
-            luisProjectId: luisProjectId, userToken: event.userToken);
+        yield UtteranceInput(luisAppId: luisAppId);
       } on ApiError {
         yield LuisError();
       }
@@ -43,8 +45,7 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
       try {
         final response = await _executeUtterance(
           event.utteranceText,
-          event.luisProjectId,
-          event.userToken,
+          event.luisAppId,
         );
 
         if (response.containsKey('url')) {
@@ -60,8 +61,7 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
 
           yield UtteranceExecutedWithKpis(kpis: kpis);
         } else {
-          yield UtteranceInput(
-              luisProjectId: event.luisProjectId, userToken: event.userToken);
+          yield UtteranceInput(luisAppId: event.luisAppId);
         }
       } on ApiError {
         yield LuisError();
@@ -69,7 +69,7 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
     }
   }
 
-  Future<String> _getLuisProjectId(Project project) async {
+  Future<String> _getLuisProjectId() async {
     final luisKey = await _getLuisKey();
     final url =
         '${settings.luisConfig["host"]}/${settings.luisConfig["path"]}/apps';
@@ -82,7 +82,8 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
     final projects =
         List<Map<String, dynamic>>.from(json.decode(response.body) as List);
 
-    final luisProject = projects.firstWhere((p) => p['name'] == project.name,
+    final luisProject = projects.firstWhere(
+        (p) => p['name'] == appContext.project.name,
         orElse: () => null);
 
     return luisProject != null ? luisProject['id'] as String : null;
@@ -97,8 +98,8 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
   }
 
   Future<Map<String, dynamic>> _executeUtterance(
-      String utteranceText, String luisProjectId, String userToken) async {
-    final url = '${settings.luisUrl}/ExecuteUtterance/$userToken';
+      String utteranceText, String luisProjectId) async {
+    final url = '${settings.luisUrl}/ExecuteUtterance/${appContext.userToken}';
 
     final requestBody = {
       'Utterance': utteranceText,

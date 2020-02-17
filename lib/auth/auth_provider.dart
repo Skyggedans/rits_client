@@ -60,7 +60,7 @@ class AuthProvider {
     final dbClient = await db;
     final result = await dbClient?.query('Auth', limit: 1);
 
-    return result != null && result.isEmpty ? result.first : null;
+    return result?.isNotEmpty == true ? result.first : null;
   }
 
   Future<int> saveAuth(Map<String, dynamic> auth) async {

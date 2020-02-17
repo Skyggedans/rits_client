@@ -1,20 +1,27 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:meta/meta.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:bloc/bloc.dart';
+import 'package:meta/meta.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rxdart/rxdart.dart';
 
-import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
-import '../models/view_objects/view_objects.dart';
 import 'view_object_parameters.dart';
 
 class ViewObjectParametersBloc
     extends Bloc<ViewObjectParametersEvent, ViewObjectParametersState> {
   final RestClient restClient;
+  final AppContext appContext;
 
-  ViewObjectParametersBloc({@required this.restClient});
+  ViewObjectParametersBloc({
+    @required this.restClient,
+    @required this.appContext,
+  })  : assert(restClient != null),
+        assert(appContext != null),
+        super();
 
   @override
   Stream<ViewObjectParametersState> transformStates(
@@ -32,12 +39,10 @@ class ViewObjectParametersBloc
       yield ViewObjectParametersInProgress();
 
       try {
-        final params =
-            await _fetchViewObjectParams(event.viewObject, event.userToken);
+        final params = await _fetchViewObjectParams(event.viewObject);
 
         yield ViewObjectParametersLoaded(
           viewObject: event.viewObject,
-          userToken: event.userToken,
           parameters: params,
         );
       } on ApiError {
@@ -47,15 +52,9 @@ class ViewObjectParametersBloc
       yield ViewObjectParametersInProgress();
 
       try {
-        await _saveViewObjectParam(
-            event.viewObject, event.parameter, event.userToken);
+        await _saveViewObjectParam(event.viewObject, event.parameter);
 
-        final e = FetchViewObjectParameters(
-          viewObject: event.viewObject,
-          userToken: event.userToken,
-        );
-
-        this.add(e);
+        this.add(FetchViewObjectParameters(viewObject: event.viewObject));
       } on ApiError {
         yield ViewObjectParametersError();
       }
@@ -63,9 +62,9 @@ class ViewObjectParametersBloc
   }
 
   Future<List<ViewObjectParameter>> _fetchViewObjectParams(
-      ViewObject viewObject, String userToken) async {
+      ViewObject viewObject) async {
     final url =
-        '${settings.backendUrl}/GetViewElementParameter/$userToken/${Uri.encodeFull(viewObject.name)}/${viewObject.itemType}';
+        '${settings.backendUrl}/GetViewElementParameter/${appContext.userToken}/${Uri.encodeFull(viewObject.name)}/${viewObject.itemType}';
     final response = await restClient.get(url);
     final body =
         List<Map<String, dynamic>>.from(json.decode(response.body) as List);
@@ -98,21 +97,23 @@ class ViewObjectParametersBloc
     return allParams;
   }
 
-  Future<void> _saveViewObjectParam(ViewObject viewObject,
-      ViewObjectParameter param, String userToken) async {
+  Future<void> _saveViewObjectParam(
+    ViewObject viewObject,
+    ViewObjectParameter param,
+  ) async {
     final paramJson = param.toJson();
     final name = Uri.encodeFull(paramJson['ParameterName'] as String);
 
     if (param.value is List<Option>) {
       final url =
-          '${settings.backendUrl}/UpdateCategoryFilterData/$userToken/$name';
+          '${settings.backendUrl}/UpdateCategoryFilterData/${appContext.userToken}/$name';
 
       await restClient.post(url,
           body: json.encode(paramJson['ParameterValue']));
     } else {
       final value = Uri.encodeFull(paramJson['ParameterValue'] as String);
       final url =
-          '${settings.backendUrl}/SetParameterValue/$userToken/$name/$value';
+          '${settings.backendUrl}/SetParameterValue/${appContext.userToken}/$name/$value';
 
       await restClient.get(url);
     }

@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:rits_client/models/comments/comments.dart';
 
-import '../models/comments/comments.dart';
-
+@immutable
 abstract class CommentsState extends Equatable {
   CommentsState([List props = const []]) : super(props);
 }
@@ -32,9 +33,8 @@ class CommentsLoaded extends CommentsState {
 
 class CommentSelected extends CommentsState {
   final Comment comment;
-  final String userToken;
 
-  CommentSelected({this.comment, this.userToken}) : super([comment, userToken]);
+  CommentSelected({this.comment}) : super([comment]);
 }
 
 class CommentsError extends CommentsState {

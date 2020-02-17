@@ -3,70 +3,62 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:rits_client/app_context.dart';
+import 'package:rits_client/utils/utils.dart';
 
-import '../models/projects/projects.dart';
-import '../utils/utils.dart';
 import 'view_objects.dart';
 
 class ViewObjectsScreen<T extends ViewObjectsBloc> extends StatefulWidget {
-  final Project project;
   final String detailsScreenRoute;
   final String title;
   final String type;
-  final String userToken;
-  final String hierarchyLevel;
   final bool favorite;
-  final ViewObjectsRepository viewObjectsRepository;
 
   ViewObjectsScreen({
     Key key,
-    @required this.project,
-    @required this.userToken,
     @required this.detailsScreenRoute,
     this.title,
     this.type,
-    this.viewObjectsRepository,
-    this.hierarchyLevel,
     this.favorite = false,
-  })  : assert(project != null),
-        assert(userToken != null),
-        assert(detailsScreenRoute != null),
+  })  : assert(detailsScreenRoute != null),
         super(key: key);
 
   @override
-  State createState() => _ViewObjectsScreenState(viewObjectsRepository);
+  State createState() => _ViewObjectsScreenState();
 }
 
 class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
-  final ViewObjectsBloc viewObjectsBloc;
+  ViewObjectsBloc bloc;
 
-  Project get _project => widget.project;
   String get _title => widget.title;
   String get _type => widget.type;
-  String get _userToken => widget.userToken;
-  String get _hierarchyLevel => widget.hierarchyLevel;
   bool get _favorite => widget.favorite;
 
-  _ViewObjectsScreenState._({this.viewObjectsBloc});
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-  factory _ViewObjectsScreenState(ViewObjectsRepository viewObjectsRepository) {
-    return _ViewObjectsScreenState._(
-      viewObjectsBloc: ViewObjectsBloc(
-          viewObjectsRepository: viewObjectsRepository ??
-              ViewObjectsRepository(restClient: RestClient())),
-    );
+    if (bloc == null) {
+      final appContext = Provider.of<AppContext>(context);
+      final viewObjectsRepository = Provider.of<ViewObjectsRepository>(context);
+
+      bloc = ViewObjectsBloc(
+        appContext: appContext,
+        viewObjectsRepository: viewObjectsRepository ??
+            ViewObjectsRepository(
+              restClient: Provider.of<RestClient>(context),
+              appContext: appContext,
+            ),
+      )..add(FetchViewObjects(
+          type: _type,
+          favorite: _favorite,
+        ));
+    }
   }
 
   @override
-  void initState() {
-    super.initState();
-    viewObjectsBloc.add(FetchViewObjects(
-      project: _project,
-      type: _type,
-      userToken: _userToken,
-      hierarchyLevel: _hierarchyLevel,
-      favorite: _favorite,
-    ));
+  void dispose() {
+    bloc.close();
+    super.dispose();
   }
 
   @override
@@ -77,13 +69,13 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
       ),
       body: Center(
           child: BlocBuilder(
-        bloc: viewObjectsBloc,
+        bloc: bloc,
         builder: (BuildContext context, ViewObjectsState state) {
           if (state is ViewObjectsUninitialized) {
             return CircularProgressIndicator();
           } else if (state is ViewObjectsLoaded) {
-            return BlocProvider(
-              create: (context) => viewObjectsBloc,
+            return Provider.value(
+              value: bloc,
               child: _ViewObjectButtons(),
             );
           }
@@ -98,10 +90,10 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
 class _ViewObjectButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final _viewObjectsBloc = BlocProvider.of<ViewObjectsBloc>(context);
+    final _bloc = Provider.of<ViewObjectsBloc>(context);
 
     return BlocBuilder(
-      bloc: _viewObjectsBloc,
+      bloc: _bloc,
       builder: (BuildContext context, ViewObjectsState state) {
         return Wrap(
           alignment: WrapAlignment.spaceAround,
@@ -116,10 +108,7 @@ class _ViewObjectButtons extends StatelessWidget {
                   await Navigator.pushNamed(
                     context,
                     screen.detailsScreenRoute,
-                    arguments: {
-                      'viewObject': viewObject,
-                      'userToken': (state as ViewObjectsLoaded).userToken,
-                    },
+                    arguments: {'viewObject': viewObject},
                   );
                 });
           }).toList(),

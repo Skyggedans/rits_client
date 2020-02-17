@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:rits_client/models/filter_groups/filter_groups.dart';
 
+@immutable
 abstract class FilterGroupsState extends Equatable {
   FilterGroupsState([List props = const []]) : super(props);
 }

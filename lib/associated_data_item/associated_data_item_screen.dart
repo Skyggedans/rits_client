@@ -4,12 +4,14 @@ import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:provider/provider.dart';
 import 'package:rits_client/app_config.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/associated_data/associated_data.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/row_editor/row_editor_screen.dart';
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rits_client/view_object/view_object.dart';
 import 'package:rw_help/rw_help.dart';
 
-import '../models/associated_data/associated_data.dart';
-import '../models/view_objects/view_objects.dart';
-import '../row_editor/row_editor_screen.dart';
-import '../view_object/view_object.dart';
 import 'associated_data_item.dart';
 
 enum RecordAction {
@@ -24,11 +26,10 @@ class AssociatedDataItemScreen extends ViewObjectScreen {
   AssociatedDataItemScreen({
     Key key,
     @required ViewObject viewObject,
-    @required String userToken,
   }) : super(
           key: key,
           viewObject: viewObject,
-          userToken: userToken,
+          canBeFavorite: false,
         );
 
   @override
@@ -37,25 +38,31 @@ class AssociatedDataItemScreen extends ViewObjectScreen {
 
 class _AssociatedDataItemScreenState extends ViewObjectScreenState<
     AssociatedDataItemBloc, AssociatedDataItemGenerated> {
-  AssociatedDataItemBloc viewObjectBloc = AssociatedDataItemBloc();
   bool isRealWearDevice;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  AssociatedDataItemBloc createBloc() {
     isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
+
+    return AssociatedDataItemBloc(
+      restClient: Provider.of<RestClient>(context),
+      appContext: Provider.of<AppContext>(context),
+    )..add(GenerateViewObject(viewObject));
   }
 
   @override
-  void initState() {
-    super.initState();
-    viewObjectBloc.add(GenerateViewObject(viewObject, userToken));
+  void dispose() {
+    if (isRealWearDevice) {
+      RwHelp.setCommands([]);
+    }
+
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder(
-      bloc: viewObjectBloc,
+      bloc: bloc,
       builder: (BuildContext context, ViewObjectState state) {
         Widget bodyChild;
         String title = viewObject.title ?? viewObject.name;
@@ -128,10 +135,9 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
                         ],
                       ),
                       onPressed: () {
-                        viewObjectBloc.add(SaveRows(
+                        bloc.add(SaveRows(
                           table: state.table,
                           viewObject: state.viewObject,
-                          userToken: state.userToken,
                         ));
                       },
                     ),
@@ -247,15 +253,6 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
   @override
   bool returnToMainScreen() => false;
 
-  @override
-  void dispose() {
-    if (isRealWearDevice) {
-      RwHelp.setCommands([]);
-    }
-
-    super.dispose();
-  }
-
   void _onNewRecord(BuildContext context, List<ColumnDef> columnDefinitions,
       AssociatedDataTable table) async {
     final Map<String, dynamic> newRow = await Navigator.push(
@@ -271,7 +268,7 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
     );
 
     if (newRow != null) {
-      viewObjectBloc.add(AddRow(table: table, row: newRow));
+      bloc.add(AddRow(table: table, row: newRow));
     }
   }
 
@@ -294,15 +291,14 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
           ) as Map<String, dynamic>;
 
           if (modifiedRow != null) {
-            viewObjectBloc
-                .add(UpdateRow(table: table, row: modifiedRow, index: index));
+            bloc.add(UpdateRow(table: table, row: modifiedRow, index: index));
           }
 
           break;
         }
       case RecordAction.REMOVE:
         {
-          viewObjectBloc.add(RemoveRow(table: table, index: index));
+          bloc.add(RemoveRow(table: table, index: index));
 
           break;
         }

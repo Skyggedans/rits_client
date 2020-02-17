@@ -1,7 +1,6 @@
-import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
-
-import '../../models/view_objects/view_objects.dart';
+import 'package:meta/meta.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
 
 @immutable
 abstract class SelectionEvent extends Equatable {
@@ -10,10 +9,8 @@ abstract class SelectionEvent extends Equatable {
 
 class FetchSelectionOptions extends SelectionEvent {
   final ViewObjectParameter param;
-  final String userToken;
 
-  FetchSelectionOptions({@required this.param, @required this.userToken})
-      : super([param, userToken]);
+  FetchSelectionOptions({@required this.param}) : super([param]);
 
   @override
   String toString() => 'FetchSelectionOptions';

@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:rits_client/app_context.dart';
+import 'package:rits_client/project/project.dart';
 import 'package:rits_client/utils/rest_client.dart';
 
-import '../project/project.dart';
 import 'projects.dart';
 
 class ProjectsScreen extends StatefulWidget {
@@ -17,38 +17,50 @@ class ProjectsScreen extends StatefulWidget {
 }
 
 class _ProjectsScreenState extends State<ProjectsScreen> {
+  ProjectsBloc _bloc;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    Provider.of<ProjectsBloc>(context).add(FetchProjects());
+    if (_bloc == null) {
+      _bloc = ProjectsBloc(restClient: Provider.of<RestClient>(context))
+        ..add(FetchProjects());
+    }
+  }
+
+  @override
+  void dispose() {
+    _bloc?.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ProjectsBloc>(
-      builder: (context, bloc, _) => Scaffold(
-        appBar: AppBar(
-          title: Text('Projects'),
-        ),
-        body: Center(
-            child: BlocBuilder(
-          bloc: bloc,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Projects'),
+      ),
+      body: Center(
+        child: BlocBuilder(
+          bloc: _bloc,
           builder: (BuildContext context, ProjectsState state) {
             if (state is ProjectsUninitialized) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
+              return CircularProgressIndicator();
             } else if (state is ProjectsLoaded) {
-              return _ProjectButtons();
+              return Provider.value(
+                value: _bloc,
+                child: _ProjectButtons(),
+              );
             }
 
             return const Center(
               child: Text('Failed to fetch projects'),
             );
           },
-        )),
+        ),
       ),
+      //),
     );
   }
 }
@@ -67,19 +79,13 @@ class _ProjectButtons extends StatelessWidget {
                   child: Text(project.name),
                   onPressed: () async {
                     appContext.project = project;
+                    appContext.sessionContext = null;
+                    appContext.sessionContextName = null;
 
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            ProxyProvider<RestClient, ProjectBloc>(
-                          update: (_, restClient, __) => ProjectBloc(
-                            restClient: restClient,
-                            appContext: appContext,
-                          ), //..add(LoadProject(project)),
-                          dispose: (_, bloc) => bloc.close(),
-                          child: ProjectScreen(),
-                        ),
+                        builder: (context) => ProjectScreen(),
                       ),
                     );
                   });

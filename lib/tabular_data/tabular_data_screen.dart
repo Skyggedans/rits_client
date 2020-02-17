@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:provider/provider.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rits_client/view_object/view_object.dart';
 
-import '../models/view_objects/view_objects.dart';
-import '../view_object/view_object.dart';
 import 'tabular_data.dart';
 
 enum RecordAction {
@@ -17,12 +20,8 @@ class TabularDataScreen extends ViewObjectScreen {
   TabularDataScreen({
     Key key,
     @required ViewObject viewObject,
-    @required String userToken,
-  }) : super(
-          key: key,
-          viewObject: viewObject,
-          userToken: userToken,
-        );
+  })  : assert(viewObject != null),
+        super(key: key, viewObject: viewObject);
 
   @override
   State createState() => _TabularDataScreenState();
@@ -30,8 +29,13 @@ class TabularDataScreen extends ViewObjectScreen {
 
 class _TabularDataScreenState
     extends ViewObjectScreenState<TabularDataBloc, TabularDataGenerated> {
-  // ignore: close_sinks
-  final viewObjectBloc = TabularDataBloc();
+  @override
+  TabularDataBloc createBloc() {
+    return TabularDataBloc(
+      restClient: Provider.of<RestClient>(context),
+      appContext: Provider.of<AppContext>(context),
+    );
+  }
 
   @override
   Widget buildOutputWidget(BuildContext context, TabularDataGenerated state) {

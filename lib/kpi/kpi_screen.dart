@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:provider/provider.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/kpi/kpi.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rits_client/view_object/view_object.dart';
 
-import '../models/view_objects/view_objects.dart';
-import '../models/kpi/kpi.dart';
-import '../view_object/view_object.dart';
 import 'kpi.dart';
 
 Card buildKpiCard(Kpi kpi) {
@@ -68,19 +71,21 @@ class KpiScreen extends ViewObjectScreen {
   KpiScreen({
     Key key,
     @required ViewObject viewObject,
-    @required String userToken,
-  }) : super(
-          key: key,
-          viewObject: viewObject,
-          userToken: userToken,
-        );
+  })  : assert(viewObject != null),
+        super(key: key, viewObject: viewObject);
 
   @override
   State createState() => _KpiScreenState();
 }
 
 class _KpiScreenState extends ViewObjectScreenState<KpiBloc, KpiGenerated> {
-  final viewObjectBloc = KpiBloc();
+  @override
+  KpiBloc createBloc() {
+    return KpiBloc(
+      restClient: Provider.of<RestClient>(context),
+      appContext: Provider.of<AppContext>(context),
+    );
+  }
 
   @override
   Widget buildOutputWidget(BuildContext context, KpiGenerated state) {

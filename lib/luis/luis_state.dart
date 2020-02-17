@@ -1,6 +1,6 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
-import 'package:equatable/equatable.dart';
 import 'package:rits_client/models/kpi/kpi.dart';
 
 @immutable
@@ -14,11 +14,9 @@ class LuisUninitialized extends LuisState {
 }
 
 class UtteranceInput extends LuisState {
-  final String luisProjectId;
-  final String userToken;
+  final String luisAppId;
 
-  UtteranceInput({@required this.luisProjectId, @required this.userToken})
-      : super([luisProjectId, userToken]);
+  UtteranceInput({@required this.luisAppId}) : super([luisAppId]);
 
   @override
   String toString() => 'UtteranceInput';

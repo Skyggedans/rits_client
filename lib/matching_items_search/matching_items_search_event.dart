@@ -1,17 +1,17 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
+@immutable
 abstract class MatchingItemsSearchEvent extends Equatable {
   MatchingItemsSearchEvent([List props = const []]) : super(props);
 }
 
 class SearchMatchingItems extends MatchingItemsSearchEvent {
   final String searchString;
-  final String userToken;
 
-  SearchMatchingItems({@required this.searchString, @required this.userToken})
+  SearchMatchingItems({@required this.searchString})
       : assert(searchString != null),
-        assert(userToken != null);
+        super([searchString]);
 
   @override
   String toString() => 'SearchMatchingItems';

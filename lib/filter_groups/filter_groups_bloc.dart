@@ -2,17 +2,22 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/filter_groups/filter_groups.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/rest_client.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../models/filter_groups/filter_groups.dart';
-import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
 import 'filter_groups.dart';
 
 class FilterGroupsBloc extends Bloc<FilterGroupsEvent, FilterGroupsState> {
   final RestClient restClient;
+  final AppContext appContext;
 
-  FilterGroupsBloc({@required this.restClient}) : assert(restClient != null);
+  FilterGroupsBloc({@required this.restClient, @required this.appContext})
+      : assert(restClient != null),
+        assert(appContext != null),
+        super();
 
   @override
   get initialState => FilterGroupsInProgress();
@@ -28,7 +33,7 @@ class FilterGroupsBloc extends Bloc<FilterGroupsEvent, FilterGroupsState> {
       yield FilterGroupsInProgress();
 
       try {
-        final filterGroups = await _fetchFilterGroups(event.userToken);
+        final filterGroups = await _fetchFilterGroups();
 
         yield FilterGroupsLoaded(filterGroups: filterGroups);
       } on ApiError {
@@ -38,10 +43,7 @@ class FilterGroupsBloc extends Bloc<FilterGroupsEvent, FilterGroupsState> {
       yield FilterGroupsInProgress();
 
       try {
-        await _saveSelectedFilterGroup(
-          event.filterGroup,
-          event.userToken,
-        );
+        await _saveSelectedFilterGroup(event.filterGroup);
       } on ApiError {
         yield FilterGroupsError(
             message: 'Unable to save selected filter group');
@@ -49,8 +51,8 @@ class FilterGroupsBloc extends Bloc<FilterGroupsEvent, FilterGroupsState> {
     }
   }
 
-  Future<List<FilterGroup>> _fetchFilterGroups(String userToken) async {
-    final url = '${settings.backendUrl}/GroupFilter/$userToken';
+  Future<List<FilterGroup>> _fetchFilterGroups() async {
+    final url = '${settings.backendUrl}/GroupFilter/${appContext.userToken}';
     final response = await restClient.get(url);
     final body =
         List<Map<String, dynamic>>.from(json.decode(response.body) as List);
@@ -86,21 +88,17 @@ class FilterGroupsBloc extends Bloc<FilterGroupsEvent, FilterGroupsState> {
     return filterGroups;
   }
 
-  Future<List<String>> _getActiveFilterGroupsForLevel(
-      int levelNumber, String userToken) async {
+  Future<List<String>> _getActiveFilterGroupsForLevel(int levelNumber) async {
     final url =
-        '${settings.backendUrl}/GetActiveGroupFilter/$userToken/$levelNumber';
+        '${settings.backendUrl}/GetActiveGroupFilter/${appContext.userToken}/$levelNumber';
     final String response = await restClient.get(url) as String;
 
     return response?.split('|') ?? [];
   }
 
-  Future<void> _saveSelectedFilterGroup(
-    FilterGroup filterGroup,
-    String userToken,
-  ) async {
+  Future<void> _saveSelectedFilterGroup(FilterGroup filterGroup) async {
     final url =
-        '${settings.backendUrl}/SetActiveGroupFilter/$userToken/${filterGroup.levelNumber}/${Uri.encodeFull(filterGroup.name)}';
+        '${settings.backendUrl}/SetActiveGroupFilter/${appContext.userToken}/${filterGroup.levelNumber}/${Uri.encodeFull(filterGroup.name)}';
 
     await restClient.get(url);
   }

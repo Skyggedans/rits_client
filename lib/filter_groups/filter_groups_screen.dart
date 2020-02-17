@@ -1,33 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meta/meta.dart';
+import 'package:provider/provider.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/filter_groups/filter_groups.dart';
+import 'package:rits_client/utils/utils.dart';
 
-import '../models/filter_groups/filter_groups.dart';
-import '../utils/utils.dart';
 import 'filter_groups.dart';
 
 class FilterGroupsScreen extends StatefulWidget {
-  final String userToken;
-
-  FilterGroupsScreen({
-    Key key,
-    @required this.userToken,
-  }) : assert(userToken != null);
-
   @override
   State createState() => _FilterGroupsScreenState();
 }
 
 class _FilterGroupsScreenState extends State<FilterGroupsScreen> {
-  final _filterGroupsBloc = FilterGroupsBloc(restClient: RestClient());
-
-  String get _userToken => widget.userToken;
+  FilterGroupsBloc _bloc;
 
   @override
-  void initState() {
-    super.initState();
-    _filterGroupsBloc.add(FetchFilterGroups(userToken: _userToken));
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_bloc == null) {
+      _bloc = FilterGroupsBloc(
+        restClient: Provider.of<RestClient>(context),
+        appContext: Provider.of<AppContext>(context),
+      )..add(FetchFilterGroups());
+    }
+  }
+
+  @override
+  void dispose() {
+    _bloc.close();
+    super.dispose();
   }
 
   @override
@@ -38,7 +42,7 @@ class _FilterGroupsScreenState extends State<FilterGroupsScreen> {
       ),
       body: Center(
         child: BlocBuilder(
-          bloc: _filterGroupsBloc,
+          bloc: _bloc,
           builder: (BuildContext context, FilterGroupsState state) {
             if (state is FilterGroupsInProgress) {
               return CircularProgressIndicator();
@@ -103,18 +107,13 @@ class _FilterGroupsScreenState extends State<FilterGroupsScreen> {
     final selectedFilterGroup = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FilterGroupsSelectionScreen(
-          userToken: _userToken,
-          filterGroups: levelGroups,
-        ),
+        builder: (context) =>
+            FilterGroupsSelectionScreen(filterGroups: levelGroups),
       ),
     ) as FilterGroup;
 
     if (selectedFilterGroup != null) {
-      _filterGroupsBloc.add(SaveSelectedFilterGroup(
-        filterGroup: selectedFilterGroup,
-        userToken: _userToken,
-      ));
+      _bloc.add(SaveSelectedFilterGroup(filterGroup: selectedFilterGroup));
     }
   }
 }

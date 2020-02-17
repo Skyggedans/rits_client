@@ -1,17 +1,22 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/associated_data/associated_data.dart';
+import 'package:rits_client/models/associated_data/business_object.dart';
+import 'package:rits_client/models/associated_data/table.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rits_client/view_object/view_object.dart';
 
-import '../models/associated_data/associated_data.dart';
-import '../models/associated_data/business_object.dart';
-import '../models/associated_data/table.dart';
-import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
-import '../view_object/view_object.dart';
 import 'associated_data_item.dart';
 
 class AssociatedDataItemBloc extends ViewObjectBloc {
-  AssociatedDataItemBloc() : super(restClient: RestClient());
+  AssociatedDataItemBloc({
+    @required RestClient restClient,
+    @required AppContext appContext,
+  }) : super(restClient: restClient, appContext: appContext);
 
   @override
   get initialState => ViewObjectGeneration();
@@ -24,9 +29,8 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
       yield ViewObjectGeneration();
 
       try {
-        final columns =
-            await _getColumnDefinitions(event.viewObject, event.userToken);
-        final data = await _getData(event.viewObject, event.userToken);
+        final columns = await _getColumnDefinitions(event.viewObject);
+        final data = await _getData(event.viewObject);
 
         if (data == null) {
           yield NoActiveContainerError();
@@ -37,7 +41,6 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
           columnDefinitions: columns,
           table: data,
           viewObject: event.viewObject,
-          userToken: event.userToken,
         );
       } on ApiError {
         yield ViewObjectError();
@@ -73,7 +76,7 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
       yield ViewObjectGeneration();
 
       try {
-        await _saveRows(event.table, event.viewObject, event.userToken);
+        await _saveRows(event.table, event.viewObject);
       } on ApiError {
         yield ViewObjectError();
       }
@@ -106,10 +109,9 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
   //       orElse: () => null);
   // }
 
-  Future<AssociatedDataTable> _getData(
-      BusinessObject viewObject, String userToken) async {
+  Future<AssociatedDataTable> _getData(BusinessObject viewObject) async {
     final url =
-        '${settings.backendUrl}/GetAssociatedDataContainer/$userToken/${viewObject.id}';
+        '${settings.backendUrl}/GetAssociatedDataContainer/${appContext.userToken}/${viewObject.id}';
 
     final response = await restClient.get(url);
 
@@ -129,9 +131,9 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
   }
 
   Future<List<ColumnDef>> _getColumnDefinitions(
-      BusinessObject viewObject, String userToken) async {
+      BusinessObject viewObject) async {
     final url =
-        '${settings.backendUrl}/GetAssociatedDataValidation/$userToken/${viewObject.name}';
+        '${settings.backendUrl}/GetAssociatedDataValidation/${appContext.userToken}/${viewObject.name}';
 
     final response = await restClient.get(url);
     final body =
@@ -142,10 +144,10 @@ class AssociatedDataItemBloc extends ViewObjectBloc {
     }).toList();
   }
 
-  Future<void> _saveRows(AssociatedDataTable table, BusinessObject viewObject,
-      String userToken) async {
+  Future<void> _saveRows(
+      AssociatedDataTable table, BusinessObject viewObject) async {
     final url =
-        '${settings.backendUrl}/UpdateBusObjectAssociatedData/$userToken/${table.container.id}';
+        '${settings.backendUrl}/UpdateBusObjectAssociatedData/${appContext.userToken}/${table.container.id}';
 
     table.rows.forEach((row) {
       row['AssociatedDataHeaderID'] = table.container.id;

@@ -1,7 +1,6 @@
-import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
-
-import '../models/view_objects/view_objects.dart';
+import 'package:meta/meta.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
 
 @immutable
 abstract class ViewObjectParametersEvent extends Equatable {
@@ -11,11 +10,10 @@ abstract class ViewObjectParametersEvent extends Equatable {
 class FetchViewObjectParameters<T extends ViewObject>
     extends ViewObjectParametersEvent {
   final T viewObject;
-  final String userToken;
 
-  FetchViewObjectParameters(
-      {@required this.viewObject, @required this.userToken})
-      : super([viewObject, userToken]);
+  FetchViewObjectParameters({@required this.viewObject})
+      : assert(viewObject != null),
+        super([viewObject]);
 
   @override
   String toString() => 'FetchViewObjectParameters';
@@ -24,14 +22,14 @@ class FetchViewObjectParameters<T extends ViewObject>
 class SaveViewObjectParameter<T extends ViewObject>
     extends ViewObjectParametersEvent {
   final T viewObject;
-  final String userToken;
   final ViewObjectParameter parameter;
 
   SaveViewObjectParameter({
     @required this.viewObject,
-    @required this.userToken,
     @required this.parameter,
-  }) : super([viewObject, userToken, parameter]);
+  })  : assert(viewObject != null),
+        assert(parameter != null),
+        super([viewObject, parameter]);
 
   @override
   String toString() => 'SaveViewObjectParameter';

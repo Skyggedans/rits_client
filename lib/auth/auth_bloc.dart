@@ -4,29 +4,28 @@ import 'dart:core';
 
 import 'package:bloc/bloc.dart';
 import 'package:http/http.dart' as http;
+import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:oauth2/oauth2.dart';
-import 'package:logging/logging.dart';
+import 'package:rits_client/settings.dart' as settings;
 
-import '../settings.dart' as settings;
-import 'authentication.dart';
+import 'auth.dart';
 
 final _logger = Logger('auth');
 
-class AuthenticationBloc
-    extends Bloc<AuthenticationEvent, AuthenticationState> {
+class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
 
-  AuthenticationBloc({@required this.authRepository}) {
+  AuthBloc({@required this.authRepository}) {
     assert(authRepository != null);
   }
 
   @override
-  AuthenticationState get initialState => AuthenticationUninitialized();
+  AuthState get initialState => AuthUninitialized();
 
   @override
-  Stream<AuthenticationState> mapEventToState(
-    AuthenticationEvent event,
+  Stream<AuthState> mapEventToState(
+    AuthEvent event,
   ) async* {
     if (event is AppStarted) {
       yield* _mapAppStarted();
@@ -35,7 +34,7 @@ class AuthenticationBloc
     } else if (event is AccessGranted) {
       yield Authenticated();
     } else if (event is AccessDenied) {
-      yield AuthenticationFailed(reason: event.reason);
+      yield AuthFailed(reason: event.reason);
       /*}
     else if (event is AccessRevoked) {
       await authRepository.deleteTokens();
@@ -45,7 +44,7 @@ class AuthenticationBloc
     }
   }
 
-  Stream<AuthenticationState> _mapAppStarted() async* {
+  Stream<AuthState> _mapAppStarted() async* {
     if (await authRepository.hasAccessToken()) {
       yield Authenticated();
       // } else if (await authRepository.hasRefreshToken()) {
@@ -74,14 +73,14 @@ class AuthenticationBloc
     }
   }
 
-  Stream<AuthenticationState> _mapAuthenticate() async* {
+  Stream<AuthState> _mapAuthenticate() async* {
     try {
       final response = await _requestUserAndDeviceCodes();
 
       _logger.info(
           'Authentication will await for user code for ${response['expires_in']} seconds');
 
-      yield AuthenticationPending(
+      yield AuthPending(
         userCode: response['user_code'] as String,
         verificationUrl: response['verification_uri'] as String,
         expiresIn: Duration(seconds: response['expires_in'] as int),

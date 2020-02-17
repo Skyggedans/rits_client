@@ -1,19 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:meta/meta.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:bloc/bloc.dart';
+import 'package:meta/meta.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rxdart/rxdart.dart';
 
-import '../../settings.dart' as settings;
-import '../../utils/rest_client.dart';
-import '../../models/view_objects/view_objects.dart';
 import 'selection.dart';
 
 class MultiSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
   final RestClient restClient;
+  final AppContext appContext;
 
-  MultiSelectionBloc({@required this.restClient});
+  MultiSelectionBloc({@required this.restClient, @required this.appContext})
+      : assert(restClient != null),
+        assert(appContext != null),
+        super();
 
   @override
   Stream<SelectionState> transformStates(Stream<SelectionState> states) {
@@ -27,7 +32,7 @@ class MultiSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
   Stream<SelectionState> mapEventToState(SelectionEvent event) async* {
     if (event is FetchSelectionOptions) {
       try {
-        final options = await _fetchParamOptions(event.param, event.userToken);
+        final options = await _fetchParamOptions(event.param);
 
         yield SelectionOptionsLoaded(options: options);
       } on ApiError {
@@ -43,10 +48,9 @@ class MultiSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
     }
   }
 
-  Future<List<Option>> _fetchParamOptions(
-      ViewObjectParameter param, String userToken) async {
+  Future<List<Option>> _fetchParamOptions(ViewObjectParameter param) async {
     final url =
-        '${settings.backendUrl}/GetCategoryFilterData/$userToken/${param.name}';
+        '${settings.backendUrl}/GetCategoryFilterData/${appContext.userToken}/${param.name}';
     final response = await restClient.get(url);
     final body =
         List<Map<String, dynamic>>.from(json.decode(response.body) as List);

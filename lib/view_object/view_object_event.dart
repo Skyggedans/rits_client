@@ -1,7 +1,6 @@
-import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
-
-import '../models/view_objects/view_objects.dart';
+import 'package:meta/meta.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
 
 @immutable
 abstract class ViewObjectEvent extends Equatable {
@@ -11,10 +10,8 @@ abstract class ViewObjectEvent extends Equatable {
 class ReturnToViewObjectMainScreen<T extends ViewObject>
     extends ViewObjectEvent {
   final T viewObject;
-  final String userToken;
 
-  ReturnToViewObjectMainScreen(this.viewObject, this.userToken)
-      : super([viewObject, userToken]);
+  ReturnToViewObjectMainScreen(this.viewObject) : super([viewObject]);
 
   @override
   String toString() => 'ReturnToViewObjectMainScreen';
@@ -22,10 +19,8 @@ class ReturnToViewObjectMainScreen<T extends ViewObject>
 
 class GetFavoriteId<T extends ViewObject> extends ViewObjectEvent {
   final T viewObject;
-  final String userToken;
 
-  GetFavoriteId(this.viewObject, this.userToken)
-      : super([viewObject, userToken]);
+  GetFavoriteId(this.viewObject) : super([viewObject]);
 
   @override
   String toString() => 'GetFavoriteId { viewObject: ${viewObject.name} }';
@@ -33,10 +28,8 @@ class GetFavoriteId<T extends ViewObject> extends ViewObjectEvent {
 
 class GenerateViewObject<T extends ViewObject> extends ViewObjectEvent {
   final T viewObject;
-  final String userToken;
 
-  GenerateViewObject(this.viewObject, this.userToken)
-      : super([viewObject, userToken]);
+  GenerateViewObject(this.viewObject) : super([viewObject]);
 
   @override
   String toString() => 'GenerateViewObject { viewObject: ${viewObject.name} }';
@@ -44,9 +37,8 @@ class GenerateViewObject<T extends ViewObject> extends ViewObjectEvent {
 
 class AddFavorite<T extends ViewObject> extends ViewObjectEvent {
   final T viewObject;
-  final String userToken;
 
-  AddFavorite(this.viewObject, this.userToken) : super([viewObject, userToken]);
+  AddFavorite(this.viewObject) : super([viewObject]);
 
   @override
   String toString() => 'AddFavorite { viewObject: ${viewObject.name} }';
@@ -54,10 +46,8 @@ class AddFavorite<T extends ViewObject> extends ViewObjectEvent {
 
 class RemoveFavorite<T extends ViewObject> extends ViewObjectEvent {
   final int favoriteId;
-  final String userToken;
 
-  RemoveFavorite(this.favoriteId, this.userToken)
-      : super([favoriteId, userToken]);
+  RemoveFavorite(this.favoriteId) : super([favoriteId]);
 
   @override
   String toString() => 'RemoveFavorite { favoriteId: $favoriteId }';

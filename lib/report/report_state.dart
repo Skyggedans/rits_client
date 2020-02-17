@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../view_object/view_object.dart';
+import 'package:rits_client/view_object/view_object.dart';
 
 class ReportGenerated extends ViewObjectState {
   final Uint8List bytes;
@@ -9,4 +9,9 @@ class ReportGenerated extends ViewObjectState {
 
   @override
   String toString() => 'ReportGenerated';
+}
+
+class ReportFormatError extends ViewObjectError {
+  @override
+  String toString() => 'ReportFormatError';
 }

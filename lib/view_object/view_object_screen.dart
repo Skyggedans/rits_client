@@ -1,34 +1,46 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/view_object_parameters/view_object_parameters.dart';
 
-import '../models/view_objects/view_objects.dart';
-import '../view_object_parameters/view_object_parameters.dart';
 import 'view_object.dart';
 
 abstract class ViewObjectScreen extends StatefulWidget {
   final ViewObject viewObject;
-  final String userToken;
   final bool canBeFavorite;
 
   ViewObjectScreen({
     Key key,
     @required this.viewObject,
-    @required this.userToken,
     this.canBeFavorite = true,
-  }) : super(key: key);
+  })  : assert(viewObject != null),
+        super(key: key);
 }
 
 abstract class ViewObjectScreenState<T extends ViewObjectBloc,
     S extends ViewObjectState> extends State<ViewObjectScreen> {
   ViewObject get viewObject => widget.viewObject;
-  String get userToken => widget.userToken;
   bool get _canBeFavorite => widget.canBeFavorite;
 
-  T viewObjectBloc;
+  T bloc;
   Widget buildOutputWidget(BuildContext context, S state);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (bloc == null) {
+      bloc = createBloc()..add(GetFavoriteId(viewObject));
+    }
+  }
+
+  @override
+  void dispose() {
+    bloc?.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +54,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
           padding: EdgeInsets.all(10.0),
           child: Center(
             child: BlocBuilder(
-              bloc: viewObjectBloc,
+              bloc: bloc,
               builder: (BuildContext context, ViewObjectState state) {
                 if (state is ViewObjectUninitialized) {
                   return Center(
@@ -60,8 +72,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                               MaterialPageRoute(
                                 builder: (context) =>
                                     ViewObjectParametersScreen(
-                                        viewObject: viewObject,
-                                        userToken: userToken),
+                                        viewObject: viewObject),
                               ),
                             );
                           },
@@ -69,10 +80,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                         RaisedButton(
                           child: const Text('View'),
                           onPressed: () {
-                            viewObjectBloc.add(GenerateViewObject(
-                              viewObject,
-                              userToken,
-                            ));
+                            bloc.add(GenerateViewObject(viewObject));
                           },
                         ),
                         Visibility(
@@ -83,14 +91,8 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                                 : 'Add Favorite'),
                             onPressed: () {
                               state.favoriteId > 0
-                                  ? viewObjectBloc.add(RemoveFavorite(
-                                      state.favoriteId,
-                                      userToken,
-                                    ))
-                                  : viewObjectBloc.add(AddFavorite(
-                                      viewObject,
-                                      userToken,
-                                    ));
+                                  ? bloc.add(RemoveFavorite(state.favoriteId))
+                                  : bloc.add(AddFavorite(viewObject));
                             },
                           ),
                         ),
@@ -102,6 +104,8 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                 } else if (state is ViewObjectError) {
                   return const Text('Failed to generate view object');
                 }
+
+                return null;
               },
             ),
           ),
@@ -110,17 +114,13 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
     );
   }
 
-  bool returnToMainScreen() => !(viewObjectBloc.state is ViewObjectIdle);
+  bool returnToMainScreen() => !(bloc.state is ViewObjectIdle);
 
-  @override
-  void initState() {
-    super.initState();
-    viewObjectBloc.add(GetFavoriteId(viewObject, userToken));
-  }
+  T createBloc();
 
   Future<bool> _onBackPressed() async {
     if (returnToMainScreen()) {
-      viewObjectBloc.add(ReturnToViewObjectMainScreen(viewObject, userToken));
+      bloc.add(ReturnToViewObjectMainScreen(viewObject));
 
       return false;
     }

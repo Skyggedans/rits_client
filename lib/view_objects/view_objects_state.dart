@@ -1,7 +1,6 @@
-import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
-
-import '../models/view_objects/view_objects.dart';
+import 'package:meta/meta.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
 
 @immutable
 abstract class ViewObjectsState extends Equatable {
@@ -20,15 +19,13 @@ class ViewObjectsError extends ViewObjectsState {
 
 class ViewObjectsLoaded extends ViewObjectsState {
   final List<ViewObject> viewObjects;
-  final String userToken;
 
-  ViewObjectsLoaded({this.viewObjects, this.userToken})
-      : super([viewObjects, userToken]);
+  ViewObjectsLoaded({@required this.viewObjects})
+      : assert(viewObjects != null),
+        super([viewObjects]);
 
-  ViewObjectsLoaded copyWith({List<ViewObject> viewObjects, String userToken}) {
-    return ViewObjectsLoaded(
-        viewObjects: viewObjects ?? this.viewObjects,
-        userToken: userToken ?? this.userToken);
+  ViewObjectsLoaded copyWith({List<ViewObject> viewObjects}) {
+    return ViewObjectsLoaded(viewObjects: viewObjects ?? this.viewObjects);
   }
 
   @override

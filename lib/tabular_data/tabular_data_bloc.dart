@@ -1,13 +1,18 @@
 import 'dart:convert';
 
-import '../settings.dart' as settings;
-import '../utils/rest_client.dart';
-import '../models/view_objects/view_objects.dart';
-import '../view_object/view_object.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/settings.dart' as settings;
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rits_client/view_object/view_object.dart';
+
 import 'tabular_data.dart';
 
 class TabularDataBloc extends ViewObjectBloc {
-  TabularDataBloc() : super(restClient: RestClient());
+  TabularDataBloc(
+      {@required RestClient restClient, @required AppContext appContext})
+      : super(restClient: restClient, appContext: appContext);
 
   @override
   Stream<ViewObjectState> mapEventToState(ViewObjectEvent event) async* {
@@ -15,7 +20,7 @@ class TabularDataBloc extends ViewObjectBloc {
       yield ViewObjectGeneration();
 
       try {
-        final data = await _getData(event.viewObject, event.userToken);
+        final data = await _getData(event.viewObject);
 
         yield TabularDataGenerated(data: data);
       } on ApiError {
@@ -26,10 +31,9 @@ class TabularDataBloc extends ViewObjectBloc {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _getData(
-      ViewObject viewObject, String userToken) async {
+  Future<List<Map<String, dynamic>>> _getData(ViewObject viewObject) async {
     final url =
-        '${settings.backendUrl}/fetch/$userToken/3/${Uri.encodeFull(viewObject.name)}';
+        '${settings.backendUrl}/fetch/${appContext.userToken}/3/${Uri.encodeFull(viewObject.name)}';
     final response = await restClient.get(url);
     final body =
         List<Map<String, dynamic>>.from(json.decode(response.body)[0] as List);

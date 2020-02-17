@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
 
-import '../models/view_objects/view_objects.dart';
-
+@immutable
 abstract class ViewObjectParametersState extends Equatable {
   ViewObjectParametersState([List props = const []]) : super(props);
 }
@@ -13,14 +14,12 @@ class ViewObjectParametersInProgress extends ViewObjectParametersState {
 
 class ViewObjectParametersLoaded extends ViewObjectParametersState {
   final ViewObject viewObject;
-  final String userToken;
   final List<ViewObjectParameter> parameters;
 
   ViewObjectParametersLoaded({
     this.viewObject,
-    this.userToken,
     this.parameters,
-  }) : super([viewObject, userToken, parameters]);
+  }) : super([viewObject, parameters]);
 
   ViewObjectParametersLoaded copyWith({List<ViewObjectParameter> parameters}) {
     return ViewObjectParametersLoaded(

@@ -1,26 +1,26 @@
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 
-abstract class AuthenticationEvent extends Equatable {
-  AuthenticationEvent([List props = const []]) : super(props);
+abstract class AuthEvent extends Equatable {
+  AuthEvent([List props = const []]) : super(props);
 }
 
-class AppStarted extends AuthenticationEvent {
+class AppStarted extends AuthEvent {
   @override
   String toString() => 'AppStarted';
 }
 
-class Authenticate extends AuthenticationEvent {
+class Authenticate extends AuthEvent {
   @override
   String toString() => 'Authenticate';
 }
 
-class AccessGranted extends AuthenticationEvent {
+class AccessGranted extends AuthEvent {
   @override
   String toString() => 'AccessGranted';
 }
 
-class AccessDenied extends AuthenticationEvent {
+class AccessDenied extends AuthEvent {
   final String reason;
 
   AccessDenied({@required this.reason}) : super();
@@ -29,7 +29,7 @@ class AccessDenied extends AuthenticationEvent {
   String toString() => 'AccessDenied { reason: $reason }';
 }
 
-class LoggedIn extends AuthenticationEvent {
+class LoggedIn extends AuthEvent {
   final String token;
 
   LoggedIn({@required this.token}) : super([token]);
@@ -38,17 +38,17 @@ class LoggedIn extends AuthenticationEvent {
   String toString() => 'LoggedIn { token: $token }';
 }
 
-class LoggedOut extends AuthenticationEvent {
+class LoggedOut extends AuthEvent {
   @override
   String toString() => 'LoggedOut';
 }
 
-class AccessRevoked extends AuthenticationEvent {
+class AccessRevoked extends AuthEvent {
   @override
   String toString() => 'AccessRevoked';
 }
 
-class AccessTokenExpired extends AuthenticationEvent {
+class AccessTokenExpired extends AuthEvent {
   @override
   String toString() => 'AccessTokenExpired';
 }

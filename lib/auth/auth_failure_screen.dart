@@ -1,22 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
-import 'authentication.dart';
+import 'auth.dart';
 
-class AuthenticationFailureScreen extends StatefulWidget {
+class AuthFailureScreen extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _AuthenticationFailureScreenState();
+  State<StatefulWidget> createState() => _AuthFailureScreenState();
 }
 
-class _AuthenticationFailureScreenState
-    extends State<AuthenticationFailureScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
+class _AuthFailureScreenState extends State<AuthFailureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,8 +26,7 @@ class _AuthenticationFailureScreenState
             RaisedButton(
               child: const Text('Try Again'),
               onPressed: () {
-                // ignore: close_sinks
-                final _authBloc = BlocProvider.of<AuthenticationBloc>(context);
+                final _authBloc = Provider.of<AuthBloc>(context);
 
                 _authBloc.add(Authenticate());
               },

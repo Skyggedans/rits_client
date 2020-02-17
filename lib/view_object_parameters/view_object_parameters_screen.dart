@@ -1,22 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
+import 'package:rits_client/utils/rest_client.dart';
+import 'package:rits_client/widgets/widgets.dart';
 
-import '../utils/rest_client.dart';
-import '../models/view_objects/view_objects.dart';
-import '../widgets/widgets.dart';
 import 'selection/selection.dart';
 import 'view_object_parameters.dart';
 
 class ViewObjectParametersScreen extends StatefulWidget {
   final ViewObject viewObject;
-  final String userToken;
 
-  ViewObjectParametersScreen(
-      {Key key, @required this.viewObject, @required this.userToken})
+  ViewObjectParametersScreen({Key key, @required this.viewObject})
       : super(key: key);
 
   @override
@@ -25,20 +23,26 @@ class ViewObjectParametersScreen extends StatefulWidget {
 
 class _ViewObjectParametersScreenState
     extends State<ViewObjectParametersScreen> {
-  final ViewObjectParametersBloc _viewObjectParametersBloc =
-      ViewObjectParametersBloc(restClient: RestClient());
+  ViewObjectParametersBloc _bloc;
 
   ViewObject get _viewObject => widget.viewObject;
 
-  String get _userToken => widget.userToken;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_bloc == null) {
+      _bloc = ViewObjectParametersBloc(
+        restClient: Provider.of<RestClient>(context),
+        appContext: Provider.of<AppContext>(context),
+      )..add(FetchViewObjectParameters(viewObject: _viewObject));
+    }
+  }
 
   @override
-  void initState() {
-    super.initState();
-    _viewObjectParametersBloc.add(FetchViewObjectParameters(
-      viewObject: _viewObject,
-      userToken: _userToken,
-    ));
+  void dispose() {
+    _bloc.close();
+    super.dispose();
   }
 
   @override
@@ -49,13 +53,13 @@ class _ViewObjectParametersScreenState
       ),
       body: Center(
         child: BlocBuilder(
-          bloc: _viewObjectParametersBloc,
+          bloc: _bloc,
           builder: (BuildContext context, ViewObjectParametersState state) {
             if (state is ViewObjectParametersInProgress) {
               return CircularProgressIndicator();
             } else if (state is ViewObjectParametersLoaded) {
               return InheritedProvider<ViewObjectParametersBloc>.value(
-                value: _viewObjectParametersBloc,
+                value: _bloc,
                 child: _ReportParameters(),
               );
             }
@@ -95,7 +99,6 @@ class _ReportParameters extends StatelessWidget {
                           selectDate: (value) {
                             bloc.add(SaveViewObjectParameter(
                               viewObject: concreteState.viewObject,
-                              userToken: concreteState.userToken,
                               parameter: param.copyWith(value: value),
                             ));
                           },
@@ -119,7 +122,6 @@ class _ReportParameters extends StatelessWidget {
                           onFieldSubmitted: (text) {
                             bloc.add(SaveViewObjectParameter(
                               viewObject: concreteState.viewObject,
-                              userToken: concreteState.userToken,
                               parameter: param.copyWith(value: text),
                             ));
                           },
@@ -135,17 +137,13 @@ class _ReportParameters extends StatelessWidget {
                         final selection = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SingleSelection(
-                              param: param,
-                              userToken: concreteState.userToken,
-                            ),
+                            builder: (context) => SingleSelection(param: param),
                           ),
                         );
 
                         if (selection != null) {
                           bloc.add(SaveViewObjectParameter(
                             viewObject: concreteState.viewObject,
-                            userToken: concreteState.userToken,
                             parameter: param.copyWith(value: selection),
                           ));
                         }
@@ -167,17 +165,13 @@ class _ReportParameters extends StatelessWidget {
                         final selection = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MultiSelection(
-                              param: param,
-                              userToken: concreteState.userToken,
-                            ),
+                            builder: (context) => MultiSelection(param: param),
                           ),
                         );
 
                         if (selection is List<Option>) {
                           bloc.add(SaveViewObjectParameter(
                             viewObject: concreteState.viewObject,
-                            userToken: concreteState.userToken,
                             parameter: param.copyWith(value: selection),
                           ));
                         }
