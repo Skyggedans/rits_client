@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,11 +9,13 @@ import 'view_object.dart';
 abstract class ViewObjectScreen extends StatefulWidget {
   final ViewObject viewObject;
   final bool canBeFavorite;
+  final bool hideAppBar;
 
   ViewObjectScreen({
     Key key,
     @required this.viewObject,
     this.canBeFavorite = true,
+    this.hideAppBar = false,
   })  : assert(viewObject != null),
         super(key: key);
 }
@@ -23,6 +24,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
     S extends ViewObjectState> extends State<ViewObjectScreen> {
   ViewObject get viewObject => widget.viewObject;
   bool get _canBeFavorite => widget.canBeFavorite;
+  bool get _hideAppBar => widget.hideAppBar;
 
   T bloc;
   Widget buildOutputWidget(BuildContext context, S state);
@@ -47,67 +49,65 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(viewObject.title ?? viewObject.name),
-        ),
-        body: Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Center(
-            child: BlocBuilder(
-              bloc: bloc,
-              builder: (BuildContext context, ViewObjectState state) {
-                if (state is ViewObjectUninitialized) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (state is ViewObjectIdle) {
-                  return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        RaisedButton(
-                          child: const Text('View/Edit Parameters'),
+        appBar: !_hideAppBar
+            ? AppBar(
+                title: Text(viewObject.title ?? viewObject.name),
+              )
+            : null,
+        body: Center(
+          child: BlocBuilder(
+            bloc: bloc,
+            builder: (BuildContext context, ViewObjectState state) {
+              if (state is ViewObjectUninitialized) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is ViewObjectIdle) {
+                return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RaisedButton(
+                        child: const Text('View/Edit Parameters'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ViewObjectParametersScreen(
+                                  viewObject: viewObject),
+                            ),
+                          );
+                        },
+                      ),
+                      RaisedButton(
+                        child: const Text('View'),
+                        onPressed: () {
+                          bloc.add(GenerateViewObject(viewObject));
+                        },
+                      ),
+                      Visibility(
+                        visible: _canBeFavorite,
+                        child: RaisedButton(
+                          child: Text(state.favoriteId > 0
+                              ? 'Remove Favorite'
+                              : 'Add Favorite'),
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ViewObjectParametersScreen(
-                                        viewObject: viewObject),
-                              ),
-                            );
+                            state.favoriteId > 0
+                                ? bloc.add(RemoveFavorite(state.favoriteId))
+                                : bloc.add(AddFavorite(viewObject));
                           },
                         ),
-                        RaisedButton(
-                          child: const Text('View'),
-                          onPressed: () {
-                            bloc.add(GenerateViewObject(viewObject));
-                          },
-                        ),
-                        Visibility(
-                          visible: _canBeFavorite,
-                          child: RaisedButton(
-                            child: Text(state.favoriteId > 0
-                                ? 'Remove Favorite'
-                                : 'Add Favorite'),
-                            onPressed: () {
-                              state.favoriteId > 0
-                                  ? bloc.add(RemoveFavorite(state.favoriteId))
-                                  : bloc.add(AddFavorite(viewObject));
-                            },
-                          ),
-                        ),
-                      ]);
-                } else if (state is ViewObjectGeneration) {
-                  return CircularProgressIndicator();
-                } else if (state is S) {
-                  return buildOutputWidget(context, state);
-                } else if (state is ViewObjectError) {
-                  return const Text('Failed to generate view object');
-                }
+                      ),
+                    ]);
+              } else if (state is ViewObjectGeneration) {
+                return CircularProgressIndicator();
+              } else if (state is S) {
+                return buildOutputWidget(context, state);
+              } else if (state is ViewObjectError) {
+                return const Text('Failed to generate view object');
+              }
 
-                return null;
-              },
-            ),
+              return null;
+            },
           ),
         ),
       ),

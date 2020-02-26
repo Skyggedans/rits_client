@@ -30,7 +30,7 @@ class _FilterGroupsScreenState extends State<FilterGroupsScreen> {
 
   @override
   void dispose() {
-    _bloc.close();
+    _bloc?.close();
     super.dispose();
   }
 

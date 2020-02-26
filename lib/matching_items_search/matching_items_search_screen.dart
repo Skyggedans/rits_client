@@ -50,7 +50,7 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
       RwHelp.setCommands([]);
     }
 
-    _bloc.close();
+    _bloc?.close();
     super.dispose();
   }
 

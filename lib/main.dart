@@ -123,7 +123,7 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
       builder: (context, authRepository, authenticationBloc, _) {
         return MaterialApp(
           //showSemanticsDebugger: true,
-          routes: Routes.get(authRepository: authRepository),
+          routes: Routes.get(),
           home: BlocBuilder<AuthBloc, AuthState>(
             bloc: authenticationBloc,
             builder: (BuildContext context, AuthState state) {

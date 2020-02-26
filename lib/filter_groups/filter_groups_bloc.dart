@@ -88,6 +88,7 @@ class FilterGroupsBloc extends Bloc<FilterGroupsEvent, FilterGroupsState> {
     return filterGroups;
   }
 
+  // ignore: unused_element
   Future<List<String>> _getActiveFilterGroupsForLevel(int levelNumber) async {
     final url =
         '${settings.backendUrl}/GetActiveGroupFilter/${appContext.userToken}/$levelNumber';

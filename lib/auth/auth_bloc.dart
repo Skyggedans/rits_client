@@ -116,7 +116,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             _logger.info(e);
           } on RateLimitExceededError catch (e) {
             _logger.info(e);
-            // sleep(const Duration(seconds: 1));
           } on TokenExpiredError catch (e) {
             timer.cancel();
             _logger.info(e);

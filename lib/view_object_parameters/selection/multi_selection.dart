@@ -38,7 +38,7 @@ class _MultiSelectionState extends State<MultiSelection> {
 
   @override
   void dispose() {
-    _bloc.close();
+    _bloc?.close();
     super.dispose();
   }
 

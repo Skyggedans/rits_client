@@ -2,18 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:rits_client/models/view_objects/view_object.dart';
 
 import 'associated_data_item/associated_data_item.dart';
-import 'auth/auth.dart';
 import 'chart/chart.dart';
 import 'kpi/kpi.dart';
 import 'report/report.dart';
 import 'tabular_data/tabular_data.dart';
 
 class Routes {
-  static Map<String, WidgetBuilder> get({
-    @required AuthRepository authRepository,
-  }) {
-    assert(authRepository != null);
-
+  static Map<String, WidgetBuilder> get() {
     final routes = <String, WidgetBuilder>{
       ReportScreen.route: (BuildContext context) {
         final dynamic args = ModalRoute.of(context).settings.arguments;
@@ -23,9 +18,7 @@ class Routes {
       ChartScreen.route: (BuildContext context) {
         final dynamic args = ModalRoute.of(context).settings.arguments;
 
-        return ChartScreen(
-            authRepository: authRepository,
-            viewObject: args['viewObject'] as ViewObject);
+        return ChartScreen(viewObject: args['viewObject'] as ViewObject);
       },
       TabularDataScreen.route: (BuildContext context) {
         final dynamic args = ModalRoute.of(context).settings.arguments;

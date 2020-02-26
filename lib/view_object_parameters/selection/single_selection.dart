@@ -38,7 +38,7 @@ class _SingleSelectionState extends State<SingleSelection> {
 
   @override
   void dispose() {
-    _bloc.close();
+    _bloc?.close();
     super.dispose();
   }
 

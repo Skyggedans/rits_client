@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:logging/logging.dart';
@@ -111,19 +112,11 @@ abstract class AbstractRestClient {
 }
 
 class RestClient extends AbstractRestClient {
-  static RestClient _instance;
   final AuthRepository authRepository;
 
-  RestClient._internal({this.authRepository});
-
-  factory RestClient({AuthRepository authRepository}) {
-    if (_instance == null) {
-      assert(authRepository != null);
-      _instance = RestClient._internal(authRepository: authRepository);
-    }
-
-    return _instance;
-  }
+  RestClient({@required this.authRepository})
+      : assert(authRepository != null),
+        super();
 
   @override
   Future<http.Response> get(String url,
@@ -306,40 +299,5 @@ class RestClient extends AbstractRestClient {
     } else {
       throw TokenRevokedError();
     }
-  }
-}
-
-class LuisClient extends AbstractRestClient {
-  static LuisClient _instance;
-
-  LuisClient._internal();
-
-  factory LuisClient() {
-    if (_instance == null) {
-      _instance = LuisClient._internal();
-    }
-
-    return _instance;
-  }
-
-  @override
-  Map<String, String> _getHeaders() {
-    return {
-      'Content-Type': 'application/json',
-      'Ocp-Apim-Subscription-Key': settings.luisConfig['subKeyId'],
-    };
-  }
-
-  @override
-  http.BaseResponse _handleResponse(http.BaseResponse response) {
-    response = super._handleResponse(response);
-
-    final int statusCode = response.statusCode;
-
-    if (statusCode < 200 || statusCode >= 300) {
-      throw ApiError('Error while fetching LUIS data');
-    }
-
-    return response;
   }
 }

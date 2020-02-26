@@ -63,7 +63,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
       RwHelp.setCommands([]);
     }
 
-    _bloc.close();
+    _bloc?.close();
     super.dispose();
   }
 

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rits_client/app_context.dart';
 import 'package:rits_client/models/view_objects/view_objects.dart';
 import 'package:rits_client/settings.dart' as settings;
@@ -10,9 +10,10 @@ import 'package:rits_client/view_object/view_object.dart';
 import 'tabular_data.dart';
 
 class TabularDataBloc extends ViewObjectBloc {
-  TabularDataBloc(
-      {@required RestClient restClient, @required AppContext appContext})
-      : super(restClient: restClient, appContext: appContext);
+  TabularDataBloc({
+    @required RestClient restClient,
+    @required AppContext appContext,
+  }) : super(restClient: restClient, appContext: appContext);
 
   @override
   Stream<ViewObjectState> mapEventToState(ViewObjectEvent event) async* {

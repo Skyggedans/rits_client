@@ -57,7 +57,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
 
   @override
   void dispose() {
-    bloc.close();
+    bloc?.close();
     super.dispose();
   }
 

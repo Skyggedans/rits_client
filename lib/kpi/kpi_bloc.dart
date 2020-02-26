@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rits_client/app_context.dart';
 import 'package:rits_client/models/kpi/kpi.dart';
 import 'package:rits_client/models/view_objects/view_objects.dart';
@@ -11,8 +11,10 @@ import 'package:rits_client/view_object/view_object.dart';
 import 'kpi.dart';
 
 class KpiBloc extends ViewObjectBloc {
-  KpiBloc({@required RestClient restClient, @required AppContext appContext})
-      : super(restClient: restClient, appContext: appContext);
+  KpiBloc({
+    @required RestClient restClient,
+    @required AppContext appContext,
+  }) : super(restClient: restClient, appContext: appContext);
 
   @override
   Stream<ViewObjectState> mapEventToState(ViewObjectEvent event) async* {

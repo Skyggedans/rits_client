@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rits_client/models/view_objects/view_objects.dart';
 import 'package:rits_client/view_object/view_object.dart';
 

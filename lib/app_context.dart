@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rits_client/models/projects/project.dart';
 
 class AppContext extends ChangeNotifier {

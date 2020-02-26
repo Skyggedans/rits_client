@@ -13,15 +13,16 @@ import 'chart.dart';
 
 class ChartScreen extends ViewObjectScreen {
   static String route = '/chart';
-  final AuthRepository authRepository;
 
   ChartScreen({
     Key key,
-    @required this.authRepository,
     @required ViewObject viewObject,
-  })  : assert(authRepository != null),
-        assert(viewObject != null),
-        super(key: key, viewObject: viewObject);
+  })  : assert(viewObject != null),
+        super(
+          key: key,
+          viewObject: viewObject,
+          hideAppBar: false,
+        );
 
   @override
   State createState() => _ChartScreenState();
@@ -29,8 +30,6 @@ class ChartScreen extends ViewObjectScreen {
 
 class _ChartScreenState
     extends ViewObjectScreenState<ChartBloc, ChartPresentation> {
-  AuthRepository get _authRepository => (widget as ChartScreen).authRepository;
-
   @override
   ChartBloc createBloc() {
     return ChartBloc(
@@ -43,7 +42,8 @@ class _ChartScreenState
   Widget buildOutputWidget(BuildContext context, ChartPresentation state) {
     final uri = Uri.parse(state.url);
     final params = uri.queryParameters;
-    final newParams = {'id_token': _authRepository.accessToken};
+    final authRepository = Provider.of<AuthRepository>(context);
+    final newParams = {'id_token': authRepository.accessToken};
 
     newParams.addAll(params);
 
@@ -52,7 +52,7 @@ class _ChartScreenState
     return WebviewScaffold(
       url: newUri.toString(),
       headers: {
-        'Authorization': 'Bearer ${_authRepository.accessToken}',
+        'Authorization': 'Bearer ${authRepository.accessToken}',
       },
     );
   }

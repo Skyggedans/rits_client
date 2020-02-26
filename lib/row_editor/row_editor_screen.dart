@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -208,7 +207,7 @@ class _RowEditorScreenState extends State<RowEditorScreen> {
                   ),
                 );
               } else {
-                Text(columnDef.name);
+                return Text(columnDef.name);
               }
             }).toList(),
           ),

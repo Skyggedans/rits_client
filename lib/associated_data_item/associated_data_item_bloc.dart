@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:rits_client/app_context.dart';
 import 'package:rits_client/models/associated_data/associated_data.dart';

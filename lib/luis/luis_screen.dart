@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
@@ -6,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:rits_client/app_context.dart';
 import 'package:rits_client/kpi/kpi.dart';
 import 'package:rits_client/utils/rest_client.dart';
+import 'package:rits_client/auth/auth_repository.dart';
 
 import 'luis.dart';
 
@@ -31,7 +31,7 @@ class _LuisScreenState extends State<LuisScreen> {
 
   @override
   void dispose() {
-    _bloc.close();
+    _bloc?.close();
     super.dispose();
   }
 
@@ -69,8 +69,20 @@ class _LuisScreenState extends State<LuisScreen> {
             );
           } else if (state is UtteranceExecutedWithUrl) {
             if (state.url.startsWith('http')) {
+              final uri = Uri.parse(state.url);
+              final params = uri.queryParameters;
+              final authRepository = Provider.of<AuthRepository>(context);
+              final newParams = {'id_token': authRepository.accessToken};
+
+              newParams.addAll(params);
+
+              final newUri = uri.replace(queryParameters: newParams);
+
               return WebviewScaffold(
-                url: state.url,
+                url: newUri.toString(),
+                headers: {
+                  'Authorization': 'Bearer ${authRepository.accessToken}',
+                },
               );
             } else {
               return Text(state.url);
