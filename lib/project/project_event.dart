@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:rits_client/models/filter_groups/filter.dart';
 import 'package:rits_client/models/projects/projects.dart';
 
 @immutable
@@ -41,6 +42,17 @@ class SetContextFromSearch extends ProjectEvent {
 
   @override
   String toString() => 'SetContextFromSearch { context: $sessionContext }';
+}
+
+class SetContextFromFilter extends ProjectEvent {
+  final Filter filter;
+
+  SetContextFromFilter({@required this.filter})
+      : assert(filter != null),
+        super([filter]);
+
+  @override
+  String toString() => 'SetContextFromFilter { filter: $filter.name }';
 }
 
 class TakePhoto extends ProjectEvent {

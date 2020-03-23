@@ -6,9 +6,14 @@ abstract class MatchingItemsSearchState extends Equatable {
   MatchingItemsSearchState([List props = const []]) : super(props);
 }
 
-class MatchingItemsUninitialized extends MatchingItemsSearchState {
+class MatchingItemsIdle extends MatchingItemsSearchState {
   @override
   String toString() => 'MatchingItemsUninitialized';
+}
+
+class MatchingItemsSearchInProgress extends MatchingItemsSearchState {
+  @override
+  String toString() => 'MatchingItemsSearchInProgress';
 }
 
 class MatchingItemsLoaded extends MatchingItemsSearchState {

@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:rits_client/models/filter_groups/filter_groups.dart';
 
 class FilterGroupsSelectionScreen extends StatefulWidget {
-  final List<FilterGroup> filterGroups;
+  final FilterGroup filterGroup;
 
   FilterGroupsSelectionScreen({
     Key key,
-    @required this.filterGroups,
-  }) : assert(filterGroups != null);
+    @required this.filterGroup,
+  })  : assert(filterGroup != null),
+        super();
 
   @override
   State createState() => FilterGroupsSelectionScreenState();
@@ -15,66 +16,30 @@ class FilterGroupsSelectionScreen extends StatefulWidget {
 
 class FilterGroupsSelectionScreenState
     extends State<FilterGroupsSelectionScreen> {
-  FilterGroup _selectedFilterGroup;
-
-  List<FilterGroup> get _filterGroups => widget.filterGroups;
-
-  @override
-  void initState() {
-    super.initState();
-    // _selectedFilterGroup =
-    //     _filterGroups.singleWhere((filterGroup) => filterGroup.isActive);
-  }
+  FilterGroup get _filterGroup => widget.filterGroup;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Filter Group'),
-        actions: <Widget>[
-          FlatButton(
-            child: Row(
-              children: <Widget>[
-                const Icon(
-                  Icons.check,
-                  color: Colors.white,
-                ),
-                Text(
-                  'ACCEPT',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            onPressed: () {
-              Navigator.pop(context, _selectedFilterGroup);
-            },
-          )
-        ],
+        title: Text('${_filterGroup.name} - Select Filter'),
       ),
       body: Center(
         child: ListView.builder(
           padding: const EdgeInsets.all(10.0),
-          itemCount: _filterGroups.length,
+          itemCount: _filterGroup.filters.length,
           itemBuilder: (context, index) {
-            final filterGroup = _filterGroups[index];
+            final filter = _filterGroup.filters[index];
 
             return InkWell(
               child: Semantics(
                 button: true,
-                value: filterGroup.name,
-                child: RadioListTile(
-                  title: Text(filterGroup.name),
-                  value: filterGroup,
-                  groupValue: _selectedFilterGroup,
-                  onChanged: (FilterGroup value) {
-                    setState(() {
-                      _selectedFilterGroup = value;
-                    });
-                  },
+                value: filter.name,
+                child: ListTile(
+                  title: Text(filter.displayName),
+                  onTap: () => Navigator.pop(context, filter),
                 ),
+                onTap: () => Navigator.pop(context, filter),
               ),
             );
           },

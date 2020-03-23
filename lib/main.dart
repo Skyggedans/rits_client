@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:rits_client/app_config.dart';
 import 'package:rits_client/app_context.dart';
 import 'package:rits_client/view_objects/view_objects.dart';
+import 'package:flutter/services.dart';
 
 import 'auth/auth.dart';
 import 'projects/projects.dart';
@@ -40,6 +41,9 @@ class _HttpOverrides extends HttpOverrides {
 }
 
 main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIOverlays([]);
+
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
   }
@@ -141,7 +145,7 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
                 return AuthFailureScreen();
               }
 
-              return null;
+              return SizedBox.shrink();
             },
           ),
           theme: ThemeData(

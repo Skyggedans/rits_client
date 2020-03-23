@@ -1,20 +1,31 @@
 import 'package:equatable/equatable.dart';
 
 class Filter extends Equatable {
-  final String title;
+  final String name;
+  final String displayName;
+  int level;
   final bool isSelected;
 
   Filter({
-    this.title,
+    this.name,
+    this.displayName,
+    this.level,
     this.isSelected,
   }) : super([
-          title,
+          name,
+          displayName,
           isSelected,
         ]);
 
   factory Filter.fromJson(Map<String, dynamic> json) {
+    final splittedName = (json['Title'] as String ?? '').split('/');
+    final name = splittedName[splittedName.length - 1];
+    final displayName = splittedName.join(' > ');
+
     return Filter(
-      title: json['Title'] as String,
+      name: name,
+      displayName: displayName,
+      level: splittedName.length,
       isSelected: json['IsSelected'] as bool,
     );
   }

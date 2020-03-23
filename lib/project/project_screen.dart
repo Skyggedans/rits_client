@@ -13,6 +13,7 @@ import 'package:rits_client/filter_groups/filter_groups_screen.dart';
 import 'package:rits_client/kpi/kpi.dart';
 import 'package:rits_client/luis/luis.dart';
 import 'package:rits_client/matching_items_search/matching_items_search.dart';
+import 'package:rits_client/models/filter_groups/filter.dart';
 import 'package:rits_client/my_favorites/my_favorites_screen.dart';
 import 'package:rits_client/report/report.dart';
 import 'package:rits_client/tabular_data/tabular_data.dart';
@@ -68,222 +69,282 @@ class _ProjectScreenState extends State<ProjectScreen> {
             bodyChild = CircularProgressIndicator();
           } else if (state is ProjectLoaded) {
             title = appContext.sessionContextName != null
-                ? '${appContext.project.name} - ${appContext.sessionContextName}'
+                ? '${appContext.project.name} > ${appContext.sessionContextName}'
                 : appContext.project.name;
 
-            actions = <Widget>[
-              Visibility(
-                visible: _isRealWearDevice,
-                child: FlatButton(
-                  child: Row(
-                    children: <Widget>[
-                      const Icon(
-                        FontAwesomeIcons.qrcode,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                      Container(
-                        width: 10,
-                      ),
-                      const Text('Scan Bar Code'),
-                    ],
-                  ),
-                  onPressed: () {
-                    _bloc.add(ScanBarcode());
-                  },
-                ),
-              ),
-              SizedBox(
-                width: 200,
-                child: Semantics(
-                  //textField: true,
-                  value: 'Search Item',
-                  child: TextFormField(
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      suffixIcon: const Icon(Icons.search),
-                      labelText: 'Search Item',
-                      alignLabelWithHint: true,
-                    ),
-                    onFieldSubmitted: (value) async {
-                      final selectedContext = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              MatchingItemsSearchScreen(searchString: value),
-                        ),
-                      ) as String;
-
-                      if (selectedContext != null) {
-                        _bloc.add(SetContextFromSearch(
-                          sessionContext: selectedContext,
-                        ));
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ];
-
-            bodyChild = Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            bodyChild = Flex(
+              direction: Axis.vertical,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Wrap(
-                  alignment: WrapAlignment.spaceAround,
-                  spacing: 10,
-                  children: <Widget>[
-                    Visibility(
-                      visible: _isRealWearDevice &&
-                          appContext.sessionContextName != null,
-                      maintainSize: false,
-                      child: RaisedButton(
-                        child: const Text('Take Photo'),
-                        onPressed: () async {
-                          _bloc.add(TakePhoto());
-                        },
-                      ),
-                    ),
-                    Visibility(
-                      visible: _isRealWearDevice &&
-                          appContext.sessionContextName != null,
-                      maintainSize: false,
-                      child: RaisedButton(
-                        child: const Text('Record Video'),
-                        onPressed: () async {
-                          _bloc.add(RecordVideo());
-                        },
-                      ),
-                    ),
-                    RaisedButton(
-                      child: const Text('Start LUIS'),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LuisScreen(),
+                Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            'Observed item selector',
+                            textAlign: TextAlign.left,
                           ),
-                        );
-                      },
-                    ),
-                    RaisedButton(
-                      child: const Text('Show Reports'),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ViewObjectsScreen(
-                              type: 'Reports',
-                              detailsScreenRoute: ReportScreen.route,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    RaisedButton(
-                      child: const Text('Show Charts'),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ViewObjectsScreen(
-                              type: 'Charts',
-                              detailsScreenRoute: ChartScreen.route,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    RaisedButton(
-                      child: const Text('Show Tabular Data'),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ViewObjectsScreen(
-                              title: 'Tabular Data',
-                              type: 'DataObjects',
-                              detailsScreenRoute: TabularDataScreen.route,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    RaisedButton(
-                      child: const Text('Show KPIs'),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ViewObjectsScreen(
-                              type: 'KPIs',
-                              detailsScreenRoute: KpiScreen.route,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    Visibility(
-                      visible: appContext.sessionContextName != null,
-                      child: RaisedButton(
-                        child: const Text('Show Associated Data'),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  Provider<ViewObjectsRepository>(
-                                create: (_) => AssociatedDataItemsRepository(
-                                  restClient: restClient,
-                                  appContext: appContext,
-                                ),
-                                child: ViewObjectsScreen(
-                                  title: 'Associated Data',
-                                  detailsScreenRoute:
-                                      AssociatedDataItemScreen.route,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Visibility(
+                                visible: _isRealWearDevice,
+                                child: FlatButton(
+                                  child: Column(
+                                    children: <Widget>[
+                                      const Icon(
+                                        FontAwesomeIcons.qrcode,
+                                        color: Colors.white,
+                                        size: 60,
+                                      ),
+                                      Container(
+                                        height: 10,
+                                      ),
+                                      const Text('Scan Bar Code'),
+                                    ],
+                                  ),
+                                  onPressed: () {
+                                    _bloc.add(ScanBarcode());
+                                  },
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                              FlatButton(
+                                child: Column(
+                                  children: <Widget>[
+                                    const Icon(
+                                      FontAwesomeIcons.filter,
+                                      color: Colors.white,
+                                      size: 60,
+                                    ),
+                                    Container(
+                                      height: 10,
+                                    ),
+                                    const Text('Filter Groups'),
+                                  ],
+                                ),
+                                onPressed: () async {
+                                  final selectedFilter = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          FilterGroupsScreen(),
+                                    ),
+                                  ) as Filter;
+
+                                  if (selectedFilter != null) {
+                                    _bloc.add(SetContextFromFilter(
+                                      filter: selectedFilter,
+                                    ));
+                                  }
+                                },
+                              ),
+                              FlatButton(
+                                child: Column(
+                                  children: <Widget>[
+                                    const Icon(
+                                      FontAwesomeIcons.search,
+                                      color: Colors.white,
+                                      size: 60,
+                                    ),
+                                    Container(
+                                      height: 10,
+                                    ),
+                                    const Text('Search Item'),
+                                  ],
+                                ),
+                                onPressed: () async {
+                                  final selectedContext = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          MatchingItemsSearchScreen(),
+                                    ),
+                                  ) as String;
+
+                                  if (selectedContext != null) {
+                                    _bloc.add(SetContextFromSearch(
+                                      sessionContext: selectedContext,
+                                    ));
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ]),
+                  ),
+                ),
+                Visibility(
+                  visible: appContext.sessionContextName != null,
+                  child: Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                          'Observed item: ${appContext.sessionContextName}'),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Wrap(
+                            alignment: WrapAlignment.spaceAround,
+                            spacing: 5,
+                            children: <Widget>[
+                              Visibility(
+                                visible: _isRealWearDevice &&
+                                    appContext.sessionContextName != null,
+                                maintainSize: false,
+                                child: RaisedButton(
+                                  child: const Text('Take Photo'),
+                                  onPressed: () async {
+                                    _bloc.add(TakePhoto());
+                                  },
+                                ),
+                              ),
+                              Visibility(
+                                visible: _isRealWearDevice &&
+                                    appContext.sessionContextName != null,
+                                maintainSize: false,
+                                child: RaisedButton(
+                                  child: const Text('Record Video'),
+                                  onPressed: () async {
+                                    _bloc.add(RecordVideo());
+                                  },
+                                ),
+                              ),
+                              RaisedButton(
+                                child: const Text('Start LUIS'),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => LuisScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              RaisedButton(
+                                child: const Text('Show Reports'),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ViewObjectsScreen(
+                                        type: 'Reports',
+                                        detailsScreenRoute: ReportScreen.route,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              RaisedButton(
+                                child: const Text('Show Charts'),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ViewObjectsScreen(
+                                        type: 'Charts',
+                                        detailsScreenRoute: ChartScreen.route,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              RaisedButton(
+                                child: const Text('Show Tabular Data'),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ViewObjectsScreen(
+                                        title: 'Tabular Data',
+                                        type: 'DataObjects',
+                                        detailsScreenRoute:
+                                            TabularDataScreen.route,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              RaisedButton(
+                                child: const Text('Show KPIs'),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ViewObjectsScreen(
+                                        type: 'KPIs',
+                                        detailsScreenRoute: KpiScreen.route,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              Visibility(
+                                visible: appContext.sessionContextName != null,
+                                child: RaisedButton(
+                                  child: const Text('Show Associated Data'),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            Provider<ViewObjectsRepository>(
+                                          create: (_) =>
+                                              AssociatedDataItemsRepository(
+                                            restClient: restClient,
+                                            appContext: appContext,
+                                          ),
+                                          child: ViewObjectsScreen(
+                                            title: 'Associated Data',
+                                            detailsScreenRoute:
+                                                AssociatedDataItemScreen.route,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              Visibility(
+                                visible: appContext.sessionContextName != null,
+                                child: RaisedButton(
+                                  child: const Text('Show Comments'),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CommentsScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              RaisedButton(
+                                child: Text('Show My Favorites'),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MyFavoritesScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          )
+                        ],
                       ),
                     ),
-                    Visibility(
-                      visible: appContext.sessionContextName != null,
-                      child: RaisedButton(
-                        child: const Text('Show Comments'),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CommentsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    RaisedButton(
-                      child: Text('Show Filter Groups'),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FilterGroupsScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    RaisedButton(
-                      child: Text('Show My Favorites'),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MyFavoritesScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                  ),
                 ),
               ],
             );

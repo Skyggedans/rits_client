@@ -6,6 +6,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:meta/meta.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rits_client/app_context.dart';
+import 'package:rits_client/models/filter_groups/filter.dart';
 import 'package:rits_client/models/projects/projects.dart';
 import 'package:rits_client/settings.dart' as settings;
 import 'package:rits_client/utils/rest_client.dart';
@@ -19,8 +20,10 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   final RestClient restClient;
   final AppContext appContext;
 
-  ProjectBloc({@required this.restClient, @required this.appContext})
-      : assert(restClient != null),
+  ProjectBloc({
+    @required this.restClient,
+    @required this.appContext,
+  })  : assert(restClient != null),
         assert(appContext != null),
         super();
 
@@ -105,20 +108,25 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         yield ProjectError(
             message: 'Unrecognized context: ${event.sessionContext}');
       }
+    } else if (event is SetContextFromFilter) {
+      yield ProjectLoading();
+
+      try {
+        final levelName = await _setContextFromFilter(event.filter);
+
+        if (levelName != null) {
+          appContext.sessionContext = event.filter.name;
+          appContext.sessionContextName = event.filter.displayName;
+
+          yield ProjectLoaded();
+        } else {
+          yield ProjectError(message: 'Unable to set context');
+        }
+      } on ApiError {
+        yield ProjectError(
+            message: 'Unrecognized context: ${event.filter.name}');
+      }
     } else if (event is TakePhoto) {
-      // final bytes = await RwCamera.takePhotoToBytes();
-
-      // if (bytes != null) {
-      //   yield ProjectLoading();
-
-      //   try {
-      //     await _postPhoto(bytes);
-      //     yield prevState;
-      //   } on ApiError {
-      //     yield ProjectError(message: 'Unable to save photo');
-      //   }
-      // }
-
       PermissionStatus permission = await PermissionHandler()
           .checkPermissionStatus(PermissionGroup.storage);
 
@@ -196,24 +204,19 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     return body['ResultData'] as String;
   }
 
+  Future<String> _setContextFromFilter(Filter filter) async {
+    final url =
+        '${settings.backendUrl}/SetObservedItemContext/${appContext.userToken}/${Uri.encodeFull(filter.name)}';
+    final response = await restClient.get(url);
+    final body = json.decode(response.body);
+
+    return body['ResultData'] as String;
+  }
+
   @override
   void onError(Object error, StackTrace stacktrace) {
     print(error);
   }
-
-  // Future<void> _postPhoto(Uint8List bytes, String userToken) async {
-  //   final url = '${settings.backendUrl}/uploadFile/$userToken';
-  //   final fileName =
-  //       'IMG_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.png';
-
-  //   await restClient.uploadFile(
-  //     url,
-  //     bytes: bytes,
-  //     field: 'photo',
-  //     fileName: fileName,
-  //     contentType: MediaType('image', 'png'),
-  //   );
-  // }
 
   Future<void> _postPhoto(String filePath) async {
     final url = '${settings.backendUrl}/uploadFile/${appContext.userToken}';

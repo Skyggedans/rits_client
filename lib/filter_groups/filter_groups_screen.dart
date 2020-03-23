@@ -60,60 +60,43 @@ class _FilterGroupsScreenState extends State<FilterGroupsScreen> {
   }
 
   Widget _buildFilterGroups(BuildContext context, FilterGroupsLoaded state) {
-    final filterGroups = state.filterGroups;
-    final levels = <int, List<FilterGroup>>{};
-
-    final levelNames = {
-      1: 'Country',
-      2: 'Company',
-      3: 'Order',
-    };
-
-    filterGroups.forEach((filterGroup) {
-      levels.putIfAbsent(filterGroup.levelNumber, () => []);
-      levels[filterGroup.levelNumber].add(filterGroup);
-    });
-
     return ListView.builder(
       padding: const EdgeInsets.all(10.0),
-      itemCount: levels.length,
+      itemCount: state.filterGroups.length,
       itemBuilder: (context, index) {
-        final levelNumber = levels.keys.toList()[index];
-        final levelGroups = levels[levelNumber];
-        final levelTitle = levelNames[levelNumber];
+        final filterGroup = state.filterGroups[index];
 
         return InkWell(
           child: Semantics(
             button: true,
-            value: levelTitle,
+            value: filterGroup.name,
             child: Card(
               child: ListTile(
-                title: Text(levelTitle),
-                subtitle: Text(levelGroups
-                    //.where((filterGroup) => filterGroup.isActive)
-                    .map((filterGroup) => filterGroup.name)
+                title: Text(filterGroup.name),
+                subtitle: Text(filterGroup.filters
+                    .map((filter) => filter.displayName)
                     .join(', ')),
               ),
             ),
-            onTap: () => _onLevelTap(context, levelGroups),
+            onTap: () => _onGroupTap(context, filterGroup),
           ),
-          onTap: () => _onLevelTap(context, levelGroups),
+          onTap: () => _onGroupTap(context, filterGroup),
         );
       },
     );
   }
 
-  void _onLevelTap(BuildContext context, List<FilterGroup> levelGroups) async {
-    final selectedFilterGroup = await Navigator.push(
+  void _onGroupTap(BuildContext context, FilterGroup filterGroup) async {
+    final selectedFilter = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
-            FilterGroupsSelectionScreen(filterGroups: levelGroups),
+            FilterGroupsSelectionScreen(filterGroup: filterGroup),
       ),
-    ) as FilterGroup;
+    ) as Filter;
 
-    if (selectedFilterGroup != null) {
-      _bloc.add(SaveSelectedFilterGroup(filterGroup: selectedFilterGroup));
+    if (selectedFilter != null) {
+      Navigator.pop(context, selectedFilter);
     }
   }
 }

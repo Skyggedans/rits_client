@@ -122,7 +122,7 @@ class _SelectionOptions extends StatelessWidget {
           );
         }
 
-        return null;
+        return SizedBox.shrink();
       },
     );
   }

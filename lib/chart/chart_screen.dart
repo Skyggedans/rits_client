@@ -18,11 +18,7 @@ class ChartScreen extends ViewObjectScreen {
     Key key,
     @required ViewObject viewObject,
   })  : assert(viewObject != null),
-        super(
-          key: key,
-          viewObject: viewObject,
-          hideAppBar: false,
-        );
+        super(key: key, viewObject: viewObject, fullScreen: true);
 
   @override
   State createState() => _ChartScreenState();

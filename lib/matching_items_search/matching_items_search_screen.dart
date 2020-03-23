@@ -11,22 +11,12 @@ import 'package:rw_help/rw_help.dart';
 import 'matching_items_search.dart';
 
 class MatchingItemsSearchScreen extends StatefulWidget {
-  final String searchString;
-
-  MatchingItemsSearchScreen({
-    Key key,
-    @required this.searchString,
-  })  : assert(searchString != null),
-        super(key: key);
-
   @override
   State createState() => _MatchingItemsSearchScreenState();
 }
 
 class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
   MatchingItemsSearchBloc _bloc;
-
-  String get _searchString => widget.searchString;
   bool isRealWearDevice;
 
   @override
@@ -34,13 +24,12 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
     super.didChangeDependencies();
 
     if (_bloc == null) {
+      isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
+
       _bloc = MatchingItemsSearchBloc(
         restClient: Provider.of<RestClient>(context),
         appContext: Provider.of<AppContext>(context),
-      )..add(SearchMatchingItems(searchString: _searchString));
-      ;
-
-      isRealWearDevice = Provider.of<AppConfig>(context).isRealWearDevice;
+      );
     }
   }
 
@@ -58,22 +47,43 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Searching for \'$_searchString\''),
+        title: Text('Search item'),
       ),
-      body: Center(
-        child: BlocBuilder(
-          bloc: _bloc,
-          builder: (BuildContext context, MatchingItemsSearchState state) {
-            if (state is MatchingItemsUninitialized) {
-              return CircularProgressIndicator();
-            } else if (state is MatchingItemsLoaded) {
-              return _buildItems(context, state);
-            } else if (state is MatchingItemsError) {
-              return Text(state.message);
-            }
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Flex(
+          direction: Axis.vertical,
+          children: <Widget>[
+            TextFormField(
+              keyboardType: TextInputType.text,
+              autofocus: true,
+              decoration: InputDecoration(
+                suffixIcon: const Icon(Icons.search),
+                labelText: 'Search Item',
+                alignLabelWithHint: true,
+              ),
+              onFieldSubmitted: (value) async {
+                _bloc.add(SearchMatchingItems(searchString: value));
+              },
+            ),
+            Expanded(
+              child: BlocBuilder(
+                bloc: _bloc,
+                builder:
+                    (BuildContext context, MatchingItemsSearchState state) {
+                  if (state is MatchingItemsSearchInProgress) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (state is MatchingItemsLoaded) {
+                    return _buildItems(context, state);
+                  } else if (state is MatchingItemsError) {
+                    return Center(child: Text(state.message));
+                  }
 
-            return const Text('Unable to fetch results');
-          },
+                  return SizedBox.shrink();
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -81,6 +91,12 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
 
   Widget _buildItems(BuildContext context, MatchingItemsLoaded state) {
     final items = state.items;
+
+    if (items.isEmpty) {
+      return Center(
+        child: const Text('There are no matching items found'),
+      );
+    }
 
     if (isRealWearDevice) {
       if (items.isNotEmpty) {
@@ -93,7 +109,6 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(10.0),
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];

@@ -39,68 +39,18 @@ class FilterGroupsBloc extends Bloc<FilterGroupsEvent, FilterGroupsState> {
       } on ApiError {
         yield FilterGroupsError(message: 'Unable to fetch filter groups');
       }
-    } else if (event is SaveSelectedFilterGroup) {
-      yield FilterGroupsInProgress();
-
-      try {
-        await _saveSelectedFilterGroup(event.filterGroup);
-      } on ApiError {
-        yield FilterGroupsError(
-            message: 'Unable to save selected filter group');
-      }
     }
   }
 
   Future<List<FilterGroup>> _fetchFilterGroups() async {
-    final url = '${settings.backendUrl}/GroupFilter/${appContext.userToken}';
+    final url =
+        '${settings.backendUrl}/ObservedGroupFilter/${appContext.userToken}';
     final response = await restClient.get(url);
     final body =
         List<Map<String, dynamic>>.from(json.decode(response.body) as List);
-    // final getActiveFilterGroupsForLevelCached =
-    //     memo2(_getActiveFilterGroupsForLevel);
-
-    // final futures = body.map((filterGroup) {
-    //   final group = FilterGroup.fromJson(filterGroup);
-
-    //   return getActiveFilterGroupsForLevelCached(
-    //     group.levelNumber,
-    //     userToken,
-    //   ).then((filterGroupsForLevel) {
-    //     final isActive = filterGroupsForLevel.contains(group.name);
-
-    //     return group.copyWith(isActive: isActive);
-    //   });
-
-    //   //return Future.value(group.copyWith(isActive: group.name == 'alfred'));
-    // });
-
-    // final filterGroups = await Future.wait(futures);
-
     final filterGroups =
         body.map((filterGroup) => FilterGroup.fromJson(filterGroup)).toList();
 
-    // filterGroups.sort((group1, group2) {
-    //   return group1.levelNumber < group2.levelNumber
-    //       ? -1
-    //       : (group1.levelNumber > group2.levelNumber ? 1 : 0);
-    // });
-
     return filterGroups;
-  }
-
-  // ignore: unused_element
-  Future<List<String>> _getActiveFilterGroupsForLevel(int levelNumber) async {
-    final url =
-        '${settings.backendUrl}/GetActiveGroupFilter/${appContext.userToken}/$levelNumber';
-    final String response = await restClient.get(url) as String;
-
-    return response?.split('|') ?? [];
-  }
-
-  Future<void> _saveSelectedFilterGroup(FilterGroup filterGroup) async {
-    final url =
-        '${settings.backendUrl}/SetActiveGroupFilter/${appContext.userToken}/${filterGroup.levelNumber}/${Uri.encodeFull(filterGroup.name)}';
-
-    await restClient.get(url);
   }
 }

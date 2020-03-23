@@ -21,7 +21,10 @@ class ChartBloc extends ViewObjectBloc {
         yield ChartPresentation(
           viewObject: event.viewObject,
           url:
-              '${settings.chartUrl}/Charts/BaseChart?skypeBotToken=${appContext.userToken}&chart=${Uri.encodeFull(event.viewObject.name)}',
+              '${settings.chartUrl}/Charts/ChartView?skypeBotToken=${appContext.userToken}&chart=${Uri.encodeFull(event.viewObject.name)}' +
+                  (appContext.sessionContextName != null
+                      ? '&hierarchy=${appContext.sessionContextName}'
+                      : ''),
         );
       } on ApiError {
         yield ViewObjectError();

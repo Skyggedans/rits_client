@@ -22,7 +22,7 @@ class MatchingItemsSearchBloc
         super();
 
   @override
-  get initialState => MatchingItemsUninitialized();
+  get initialState => MatchingItemsIdle();
 
   @override
   Stream<MatchingItemsSearchState> transformStates(
@@ -34,7 +34,7 @@ class MatchingItemsSearchBloc
   Stream<MatchingItemsSearchState> mapEventToState(
       MatchingItemsSearchEvent event) async* {
     if (event is SearchMatchingItems) {
-      yield MatchingItemsUninitialized();
+      yield MatchingItemsSearchInProgress();
 
       try {
         final items = await _searchItems(event.searchString);
