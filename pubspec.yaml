@@ -17,10 +17,6 @@ dependencies:
   flutter_bloc: 3.2.0
   rxdart: 0.23.0
   path_provider: any
-  flutter_webview_plugin: #0.3.4
-    git:
-      url: https://github.com/Skyggedans/flutter_webview_plugin.git
-
   sqflite: 1.1.0
   permission_handler: 3.1.0
   device_info: 0.4.0+2
@@ -29,12 +25,14 @@ dependencies:
   memoize: 2.0.0
   logging_appenders: 0.4.1
   flutter_pdf_viewer:
+    path: ../flutter_pdf_viewer
+    # git:
+    #   url: https://github.com/Skyggedans/flutter_pdf_viewer.git
+  flutter_inappwebview: 3.1.0
+  flutter_downloader: 1.4.4
+  rw_speech_recognizer:
     git:
-      url: https://github.com/Skyggedans/flutter_pdf_viewer.git
-  # rw_speech_recognizer:
-  #   git:
-  #     url: https://github.com/Skyggedans/rw_speech_recognizer.git
-  #     ref: androidx
+      url: https://github.com/Skyggedans/rw_speech_recognizer.git
   rw_camera:
     git:
       url: https://github.com/Skyggedans/rw_camera.git
@@ -44,6 +42,10 @@ dependencies:
   rw_help:
     git:
       url: https://github.com/Skyggedans/rw_help.git
+  rw_movie:
+    path: ../rw_movie
+    # git:
+    #   url: https://github.com/Skyggedans/rw_movie.git
 
 dev_dependencies:
   flutter_test:

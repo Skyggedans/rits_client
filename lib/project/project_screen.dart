@@ -10,6 +10,7 @@ import 'package:rits_client/associated_data_items/associated_data_items.dart';
 import 'package:rits_client/chart/chart.dart';
 import 'package:rits_client/comments/comments_screen.dart';
 import 'package:rits_client/filter_groups/filter_groups_screen.dart';
+import 'package:rits_client/image_gallery/image_gallery_screen.dart';
 import 'package:rits_client/kpi/kpi.dart';
 import 'package:rits_client/luis/luis.dart';
 import 'package:rits_client/matching_items_search/matching_items_search.dart';
@@ -19,6 +20,7 @@ import 'package:rits_client/report/report.dart';
 import 'package:rits_client/tabular_data/tabular_data.dart';
 import 'package:rits_client/utils/rest_client.dart';
 import 'package:rits_client/view_objects/view_objects.dart';
+import 'package:rw_movie/rw_movie.dart';
 
 import 'project.dart';
 
@@ -69,7 +71,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
             bodyChild = CircularProgressIndicator();
           } else if (state is ProjectLoaded) {
             title = appContext.sessionContextName != null
-                ? '${appContext.project.name} > ${appContext.sessionContextName}'
+                ? '${appContext.project.name} > ${(appContext.sessionContextName ?? '').split("|").join(" > ")}'
                 : appContext.project.name;
 
             bodyChild = Flex(
@@ -181,8 +183,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   child: Card(
                     child: Padding(
                       padding: EdgeInsets.all(10),
-                      child: Text(
-                          'Observed item: ${appContext.sessionContextName}'),
+                      child:
+                          Text('Observed item: ${appContext.sessionContext}'),
                     ),
                   ),
                 ),
@@ -337,6 +339,25 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                       builder: (context) => MyFavoritesScreen(),
                                     ),
                                   );
+                                },
+                              ),
+                              RaisedButton(
+                                child: Text('Show Image Gallery'),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ImageGalleryScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              RaisedButton(
+                                child: Text('Play Movie'),
+                                onPressed: () {
+                                  RwMovie.playUrl(
+                                      'https://content.uplynk.com/ext/1efe3bfc4d1e4b5db5e5085a535b510b/081816-ktrk-rff-spencer-tillman-vid_web.m3u8?ad._v=2&ad=ktrk_video&ad.preroll=&ad.fill_slate=1&ad.ametr=1');
                                 },
                               ),
                             ],

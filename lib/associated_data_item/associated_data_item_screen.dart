@@ -261,7 +261,7 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
         builder: (context) => RowEditorScreen(
           columnDefinitions: columnDefinitions,
           row: Map<String, dynamic>.fromIterable(columnDefinitions,
-              key: (colDef) => colDef.name as String,
+              key: (colDef) => colDef.fileName as String,
               value: (colDef) => colDef.defaultValue),
         ),
       ),

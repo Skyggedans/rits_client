@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:rits_client/app_context.dart';
 import 'package:rits_client/models/view_objects/view_object.dart';
+import 'package:rits_client/models/view_objects/view_objects.dart';
 import 'package:rits_client/settings.dart' as settings;
 import 'package:rits_client/utils/rest_client.dart';
 import 'package:rxdart/rxdart.dart';
@@ -32,26 +34,31 @@ abstract class ViewObjectBloc extends Bloc<ViewObjectEvent, ViewObjectState> {
   Stream<ViewObjectState> mapEventToState(ViewObjectEvent event) async* {
     if (event is GetFavoriteId) {
       final favoriteId = await _getFavoriteId(event.viewObject);
+      final hasParams = await _hasEditableParams(event.viewObject);
 
-      yield ViewObjectIdle(favoriteId: favoriteId);
+      yield ViewObjectIdle(favoriteId: favoriteId, hasParams: hasParams);
     } else if (event is AddFavorite) {
       yield ViewObjectUninitialized();
 
       await _addFavorite(event.viewObject);
 
       final favoriteId = await _getFavoriteId(event.viewObject);
+      final hasParams = await _hasEditableParams(event.viewObject);
 
-      yield ViewObjectIdle(favoriteId: favoriteId);
+      yield ViewObjectIdle(favoriteId: favoriteId, hasParams: hasParams);
     } else if (event is RemoveFavorite) {
       yield ViewObjectUninitialized();
 
       await _removeFavorite(event.favoriteId);
 
-      yield ViewObjectIdle(favoriteId: -1);
+      final hasParams = await _hasEditableParams(event.viewObject);
+
+      yield ViewObjectIdle(favoriteId: -1, hasParams: hasParams);
     } else if (event is ReturnToViewObjectMainScreen) {
       final favoriteId = await _getFavoriteId(event.viewObject);
+      final hasParams = await _hasEditableParams(event.viewObject);
 
-      yield ViewObjectIdle(favoriteId: favoriteId);
+      yield ViewObjectIdle(favoriteId: favoriteId, hasParams: hasParams);
     }
   }
 
@@ -81,5 +88,20 @@ abstract class ViewObjectBloc extends Bloc<ViewObjectEvent, ViewObjectState> {
     final response = await restClient.get(url);
 
     return (response.body ?? '') == 'true';
+  }
+
+  Future<bool> _hasEditableParams(ViewObject viewObject) async {
+    final url =
+        '${settings.backendUrl}/GetViewElementParameter/${appContext.userToken}/${Uri.encodeFull(viewObject.name)}/${viewObject.itemType}';
+    final response = await restClient.get(url);
+    final body =
+        List<Map<String, dynamic>>.from(json.decode(response.body) as List);
+
+    return body
+        .map((param) {
+          return ViewObjectParameter.fromJson(param);
+        })
+        .where((param) => !param.readOnly)
+        .isNotEmpty;
   }
 }

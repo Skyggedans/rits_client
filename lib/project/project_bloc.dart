@@ -114,14 +114,14 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       try {
         final levelName = await _setContextFromFilter(event.filter);
 
-        if (levelName != null) {
-          appContext.sessionContext = event.filter.name;
-          appContext.sessionContextName = event.filter.displayName;
+        // if (levelName != null) {
+        appContext.sessionContext = event.filter.name;
+        appContext.sessionContextName = event.filter.fullName;
 
-          yield ProjectLoaded();
-        } else {
-          yield ProjectError(message: 'Unable to set context');
-        }
+        yield ProjectLoaded();
+        // } else {
+        //   yield ProjectError(message: 'Unable to set context');
+        // }
       } on ApiError {
         yield ProjectError(
             message: 'Unrecognized context: ${event.filter.name}');

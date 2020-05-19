@@ -13,11 +13,14 @@ class ViewObjectUninitialized extends ViewObjectState {
 
 class ViewObjectIdle extends ViewObjectState {
   final int favoriteId;
+  final bool hasParams;
 
-  ViewObjectIdle({this.favoriteId}) : super([favoriteId]);
+  ViewObjectIdle({this.favoriteId, this.hasParams})
+      : super([favoriteId, hasParams]);
 
   @override
-  String toString() => 'ViewObjectIdle';
+  String toString() =>
+      'ViewObjectIdle { favoriteId: $favoriteId, hasParams: $hasParams }';
 }
 
 class ViewObjectGeneration extends ViewObjectState {

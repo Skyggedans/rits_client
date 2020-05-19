@@ -56,17 +56,20 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
           } else if (state is ViewObjectIdle) {
             bodyChild =
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              RaisedButton(
-                child: const Text('View/Edit Parameters'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          ViewObjectParametersScreen(viewObject: viewObject),
-                    ),
-                  );
-                },
+              Visibility(
+                visible: state.hasParams,
+                child: RaisedButton(
+                  child: const Text('View/Edit Parameters'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ViewObjectParametersScreen(viewObject: viewObject),
+                      ),
+                    );
+                  },
+                ),
               ),
               RaisedButton(
                 child: const Text('View'),
@@ -82,7 +85,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
                       : 'Add Favorite'),
                   onPressed: () {
                     state.favoriteId > 0
-                        ? bloc.add(RemoveFavorite(state.favoriteId))
+                        ? bloc.add(RemoveFavorite(viewObject, state.favoriteId))
                         : bloc.add(AddFavorite(viewObject));
                   },
                 ),

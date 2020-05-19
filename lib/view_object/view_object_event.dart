@@ -45,9 +45,11 @@ class AddFavorite<T extends ViewObject> extends ViewObjectEvent {
 }
 
 class RemoveFavorite<T extends ViewObject> extends ViewObjectEvent {
+  final T viewObject;
   final int favoriteId;
 
-  RemoveFavorite(this.favoriteId) : super([favoriteId]);
+  RemoveFavorite(this.viewObject, this.favoriteId)
+      : super([viewObject, favoriteId]);
 
   @override
   String toString() => 'RemoveFavorite { favoriteId: $favoriteId }';
