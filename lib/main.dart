@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:logging/logging.dart';
 import 'package:logging_appenders/logging_appenders.dart';
 import 'package:path/path.dart' as path;
@@ -59,6 +60,10 @@ main() {
         baseFilePath: path.join(Directory.current.path, 'logs', 'rits.log'))
       ..attachToLogger(Logger.root);
   }
+
+  FlutterDownloader.initialize(
+    debug: true,
+  );
 
   runApp(
     MultiProvider(
@@ -183,6 +188,13 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
   @override
   void onError(Bloc bloc, Object error, StackTrace stacktrace) {
     super.onError(bloc, error, stacktrace);
+
+    if (error is AccessDeniedError) {
+      _authBloc.add(AccessTokenExpired());
+
+      return;
+    }
+
     _logger.severe('${bloc.runtimeType}: $error, $stacktrace');
   }
 }

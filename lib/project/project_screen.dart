@@ -10,10 +10,10 @@ import 'package:rits_client/associated_data_items/associated_data_items.dart';
 import 'package:rits_client/chart/chart.dart';
 import 'package:rits_client/comments/comments_screen.dart';
 import 'package:rits_client/filter_groups/filter_groups_screen.dart';
-import 'package:rits_client/image_gallery/image_gallery_screen.dart';
 import 'package:rits_client/kpi/kpi.dart';
 import 'package:rits_client/luis/luis.dart';
 import 'package:rits_client/matching_items_search/matching_items_search.dart';
+import 'package:rits_client/media_gallery/media_gallery_screen.dart';
 import 'package:rits_client/models/filter_groups/filter.dart';
 import 'package:rits_client/my_favorites/my_favorites_screen.dart';
 import 'package:rits_client/report/report.dart';
@@ -348,7 +348,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          ImageGalleryScreen(),
+                                          MediaGalleryScreen(),
                                     ),
                                   );
                                 },

@@ -20,7 +20,7 @@ dependencies:
   sqflite: 1.1.0
   permission_handler: 3.1.0
   device_info: 0.4.0+2
-  font_awesome_flutter: 8.5.0
+  font_awesome_flutter: 8.8.1
   provider: 4.0.1
   memoize: 2.0.0
   logging_appenders: 0.4.1
@@ -30,6 +30,8 @@ dependencies:
     #   url: https://github.com/Skyggedans/flutter_pdf_viewer.git
   flutter_inappwebview: 3.1.0
   flutter_downloader: 1.4.4
+  android_intent: 0.3.7+2
+  badges: 1.1.1
   rw_speech_recognizer:
     git:
       url: https://github.com/Skyggedans/rw_speech_recognizer.git

@@ -25,7 +25,7 @@ class _AuthFailureScreenState extends State<AuthFailureScreen> {
             RaisedButton(
               child: const Text('Try Again'),
               onPressed: () {
-                final _authBloc = Provider.of<AuthBloc>(context);
+                final _authBloc = Provider.of<AuthBloc>(context, listen: false);
 
                 _authBloc.add(Authenticate());
               },
