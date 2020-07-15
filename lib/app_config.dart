@@ -22,7 +22,7 @@ class AppConfig extends ChangeNotifier {
     try {
       final androidInfo = await deviceInfo.androidInfo;
 
-      return androidInfo?.brand == 'RealWear';
+      return androidInfo?.brand?.contains('RealWear');
     } on MissingPluginException {
       return false;
     }

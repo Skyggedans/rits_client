@@ -15,7 +15,9 @@ class MediaEntry extends Equatable {
   final bool isVideo;
   final bool isYoutube;
   final String downloadTaskId;
+  final String mimeType;
   final MediaEntryStatus status;
+  final int progress;
   //final Uint8List bytes;
 
   MediaEntry({
@@ -26,7 +28,9 @@ class MediaEntry extends Equatable {
     this.isVideo,
     this.isYoutube,
     this.downloadTaskId,
+    this.mimeType,
     this.status = MediaEntryStatus.online,
+    this.progress = 0,
   }) : super([
           fileName,
           localFileName,
@@ -35,7 +39,9 @@ class MediaEntry extends Equatable {
           isVideo,
           isYoutube,
           downloadTaskId,
+          mimeType,
           status,
+          progress,
         ]);
 
   factory MediaEntry.fromJson(Map<String, dynamic> json) {
@@ -55,7 +61,9 @@ class MediaEntry extends Equatable {
     String localFileName,
     String url,
     String downloadTaskId,
+    String mimeType,
     MediaEntryStatus status,
+    int progress,
   }) {
     return MediaEntry(
       fileName: fileName ?? this.fileName,
@@ -65,7 +73,9 @@ class MediaEntry extends Equatable {
       isVideo: this.isVideo,
       isYoutube: this.isYoutube,
       downloadTaskId: downloadTaskId ?? this.downloadTaskId,
+      mimeType: mimeType ?? this.mimeType,
       status: status ?? this.status,
+      progress: progress ?? this.progress,
     );
   }
 }

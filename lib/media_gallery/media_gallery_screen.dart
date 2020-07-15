@@ -83,7 +83,7 @@ class _MediaGalleryScreenState extends State {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Image Gallery'),
+        title: const Text('Media Gallery'),
       ),
       body: Center(
         child: BlocBuilder(
@@ -122,10 +122,11 @@ class _MediaGalleryScreenState extends State {
                           }
                         case MediaEntryStatus.download_in_progress:
                           {
-                            return const SizedBox(
+                            return SizedBox(
                                 width: 20,
                                 height: 20,
                                 child: CircularProgressIndicator(
+                                  value: entry.progress / 100,
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                       Colors.white),
                                 ));
@@ -156,10 +157,21 @@ class _MediaGalleryScreenState extends State {
                                   width: 140,
                                   height: 105,
                                   color: Colors.black,
+                                  // child: Column(
+                                  //   mainAxisAlignment: MainAxisAlignment.end,
+                                  //   children: [
+                                  //     Container(
+
+                                  //constraints: BoxConstraints.expand(),
                                   child: Icon(entry.isYoutube
                                       ? FontAwesomeIcons.youtube
                                       : Icons.video_library),
                                 ),
+                                //       LinearProgressIndicator(
+                                //           value: entry.progress / 100),
+                                //     ],
+                                //   ),
+                                // ),
                               )
                             : Image.network(
                                 entry.url,

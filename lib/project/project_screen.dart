@@ -342,7 +342,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                 },
                               ),
                               RaisedButton(
-                                child: Text('Show Image Gallery'),
+                                child: Text('Show Media Gallery'),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
@@ -351,13 +351,6 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                           MediaGalleryScreen(),
                                     ),
                                   );
-                                },
-                              ),
-                              RaisedButton(
-                                child: Text('Play Movie'),
-                                onPressed: () {
-                                  RwMovie.playUrl(
-                                      'https://content.uplynk.com/ext/1efe3bfc4d1e4b5db5e5085a535b510b/081816-ktrk-rff-spencer-tillman-vid_web.m3u8?ad._v=2&ad=ktrk_video&ad.preroll=&ad.fill_slate=1&ad.ametr=1');
                                 },
                               ),
                             ],

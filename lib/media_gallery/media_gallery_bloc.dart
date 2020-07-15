@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rits_client/app_context.dart';
 import 'package:rits_client/models/gallery/gallery_entry.dart';
 import 'package:rits_client/settings.dart' as settings;
@@ -31,6 +32,9 @@ class MediaGalleryBloc extends Bloc<MediaGalleryEvent, MediaGalleryState> {
   @override
   Stream<MediaGalleryState> mapEventToState(MediaGalleryEvent event) async* {
     final currentState = state;
+    final directory = await getExternalStorageDirectory();
+    final saveDirPath = join(directory.path, 'Documents', 'AdvisoryStudio',
+        appContext.sessionContext);
 
     if (event is FetchMedia) {
       try {
@@ -52,14 +56,23 @@ class MediaGalleryBloc extends Bloc<MediaGalleryEvent, MediaGalleryState> {
           action: 'action_view',
           data: Uri.encodeFull('file://' + event.entry.localFileName),
           flags: [0x10000000, 0x00000001],
-          //type: 'video/mp4',
+          type: 'video/mp4',
         );
 
         await intent.launch();
       } else {
-        final directory = await getExternalStorageDirectory();
-        final saveDirPath = join(directory.path, 'Documents', 'AdvisoryStudio',
-            appContext.sessionContext);
+        PermissionStatus permission = await PermissionHandler()
+            .checkPermissionStatus(PermissionGroup.storage);
+
+        if (permission != PermissionStatus.granted) {
+          final permissions = await PermissionHandler()
+              .requestPermissions([PermissionGroup.storage]);
+
+          if (permissions[PermissionGroup.storage] !=
+              PermissionStatus.granted) {
+            return;
+          }
+        }
 
         if (FileSystemEntity.typeSync(saveDirPath) ==
             FileSystemEntityType.notFound) {
@@ -96,9 +109,27 @@ class MediaGalleryBloc extends Bloc<MediaGalleryEvent, MediaGalleryState> {
 
       if (runningEntry != null && event.status == DownloadTaskStatus.complete) {
         final entryIdx = entries.indexOf(runningEntry);
+        // final downloadTask = (await FlutterDownloader.loadTasksWithRawQuery(
+        //     query: 'SELECT * FROM task WHERE task_id="${event.taskId}" LIMIT 1'))[0];
 
-        entries.replaceRange(entryIdx, entryIdx + 1,
-            [runningEntry.copyWith(status: MediaEntryStatus.offline)]);
+        entries.replaceRange(entryIdx, entryIdx + 1, [
+          runningEntry.copyWith(
+            localFileName: join(saveDirPath,
+                runningEntry.fileName + (runningEntry.isYoutube ? '.mp4' : '')),
+            status: MediaEntryStatus.offline,
+          )
+        ]);
+
+        yield MediaGalleryLoaded(entries: entries);
+      } else if (runningEntry != null &&
+          event.status == DownloadTaskStatus.running) {
+        final entryIdx = entries.indexOf(runningEntry);
+
+        entries.replaceRange(entryIdx, entryIdx + 1, [
+          runningEntry.copyWith(
+            progress: event.progress,
+          )
+        ]);
 
         yield MediaGalleryLoaded(entries: entries);
       }

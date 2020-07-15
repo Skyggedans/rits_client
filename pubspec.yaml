@@ -25,9 +25,9 @@ dependencies:
   memoize: 2.0.0
   logging_appenders: 0.4.1
   flutter_pdf_viewer:
-    path: ../flutter_pdf_viewer
-    # git:
-    #   url: https://github.com/Skyggedans/flutter_pdf_viewer.git
+    # path: ../flutter_pdf_viewer
+    git:
+      url: https://github.com/Skyggedans/flutter_pdf_viewer.git
   flutter_inappwebview: 3.1.0
   flutter_downloader: 1.4.4
   android_intent: 0.3.7+2
@@ -48,7 +48,9 @@ dependencies:
     path: ../rw_movie
     # git:
     #   url: https://github.com/Skyggedans/rw_movie.git
-
+  flutter_webview_plugin:
+    git:
+      url: https://github.com/Skyggedans/flutter_webview_plugin
 dev_dependencies:
   flutter_test:
     sdk: flutter
