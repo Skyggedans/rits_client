@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:core';
 
 import 'package:bloc/bloc.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
@@ -15,10 +17,12 @@ final _logger = Logger('auth');
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
+  final FirebaseAnalytics analytics;
 
-  AuthBloc({@required this.authRepository}) {
-    assert(authRepository != null);
-  }
+  AuthBloc({@required this.authRepository, @required this.analytics})
+      : assert(authRepository != null),
+        assert(analytics != null),
+        super();
 
   @override
   AuthState get initialState => AuthUninitialized();
@@ -40,6 +44,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await authRepository.deleteTokens();
       yield Unauthenticated();*/
     } else if (event is AccessTokenExpired) {
+      yield AuthReinitialized();
+
       add(Authenticate());
     }
   }
@@ -110,6 +116,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
                 Duration(seconds: tokenResponse['expires_in'] as int),
               ),
             );
+
+            analytics.logLogin();
 
             add(AccessGranted());
           } on AuthorizationPendingError catch (e) {

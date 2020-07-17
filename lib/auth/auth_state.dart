@@ -9,6 +9,11 @@ class AuthUninitialized extends AuthState {
   String toString() => 'AuthUninitialized';
 }
 
+class AuthReinitialized extends AuthState {
+  @override
+  String toString() => 'AuthReinitialized';
+}
+
 class AuthPending extends AuthState {
   final String userCode;
   final String verificationUrl;

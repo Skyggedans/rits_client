@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
@@ -26,10 +27,12 @@ final _appContext = AppContext();
 final _authProvider = AuthProvider();
 final _authRepository = AuthRepository(authProvider: _authProvider);
 final _restClient = RestClient(authRepository: _authRepository);
-final _authBloc = AuthBloc(authRepository: _authRepository);
+final _authBloc =
+    AuthBloc(authRepository: _authRepository, analytics: _analytics);
 final _viewObjectsRepository =
     ViewObjectsRepository(restClient: _restClient, appContext: _appContext);
 final _logger = Logger('main');
+final _analytics = FirebaseAnalytics();
 
 class _HttpOverrides extends HttpOverrides {
   @override
@@ -61,9 +64,11 @@ main() {
       ..attachToLogger(Logger.root);
   }
 
-  FlutterDownloader.initialize(
-    debug: true,
-  );
+  if (Platform.isAndroid || Platform.isIOS) {
+    FlutterDownloader.initialize(
+      debug: true,
+    );
+  }
 
   runApp(
     MultiProvider(
@@ -89,6 +94,7 @@ main() {
         Provider<ViewObjectsRepository>.value(
           value: _viewObjectsRepository,
         ),
+        Provider<FirebaseAnalytics>.value(value: _analytics),
       ],
       child: RitsApp(),
     ),
@@ -138,6 +144,10 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
             builder: (BuildContext context, AuthState state) {
               if (state is AuthUninitialized) {
                 return SplashScreen();
+              } else if (state is AuthReinitialized) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                });
               } else if (state is AuthPending) {
                 return AuthUserCodeScreen(
                   verificationUrl: state.verificationUrl,
@@ -196,5 +206,14 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
     }
 
     _logger.severe('${bloc.runtimeType}: $error, $stacktrace');
+
+    _analytics.logEvent(
+      name: 'Bloc Error',
+      parameters: {
+        'bloc': bloc.runtimeType,
+        'error': error,
+        'stacktrace': stacktrace,
+      },
+    );
   }
 }
