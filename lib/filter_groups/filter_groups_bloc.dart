@@ -17,10 +17,7 @@ class FilterGroupsBloc extends Bloc<FilterGroupsEvent, FilterGroupsState> {
   FilterGroupsBloc({@required this.restClient, @required this.appContext})
       : assert(restClient != null),
         assert(appContext != null),
-        super();
-
-  @override
-  get initialState => FilterGroupsInProgress();
+        super(FilterGroupsInProgress());
 
   @override
   Stream<FilterGroupsState> transformStates(Stream<FilterGroupsState> states) {

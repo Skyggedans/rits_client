@@ -23,25 +23,25 @@ class ScanBarcode extends ProjectEvent {
 }
 
 class SetContextFromBarCode extends ProjectEvent {
-  final String sessionContext;
+  final String content;
 
-  SetContextFromBarCode({@required this.sessionContext})
-      : assert(sessionContext != null),
-        super([sessionContext]);
+  SetContextFromBarCode({@required this.content})
+      : assert(content != null),
+        super([content]);
 
   @override
-  String toString() => 'SetContextFromString { context: $sessionContext }';
+  String toString() => 'SetContextFromString { context: $content }';
 }
 
 class SetContextFromSearch extends ProjectEvent {
-  final String sessionContext;
+  final String result;
 
-  SetContextFromSearch({@required this.sessionContext})
-      : assert(sessionContext != null),
-        super([sessionContext]);
+  SetContextFromSearch({@required this.result})
+      : assert(result != null),
+        super([result]);
 
   @override
-  String toString() => 'SetContextFromSearch { context: $sessionContext }';
+  String toString() => 'SetContextFromSearch { context: $result }';
 }
 
 class SetContextFromFilter extends ProjectEvent {

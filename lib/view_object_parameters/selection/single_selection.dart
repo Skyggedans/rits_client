@@ -45,7 +45,7 @@ class _SingleSelectionState extends State<SingleSelection> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder(
-      bloc: _bloc,
+      cubit: _bloc,
       builder: (BuildContext context, SelectionState state) {
         Widget bodyChild;
 
@@ -101,7 +101,7 @@ class _SelectionOptions extends StatelessWidget {
     final _bloc = Provider.of<SingleSelectionBloc>(context);
 
     return BlocBuilder(
-      bloc: _bloc,
+      cubit: _bloc,
       builder: (BuildContext context, SelectionState state) {
         if (state is SelectionOptionsLoaded) {
           return ListView.builder(

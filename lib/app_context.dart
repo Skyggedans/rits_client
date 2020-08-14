@@ -1,16 +1,32 @@
 import 'package:flutter/foundation.dart';
 import 'package:rits_client/models/projects/project.dart';
+import 'package:rits_client/settings.dart' as settings;
 
 class AppContext extends ChangeNotifier {
   Project _project;
   String _userToken;
-  String _sessionContext;
-  String _sessionContextName;
+  Map<String, dynamic> _sessionContext;
 
   Project get project => _project;
   String get userToken => _userToken;
-  String get sessionContext => _sessionContext;
-  String get sessionContextName => _sessionContextName;
+  Map<String, dynamic> get sessionContext => _sessionContext;
+
+  String get breadCrumbs => [
+        project.name,
+        ...(sessionContext != null
+            ? settings.breadcrumbsKeys.map((key) => sessionContext[key])
+            : [])
+      ].join(' > ');
+
+  String get observedItem => sessionContext != null
+      ? sessionContext[settings.observedItemKey] as String
+      : '';
+
+  String get hierarchyParam => sessionContext != null
+      ? sessionContext[settings.hierarchyParam] as String
+      : null;
+
+  bool get hasSessionContext => sessionContext != null;
 
   set project(Project value) {
     _project = value;
@@ -22,13 +38,8 @@ class AppContext extends ChangeNotifier {
     notifyListeners();
   }
 
-  set sessionContext(String value) {
+  set sessionContext(Map<String, dynamic> value) {
     _sessionContext = value;
-    notifyListeners();
-  }
-
-  set sessionContextName(String value) {
-    _sessionContextName = value;
     notifyListeners();
   }
 }

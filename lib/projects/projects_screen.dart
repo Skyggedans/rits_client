@@ -42,7 +42,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       ),
       body: Center(
         child: BlocBuilder(
-          bloc: _bloc,
+          cubit: _bloc,
           builder: (BuildContext context, ProjectsState state) {
             if (state is ProjectsUninitialized) {
               return CircularProgressIndicator();
@@ -69,7 +69,7 @@ class _ProjectButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<AppContext, ProjectsBloc>(
       builder: (context, appContext, projectsBloc, _) => BlocBuilder(
-        bloc: projectsBloc,
+        cubit: projectsBloc,
         builder: (BuildContext context, ProjectsState state) {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -79,7 +79,6 @@ class _ProjectButtons extends StatelessWidget {
                   onPressed: () async {
                     appContext.project = project;
                     appContext.sessionContext = null;
-                    appContext.sessionContextName = null;
 
                     await Navigator.push(
                       context,

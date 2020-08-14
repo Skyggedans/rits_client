@@ -21,16 +21,13 @@ class ViewObjectParametersBloc
     @required this.appContext,
   })  : assert(restClient != null),
         assert(appContext != null),
-        super();
+        super(ViewObjectParametersInProgress());
 
   @override
   Stream<ViewObjectParametersState> transformStates(
       Stream<ViewObjectParametersState> states) {
     return states.debounceTime(Duration(milliseconds: 50));
   }
-
-  @override
-  get initialState => ViewObjectParametersInProgress();
 
   @override
   Stream<ViewObjectParametersState> mapEventToState(

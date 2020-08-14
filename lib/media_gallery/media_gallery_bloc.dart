@@ -25,16 +25,14 @@ class MediaGalleryBloc extends Bloc<MediaGalleryEvent, MediaGalleryState> {
     @required this.appContext,
   })  : assert(restClient != null),
         assert(appContext != null),
-        super();
-
-  MediaGalleryState get initialState => MediaGalleryUninitialized();
+        super(MediaGalleryUninitialized());
 
   @override
   Stream<MediaGalleryState> mapEventToState(MediaGalleryEvent event) async* {
     final currentState = state;
     final directory = await getExternalStorageDirectory();
     final saveDirPath = join(directory.path, 'Documents', 'AdvisoryStudio',
-        appContext.sessionContext);
+        appContext.hierarchyParam);
 
     if (event is FetchMedia) {
       try {
@@ -162,7 +160,7 @@ class MediaGalleryBloc extends Bloc<MediaGalleryEvent, MediaGalleryState> {
 
   Future<List<MediaEntry>> _fetchGalleryEntries() async {
     final url =
-        '${settings.backendUrl}/GetGalleryFileList/${appContext.userToken}/False/${appContext.sessionContextName}';
+        '${settings.backendUrl}/GetGalleryFileList/${appContext.userToken}/False/${appContext.hierarchyParam}';
 
     final response = await restClient.get(url);
 
@@ -174,7 +172,7 @@ class MediaGalleryBloc extends Bloc<MediaGalleryEvent, MediaGalleryState> {
     final directory = await getExternalStorageDirectory();
 
     final dirPath = join(directory.path, 'Documents', 'AdvisoryStudio',
-        appContext.sessionContext);
+        appContext.hierarchyParam);
 
     final downloadTasks = await FlutterDownloader.loadTasks();
 

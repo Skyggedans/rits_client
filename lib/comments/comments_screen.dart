@@ -97,7 +97,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
       ),
       body: Center(
         child: BlocBuilder(
-          bloc: _bloc,
+          cubit: _bloc,
           builder: (BuildContext context, CommentsState state) {
             if (state is CommentsInProgress) {
               return CircularProgressIndicator();

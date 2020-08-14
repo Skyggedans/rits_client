@@ -42,7 +42,7 @@ class _FilterGroupsScreenState extends State<FilterGroupsScreen> {
       ),
       body: Center(
         child: BlocBuilder(
-          bloc: _bloc,
+          cubit: _bloc,
           builder: (BuildContext context, FilterGroupsState state) {
             if (state is FilterGroupsInProgress) {
               return CircularProgressIndicator();

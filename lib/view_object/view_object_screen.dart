@@ -47,7 +47,7 @@ abstract class ViewObjectScreenState<T extends ViewObjectBloc,
   @override
   Widget build(BuildContext context) {
     return BlocBuilder(
-        bloc: bloc,
+        cubit: bloc,
         builder: (BuildContext context, ViewObjectState state) {
           Widget bodyChild = SizedBox.shrink();
 

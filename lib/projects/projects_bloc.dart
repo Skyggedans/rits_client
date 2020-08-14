@@ -16,15 +16,12 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
 
   ProjectsBloc({@required this.restClient})
       : assert(restClient != null),
-        super();
+        super(ProjectsUninitialized());
 
   @override
   Stream<ProjectsState> transformStates(Stream<ProjectsState> states) {
     return states.debounceTime(Duration(milliseconds: 50));
   }
-
-  @override
-  get initialState => ProjectsUninitialized();
 
   @override
   Stream<ProjectsState> mapEventToState(ProjectsEvent event) async* {

@@ -17,10 +17,7 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
   CommentsBloc({@required this.restClient, @required this.appContext})
       : assert(restClient != null),
         assert(appContext != null),
-        super();
-
-  @override
-  get initialState => CommentsInProgress();
+        super(CommentsInProgress());
 
   @override
   Stream<CommentsState> transformStates(Stream<CommentsState> states) {

@@ -62,7 +62,7 @@ class _AssociatedDataItemScreenState extends ViewObjectScreenState<
   @override
   Widget build(BuildContext context) {
     return BlocBuilder(
-      bloc: bloc,
+      cubit: bloc,
       builder: (BuildContext context, ViewObjectState state) {
         Widget bodyChild;
         String title = viewObject.title ?? viewObject.name;

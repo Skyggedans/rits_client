@@ -25,10 +25,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     @required this.appContext,
   })  : assert(restClient != null),
         assert(appContext != null),
-        super();
-
-  @override
-  get initialState => ProjectLoading();
+        super(ProjectLoading());
 
   @override
   Stream<ProjectState> transformStates(Stream<ProjectState> states) {
@@ -56,72 +53,32 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 
         try {
           dynamic decodedResult = json.decode(result);
-          final levelName = await _setContextFromBarCode(
+
+          appContext.sessionContext = await _setContextFromBarCode(
               decodedResult['ritsData']['itemId'] as String);
 
-          if (levelName != null) {
-            appContext.sessionContext =
-                decodedResult['ritsData']['itemId'] as String;
-            appContext.sessionContextName = levelName;
-
-            yield ProjectLoaded();
-          } else {
-            yield ProjectError(message: 'Unable to set context');
-          }
+          yield ProjectLoaded();
         } on ApiError {
           yield ProjectError(message: 'Unrecognized bar code content: $result');
         }
-      }
-    } else if (event is SetContextFromBarCode) {
-      yield ProjectLoading();
-
-      try {
-        final levelName = await _setContextFromBarCode(event.sessionContext);
-
-        if (levelName != null) {
-          appContext.sessionContext = event.sessionContext;
-          appContext.sessionContextName = levelName;
-
-          yield ProjectLoaded();
-        } else {
-          yield ProjectError(message: 'Unable to set context');
-        }
-      } on ApiError {
-        yield ProjectError(
-            message: 'Unrecognized context: ${event.sessionContext}');
       }
     } else if (event is SetContextFromSearch) {
       yield ProjectLoading();
 
       try {
-        final levelName = await _setContextFromSearch(event.sessionContext);
+        appContext.sessionContext = await _setContextFromSearch(event.result);
 
-        if (levelName != null) {
-          appContext.sessionContext = event.sessionContext;
-          appContext.sessionContextName = levelName;
-
-          yield ProjectLoaded();
-        } else {
-          yield ProjectError(message: 'Unable to set context');
-        }
+        yield ProjectLoaded();
       } on ApiError {
-        yield ProjectError(
-            message: 'Unrecognized context: ${event.sessionContext}');
+        yield ProjectError(message: 'Unrecognized context: ${event.result}');
       }
     } else if (event is SetContextFromFilter) {
       yield ProjectLoading();
 
       try {
-        final levelName = await _setContextFromFilter(event.filter);
-
-        // if (levelName != null) {
-        appContext.sessionContext = event.filter.name;
-        appContext.sessionContextName = event.filter.fullName;
+        appContext.sessionContext = await _setContextFromFilter(event.filter);
 
         yield ProjectLoaded();
-        // } else {
-        //   yield ProjectError(message: 'Unable to set context');
-        // }
       } on ApiError {
         yield ProjectError(
             message: 'Unrecognized context: ${event.filter.name}');
@@ -187,35 +144,28 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     return json.decode(response.body) as String;
   }
 
-  Future<String> _setContextFromBarCode(String contextId) async {
+  Future<Map<String, dynamic>> _setContextFromBarCode(String contextId) async {
     final url =
         '${settings.backendUrl}/SetContextFromBarCode/${appContext.userToken}/${Uri.encodeFull(contextId)}';
     final response = await restClient.get(url);
 
-    return json.decode(response.body) as String;
+    return json.decode(response.body) as Map<String, dynamic>;
   }
 
-  Future<String> _setContextFromSearch(String context) async {
+  Future<Map<String, dynamic>> _setContextFromSearch(String context) async {
     final url =
         '${settings.backendUrl}/SetObservedItemContext/${appContext.userToken}/${Uri.encodeFull(context)}';
     final response = await restClient.get(url);
-    final body = json.decode(response.body);
 
-    return body['ResultData'] as String;
+    return json.decode(response.body) as Map<String, dynamic>;
   }
 
-  Future<String> _setContextFromFilter(Filter filter) async {
+  Future<Map<String, dynamic>> _setContextFromFilter(Filter filter) async {
     final url =
         '${settings.backendUrl}/SetObservedItemContext/${appContext.userToken}/${Uri.encodeFull(filter.name)}';
     final response = await restClient.get(url);
-    final body = json.decode(response.body);
 
-    return body['ResultData'] as String;
-  }
-
-  @override
-  void onError(Object error, StackTrace stacktrace) {
-    print(error);
+    return json.decode(response.body) as Map<String, dynamic>;
   }
 
   Future<void> _postPhoto(String filePath) async {

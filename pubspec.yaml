@@ -3,7 +3,7 @@ description: Advisory Studio Demo Application
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
   flutter:
@@ -14,14 +14,15 @@ dependencies:
   oauth2: 1.2.3
   datetime_picker_formfield: 0.1.8
   equatable: 0.2.3
-  flutter_bloc: 3.2.0
+  #flutter_bloc: 3.2.0
+  sealed_flutter_bloc: 6.0.0
   rxdart: 0.23.0
   path_provider: any
   sqflite: 1.1.0
   permission_handler: 3.1.0
   device_info: 0.4.0+2
   font_awesome_flutter: 8.8.1
-  provider: 4.0.1
+  provider: ^4.1.3
   memoize: 2.0.0
   logging_appenders: 0.4.1
   flutter_inappwebview: 3.1.0

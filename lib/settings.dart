@@ -1,5 +1,6 @@
 const backendUrl = 'https://appbuilder.rockwellits.com:8081/api/appbuilder';
 const luisUrl = 'https://appbuilder.rockwellits.com:8081/api/Luis';
+const qnaUrl = 'https://appbuilder.rockwellits.com:8081/api/QnAModule';
 const chartUrl = 'https://appbuilder.rockwellits.com';
 const reportUrl = 'https://appbuilder.rockwellits.com';
 const authUrl =
@@ -14,3 +15,7 @@ const luisConfig = {
   'host': 'https://ritsluis-authoring.cognitiveservices.azure.com/',
   'path': 'luis/api/v2.0'
 };
+
+const breadcrumbsKeys = ['Country', 'CompanyName'];
+const hierarchyParam = 'CustomerID';
+const observedItemKey = 'CompanyName';

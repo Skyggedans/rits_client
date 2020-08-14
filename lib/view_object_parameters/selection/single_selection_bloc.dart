@@ -20,15 +20,12 @@ class SingleSelectionBloc extends Bloc<SelectionEvent, SelectionState> {
     @required this.appContext,
   })  : assert(restClient != null),
         assert(appContext != null),
-        super();
+        super(SelectionOptionsUninitialized());
 
   @override
   Stream<SelectionState> transformStates(Stream<SelectionState> states) {
     return states.debounceTime(Duration(milliseconds: 50));
   }
-
-  @override
-  get initialState => SelectionOptionsUninitialized();
 
   @override
   Stream<SelectionState> mapEventToState(SelectionEvent event) async* {

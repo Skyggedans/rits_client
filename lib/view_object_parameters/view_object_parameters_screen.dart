@@ -52,7 +52,7 @@ class _ViewObjectParametersScreenState
       ),
       body: Center(
         child: BlocBuilder(
-          bloc: _bloc,
+          cubit: _bloc,
           builder: (BuildContext context, ViewObjectParametersState state) {
             if (state is ViewObjectParametersInProgress) {
               return CircularProgressIndicator();

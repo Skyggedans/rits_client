@@ -19,10 +19,7 @@ class MatchingItemsSearchBloc
     @required this.appContext,
   })  : assert(restClient != null),
         assert(appContext != null),
-        super();
-
-  @override
-  get initialState => MatchingItemsIdle();
+        super(MatchingItemsIdle());
 
   @override
   Stream<MatchingItemsSearchState> transformStates(
@@ -52,6 +49,6 @@ class MatchingItemsSearchBloc
     final response = await restClient.get(url);
     final body = json.decode(response.body) as Map<String, dynamic>;
 
-    return List<String>.from(body['ResultData'] as List);
+    return List<String>.from((body['ResultData'] ?? []) as List);
   }
 }

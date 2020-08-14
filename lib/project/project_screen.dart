@@ -16,6 +16,7 @@ import 'package:rits_client/matching_items_search/matching_items_search.dart';
 import 'package:rits_client/media_gallery/media_gallery_screen.dart';
 import 'package:rits_client/models/filter_groups/filter.dart';
 import 'package:rits_client/my_favorites/my_favorites_screen.dart';
+import 'package:rits_client/qna/qna_screen.dart';
 import 'package:rits_client/report/report.dart';
 import 'package:rits_client/tabular_data/tabular_data.dart';
 import 'package:rits_client/utils/rest_client.dart';
@@ -61,7 +62,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
   Widget build(BuildContext context) {
     return Consumer2<RestClient, AppContext>(
       builder: (context, restClient, appContext, __) => BlocBuilder(
-        bloc: _bloc,
+        cubit: _bloc,
         builder: (BuildContext context, ProjectState state) {
           String title = appContext.project.name;
           Widget bodyChild;
@@ -70,8 +71,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
           if (state is ProjectLoading) {
             bodyChild = CircularProgressIndicator();
           } else if (state is ProjectLoaded) {
-            title = appContext.sessionContextName != null
-                ? '${appContext.project.name} > ${(appContext.sessionContextName ?? '').split("|").join(" > ")}'
+            title = appContext.hasSessionContext
+                ? appContext.breadCrumbs
                 : appContext.project.name;
 
             bodyChild = Flex(
@@ -168,7 +169,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
 
                                   if (selectedContext != null) {
                                     _bloc.add(SetContextFromSearch(
-                                      sessionContext: selectedContext,
+                                      result: selectedContext,
                                     ));
                                   }
                                 },
@@ -179,12 +180,11 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   ),
                 ),
                 Visibility(
-                  visible: appContext.sessionContextName != null,
+                  visible: appContext.hasSessionContext,
                   child: Card(
                     child: Padding(
                       padding: EdgeInsets.all(10),
-                      child:
-                          Text('Observed item: ${appContext.sessionContext}'),
+                      child: Text('Observed item: ${appContext.observedItem}'),
                     ),
                   ),
                 ),
@@ -201,7 +201,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                             children: <Widget>[
                               Visibility(
                                 visible: _isRealWearDevice &&
-                                    appContext.sessionContextName != null,
+                                    appContext.hasSessionContext,
                                 maintainSize: false,
                                 child: RaisedButton(
                                   child: const Text('Take Photo'),
@@ -212,7 +212,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                               ),
                               Visibility(
                                 visible: _isRealWearDevice &&
-                                    appContext.sessionContextName != null,
+                                    appContext.hasSessionContext,
                                 maintainSize: false,
                                 child: RaisedButton(
                                   child: const Text('Record Video'),
@@ -291,7 +291,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                 },
                               ),
                               Visibility(
-                                visible: appContext.sessionContextName != null,
+                                visible: appContext.hasSessionContext,
                                 child: RaisedButton(
                                   child: const Text('Show Associated Data'),
                                   onPressed: () {
@@ -317,7 +317,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                 ),
                               ),
                               Visibility(
-                                visible: appContext.sessionContextName != null,
+                                visible: appContext.hasSessionContext,
                                 child: RaisedButton(
                                   child: const Text('Show Comments'),
                                   onPressed: () {
@@ -349,6 +349,17 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           MediaGalleryScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              RaisedButton(
+                                child: Text('Show QnA'),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => QnaScreen(),
                                     ),
                                   );
                                 },

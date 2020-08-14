@@ -19,10 +19,7 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
   LuisBloc({@required this.restClient, @required this.appContext})
       : assert(restClient != null),
         assert(appContext != null),
-        super();
-
-  @override
-  get initialState => LuisUninitialized();
+        super(LuisUninitialized());
 
   @override
   Stream<LuisState> transformStates(Stream<LuisState> states) {

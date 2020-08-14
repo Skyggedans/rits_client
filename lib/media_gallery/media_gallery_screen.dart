@@ -87,7 +87,7 @@ class _MediaGalleryScreenState extends State {
       ),
       body: Center(
         child: BlocBuilder(
-          bloc: _bloc,
+          cubit: _bloc,
           builder: (context, MediaGalleryState state) {
             if (state is MediaGalleryUninitialized) {
               return CircularProgressIndicator();

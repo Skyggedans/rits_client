@@ -22,10 +22,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({@required this.authRepository, @required this.analytics})
       : assert(authRepository != null),
         assert(analytics != null),
-        super();
-
-  @override
-  AuthState get initialState => AuthUninitialized();
+        super(AuthUninitialized());
 
   @override
   Stream<AuthState> mapEventToState(

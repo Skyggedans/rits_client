@@ -68,7 +68,7 @@ class _MatchingItemsSearchScreenState extends State<MatchingItemsSearchScreen> {
             ),
             Expanded(
               child: BlocBuilder(
-                bloc: _bloc,
+                cubit: _bloc,
                 builder:
                     (BuildContext context, MatchingItemsSearchState state) {
                   if (state is MatchingItemsSearchInProgress) {

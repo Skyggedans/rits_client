@@ -9,33 +9,48 @@ import 'tabular_data/tabular_data.dart';
 
 class Routes {
   static Map<String, WidgetBuilder> get() {
+    final reportScreenBuilder = (BuildContext context) {
+      final dynamic args = ModalRoute.of(context).settings.arguments;
+
+      return ReportScreen(viewObject: args['viewObject'] as ViewObject);
+    };
+
+    final chartScreenBuilder = (BuildContext context) {
+      final dynamic args = ModalRoute.of(context).settings.arguments;
+
+      return ChartScreen(viewObject: args['viewObject'] as ViewObject);
+    };
+
+    final tabularDataScreenBuilder = (BuildContext context) {
+      final dynamic args = ModalRoute.of(context).settings.arguments;
+
+      return TabularDataScreen(viewObject: args['viewObject'] as ViewObject);
+    };
+
+    final kpiScreenBuilder = (BuildContext context) {
+      final dynamic args = ModalRoute.of(context).settings.arguments;
+
+      return KpiScreen(viewObject: args['viewObject'] as ViewObject);
+    };
+
+    final associatedDataScreenBuilder = (BuildContext context) {
+      final dynamic args = ModalRoute.of(context).settings.arguments;
+
+      return AssociatedDataItemScreen(
+          viewObject: args['viewObject'] as ViewObject);
+    };
+
     final routes = <String, WidgetBuilder>{
-      ReportScreen.route: (BuildContext context) {
-        final dynamic args = ModalRoute.of(context).settings.arguments;
-
-        return ReportScreen(viewObject: args['viewObject'] as ViewObject);
-      },
-      ChartScreen.route: (BuildContext context) {
-        final dynamic args = ModalRoute.of(context).settings.arguments;
-
-        return ChartScreen(viewObject: args['viewObject'] as ViewObject);
-      },
-      TabularDataScreen.route: (BuildContext context) {
-        final dynamic args = ModalRoute.of(context).settings.arguments;
-
-        return TabularDataScreen(viewObject: args['viewObject'] as ViewObject);
-      },
-      KpiScreen.route: (BuildContext context) {
-        final dynamic args = ModalRoute.of(context).settings.arguments;
-
-        return KpiScreen(viewObject: args['viewObject'] as ViewObject);
-      },
-      AssociatedDataItemScreen.route: (BuildContext context) {
-        final dynamic args = ModalRoute.of(context).settings.arguments;
-
-        return AssociatedDataItemScreen(
-            viewObject: args['viewObject'] as ViewObject);
-      },
+      '/Reports': reportScreenBuilder,
+      ReportScreen.route: reportScreenBuilder,
+      '/Charts': chartScreenBuilder,
+      ChartScreen.route: chartScreenBuilder,
+      TabularDataScreen.route: tabularDataScreenBuilder,
+      KpiScreen.route: kpiScreenBuilder,
+      '/BusinessObjects': associatedDataScreenBuilder,
+      AssociatedDataItemScreen.route: associatedDataScreenBuilder,
+      '/InputForm': (context) =>
+          ErrorWidget.withDetails(message: 'Not implemented')
     };
 
     return routes;

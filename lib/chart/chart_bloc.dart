@@ -22,8 +22,8 @@ class ChartBloc extends ViewObjectBloc {
           viewObject: event.viewObject,
           url:
               '${settings.chartUrl}/Charts/ChartView?skypeBotToken=${appContext.userToken}&chart=${Uri.encodeFull(event.viewObject.name)}' +
-                  (appContext.sessionContextName != null
-                      ? '&hierarchy=${appContext.sessionContextName}'
+                  (appContext.hasSessionContext
+                      ? '&hierarchy=${appContext.hierarchyParam}'
                       : ''),
         );
       } on ApiError {

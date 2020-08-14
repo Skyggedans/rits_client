@@ -108,9 +108,9 @@ class RitsApp extends StatefulWidget {
   State<RitsApp> createState() => _RitsAppState();
 }
 
-class _RitsAppState extends State<RitsApp> with BlocDelegate {
+class _RitsAppState extends State<RitsApp> with BlocObserver {
   _RitsAppState() {
-    BlocSupervisor.delegate = this;
+    Bloc.observer = this;
   }
 
   @override
@@ -140,7 +140,7 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
           //showSemanticsDebugger: true,
           routes: Routes.get(),
           home: BlocBuilder<AuthBloc, AuthState>(
-            bloc: authenticationBloc,
+            cubit: authenticationBloc,
             builder: (BuildContext context, AuthState state) {
               if (state is AuthUninitialized) {
                 return SplashScreen();
@@ -196,7 +196,7 @@ class _RitsAppState extends State<RitsApp> with BlocDelegate {
   }
 
   @override
-  void onError(Bloc bloc, Object error, StackTrace stacktrace) {
+  void onError(Cubit bloc, Object error, StackTrace stacktrace) {
     super.onError(bloc, error, stacktrace);
 
     if (error is AccessDeniedError) {

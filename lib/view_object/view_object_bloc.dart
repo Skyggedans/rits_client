@@ -20,10 +20,7 @@ abstract class ViewObjectBloc extends Bloc<ViewObjectEvent, ViewObjectState> {
   ViewObjectBloc({@required this.restClient, @required this.appContext})
       : assert(restClient != null),
         assert(appContext != null),
-        super();
-
-  @override
-  get initialState => ViewObjectUninitialized();
+        super(ViewObjectUninitialized());
 
   @override
   Stream<ViewObjectState> transformStates(Stream<ViewObjectState> states) {

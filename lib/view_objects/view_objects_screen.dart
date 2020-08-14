@@ -69,7 +69,7 @@ class _ViewObjectsScreenState extends State<ViewObjectsScreen> {
       ),
       body: Center(
           child: BlocBuilder(
-        bloc: bloc,
+        cubit: bloc,
         builder: (BuildContext context, ViewObjectsState state) {
           if (state is ViewObjectsUninitialized) {
             return CircularProgressIndicator();
@@ -93,7 +93,7 @@ class _ViewObjectButtons extends StatelessWidget {
     final _bloc = Provider.of<ViewObjectsBloc>(context);
 
     return BlocBuilder(
-      bloc: _bloc,
+      cubit: _bloc,
       builder: (BuildContext context, ViewObjectsState state) {
         return Wrap(
           alignment: WrapAlignment.spaceAround,

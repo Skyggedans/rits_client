@@ -43,7 +43,7 @@ class _LuisScreenState extends State<LuisScreen> {
       ),
       body: Center(
           child: BlocBuilder(
-        bloc: _bloc,
+        cubit: _bloc,
         builder: (BuildContext context, LuisState state) {
           if (state is LuisUninitialized || state is UtteranceExecution) {
             return CircularProgressIndicator();

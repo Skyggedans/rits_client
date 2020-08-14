@@ -21,8 +21,8 @@ class ViewObjectsRepository<T extends ViewObject> {
         '${settings.backendUrl}/ViewObjects/${appContext.userToken}/$type';
     final response = await restClient.get(url);
 
-    final body =
-        List<Map<String, dynamic>>.from(json.decode(response.body) as List);
+    final body = List<Map<String, dynamic>>.from(
+        (json.decode(response.body) ?? []) as List);
 
     return body
         .map((reportJson) => ViewObject.fromJson(reportJson))
@@ -32,7 +32,7 @@ class ViewObjectsRepository<T extends ViewObject> {
 
   Future<List<T>> fetchHierarchyViewObjects(String type) async {
     final url =
-        '${settings.backendUrl}/Hierarchy/${appContext.userToken}/${appContext.sessionContextName}/$type';
+        '${settings.backendUrl}/Hierarchy/${appContext.userToken}/${appContext.hierarchyParam}/$type';
 
     final response = await restClient.get(url);
 

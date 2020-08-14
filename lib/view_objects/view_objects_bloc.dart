@@ -17,7 +17,7 @@ class ViewObjectsBloc extends Bloc<ViewObjectsEvent, ViewObjectsState> {
     @required this.appContext,
   })  : assert(viewObjectsRepository != null),
         assert(appContext != null),
-        super();
+        super(ViewObjectsUninitialized());
 
   @override
   Stream<ViewObjectsState> transformStates(Stream<ViewObjectsState> states) {
@@ -25,15 +25,12 @@ class ViewObjectsBloc extends Bloc<ViewObjectsEvent, ViewObjectsState> {
   }
 
   @override
-  get initialState => ViewObjectsUninitialized();
-
-  @override
   Stream<ViewObjectsState> mapEventToState(ViewObjectsEvent event) async* {
     if (event is FetchViewObjects) {
       try {
         if (state is ViewObjectsUninitialized) {
           final viewObjects = !event.favorite
-              ? (appContext.sessionContextName?.isNotEmpty == true
+              ? (appContext.hasSessionContext
                   ? await viewObjectsRepository
                       .fetchHierarchyViewObjects(event.type)
                   : await viewObjectsRepository.fetchViewObjects(event.type))
