@@ -7,12 +7,14 @@ import 'package:flutter/foundation.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_stetho/flutter_stetho.dart';
 import 'package:logging/logging.dart';
 import 'package:logging_appenders/logging_appenders.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 import 'package:rits_client/app_config.dart';
 import 'package:rits_client/app_context.dart';
+import 'package:rits_client/navigation_service.dart';
 import 'package:rits_client/view_objects/view_objects.dart';
 import 'package:flutter/services.dart';
 
@@ -31,6 +33,7 @@ final _authBloc =
     AuthBloc(authRepository: _authRepository, analytics: _analytics);
 final _viewObjectsRepository =
     ViewObjectsRepository(restClient: _restClient, appContext: _appContext);
+final _navigationService = NavigationService();
 final _logger = Logger('main');
 final _analytics = FirebaseAnalytics();
 
@@ -53,6 +56,7 @@ main() {
   }
 
   Provider.debugCheckInvalidValueType = null;
+  Stetho.initialize();
   HttpOverrides.global = _HttpOverrides();
 
   Logger.root.level = Level.ALL;
@@ -93,6 +97,9 @@ main() {
         ),
         Provider<ViewObjectsRepository>.value(
           value: _viewObjectsRepository,
+        ),
+        Provider<NavigationService>.value(
+          value: _navigationService,
         ),
         Provider<FirebaseAnalytics>.value(value: _analytics),
       ],
@@ -139,6 +146,7 @@ class _RitsAppState extends State<RitsApp> with BlocObserver {
         return MaterialApp(
           //showSemanticsDebugger: true,
           routes: Routes.get(),
+          navigatorKey: _navigationService.navigatorKey,
           home: BlocBuilder<AuthBloc, AuthState>(
             cubit: authenticationBloc,
             builder: (BuildContext context, AuthState state) {

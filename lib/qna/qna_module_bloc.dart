@@ -55,7 +55,7 @@ class QnaModuleBloc extends Bloc<QnaEvent, QnaState> {
 
             break;
           case QnaResponseStatus.done:
-            yield QnaComplete();
+            yield QnaComplete(text: prompt);
 
             break;
           default:

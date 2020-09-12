@@ -30,7 +30,7 @@ class QnaPrompt extends QnaState {
     @required this.text,
     @required this.isFirst,
     this.items,
-  }) : super([text, items]);
+  }) : super([text, isFirst, items]);
 
   @override
   String toString() =>
@@ -38,8 +38,14 @@ class QnaPrompt extends QnaState {
 }
 
 class QnaComplete extends QnaState {
+  final String text;
+
+  QnaComplete({
+    @required this.text,
+  }) : super([text]);
+
   @override
-  String toString() => 'QnaComplete';
+  String toString() => 'QnaComplete { text: ${text} }';
 }
 
 class QnaError extends QnaState {

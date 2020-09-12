@@ -9,28 +9,29 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^0.1.2
-  http: 0.12.0+1
-  oauth2: 1.2.3
-  datetime_picker_formfield: 0.1.8
-  equatable: 0.2.3
   #flutter_bloc: 3.2.0
-  sealed_flutter_bloc: 6.0.0
-  rxdart: 0.23.0
-  path_provider: any
-  sqflite: 1.1.0
-  permission_handler: 3.1.0
-  device_info: 0.4.0+2
-  font_awesome_flutter: 8.8.1
-  provider: ^4.1.3
-  memoize: 2.0.0
-  logging_appenders: 0.4.1
-  flutter_inappwebview: 3.1.0
-  flutter_downloader: 1.4.4
   android_intent: 0.3.7+2
   badges: 1.1.1
-  firebase_core: ^0.4.0+9
+  cupertino_icons: ^0.1.2
+  datetime_picker_formfield: 0.1.8
+  device_info: 0.4.0+2
+  equatable: 0.2.3
   firebase_analytics: ^5.0.2
+  firebase_core: ^0.4.0+9
+  flutter_downloader: 1.4.4
+  flutter_inappwebview: 3.1.0
+  flutter_stetho: 0.5.2
+  font_awesome_flutter: 8.8.1
+  http: 0.12.0+1
+  logging_appenders: 0.4.1
+  memoize: 2.0.0
+  oauth2: 1.2.3
+  path_provider: any
+  permission_handler: 3.1.0
+  provider: ^4.1.3
+  rxdart: 0.23.0
+  sealed_flutter_bloc: 6.0.0
+  sqflite: 1.1.0
   flutter_pdf_viewer:
     # path: ../flutter_pdf_viewer
     git:

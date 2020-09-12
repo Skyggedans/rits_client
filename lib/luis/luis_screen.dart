@@ -3,9 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 import 'package:rits_client/app_context.dart';
-import 'package:rits_client/kpi/kpi.dart';
-import 'package:rits_client/utils/rest_client.dart';
 import 'package:rits_client/auth/auth_repository.dart';
+import 'package:rits_client/kpi/kpi.dart';
+import 'package:rits_client/navigation_service.dart';
+import 'package:rits_client/utils/rest_client.dart';
 
 import 'luis.dart';
 
@@ -25,6 +26,7 @@ class _LuisScreenState extends State<LuisScreen> {
       _bloc = LuisBloc(
         restClient: Provider.of<RestClient>(context),
         appContext: Provider.of<AppContext>(context),
+        navigationService: Provider.of<NavigationService>(context),
       )..add(LoadLuisProject());
     }
   }
@@ -94,6 +96,15 @@ class _LuisScreenState extends State<LuisScreen> {
             } else {
               return const Text('No data');
             }
+            // } else if (state is UtteranceExecutedWithQnA) {
+            //   WidgetsBinding.instance.addPostFrameCallback((_) {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) => QnaModuleScreen(qnaName: state.qnaName),
+            //       ),
+            //     );
+            //   });
           }
 
           return const Text('Failed to start LUIS');

@@ -128,7 +128,7 @@ class _QnaModuleScreenState extends State<QnaModuleScreen> {
                     }))
                   ]);
                 } else if (state is QnaComplete) {
-                  return const Text('QnA session is done');
+                  return Text(state.text);
                 } else {
                   return const Text('');
                 }

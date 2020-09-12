@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 import 'package:rits_client/app_context.dart';
 import 'package:rits_client/models/kpi/kpi.dart';
+import 'package:rits_client/navigation_service.dart';
+import 'package:rits_client/qna/qna.dart';
 import 'package:rits_client/settings.dart' as settings;
 import 'package:rits_client/utils/rest_client.dart';
 import 'package:rxdart/rxdart.dart';
@@ -15,10 +17,15 @@ import 'luis.dart';
 class LuisBloc extends Bloc<LuisEvent, LuisState> {
   final RestClient restClient;
   final AppContext appContext;
+  final NavigationService navigationService;
 
-  LuisBloc({@required this.restClient, @required this.appContext})
-      : assert(restClient != null),
+  LuisBloc({
+    @required this.restClient,
+    @required this.appContext,
+    @required this.navigationService,
+  })  : assert(restClient != null),
         assert(appContext != null),
+        assert(navigationService != null),
         super(LuisUninitialized());
 
   @override
@@ -28,6 +35,8 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
 
   @override
   Stream<LuisState> mapEventToState(LuisEvent event) async* {
+    final prevState = state;
+
     if (event is LoadLuisProject) {
       try {
         final luisAppId = await _getLuisProjectId();
@@ -46,7 +55,22 @@ class LuisBloc extends Bloc<LuisEvent, LuisState> {
         );
 
         if (response.containsKey('url')) {
-          yield UtteranceExecutedWithUrl(url: response['url'] as String);
+          final url = response['url'] as String;
+
+          if (url.startsWith('runqna=true')) {
+            final qnaNameParam = url
+                .split(',')
+                .firstWhere((param) => param.startsWith('qnaname'));
+            final qnaName = qnaNameParam?.split('=')[1];
+
+            if (qnaName != null) {
+              navigationService.navigateTo(QnaModuleScreen(qnaName: qnaName));
+            }
+
+            yield prevState;
+          } else {
+            yield UtteranceExecutedWithUrl(url: response['url'] as String);
+          }
         } else if (response.containsKey('ViewType') &&
             response['ViewType']?.toString()?.toLowerCase() == 'kpis' &&
             response.containsKey('ViewItemDetails')) {
